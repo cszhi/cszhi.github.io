@@ -21,6 +21,8 @@
 
 
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
 
 
 <script id="hexo-configurations">
@@ -342,7 +344,7 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\03\11\Linux下大文件跨网传输的方法\" rel="bookmark">Linux下大文件跨网传输的方法</a></div>
+      <div class="popular-posts-title"><a href="\2012\04\25\TCP连接状态详解及TIME_WAIT过多的解决方法\" rel="bookmark">TCP连接状态详解及TIME_WAIT过多的解决方法</a></div>
       
     </li>
   
@@ -404,8 +406,8 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/" rel="next" title="使用mod_limitipconn模块限制IP并发连接数">
-                  <i class="fa fa-chevron-left"></i> 使用mod_limitipconn模块限制IP并发连接数
+                <a href="/2012/03/11/Linux下大文件跨网传输的方法/" rel="next" title="Linux下大文件跨网传输的方法">
+                  <i class="fa fa-chevron-left"></i> Linux下大文件跨网传输的方法
                 </a>
               
             </div>
@@ -414,8 +416,8 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2012/03/11/Linux下大文件跨网传输的方法/" rel="prev" title="Linux下大文件跨网传输的方法">
-                  Linux下大文件跨网传输的方法 <i class="fa fa-chevron-right"></i>
+                <a href="/2012/03/12/rsync简明教程/" rel="prev" title="rsync简明教程">
+                  rsync简明教程 <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -579,7 +581,7 @@
 
         
 <div class="busuanzi-count">
-  <script pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     <span class="post-meta-item-icon">
       <i class="fa fa-user"></i>
     </span>
@@ -618,62 +620,11 @@
 
 
   <script src="/lib/anime.min.js?v=3.1.0"></script>
-  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
   <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
 <script src="/js/utils.js?v=7.4.0"></script>
 <script src="/js/schemes/pisces.js?v=7.4.0"></script>
 
 <script src="/js/next-boot.js?v=7.4.0"></script>
-  <script>
-var pjax = new Pjax({
-  selectors: [
-    'head title',
-    '#page-configurations',
-    '.content-wrap',
-    '.post-toc-wrap',
-    '#pjax'
-  ],
-  switches: {
-    '.post-toc-wrap': Pjax.switches.innerHTML
-  },
-  analytics: false,
-  cacheBust: false,
-  scrollTo : !CONFIG.bookmark.enable
-});
-
-window.addEventListener('pjax:success', () => {
-  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
-    var id = element.id || '';
-    var src = element.src || '';
-    var code = element.text || element.textContent || element.innerHTML || '';
-    var parent = element.parentNode;
-    parent.removeChild(element);
-    var script = document.createElement('script');
-    if (id !=='') {
-      script.id = element.id;
-    }
-    if (src !== '') {
-      script.src = src;
-      // Force synchronous loading of peripheral JS.
-      script.async = false;
-    }
-    if (code !== '') {
-      script.appendChild(document.createTextNode(code));
-    }
-    parent.appendChild(script);
-  });
-  NexT.boot.refresh();
-  // Define Motion Sequence & Bootstrap Motion.
-  if (CONFIG.motion.enable) {
-    NexT.motion.integrator
-      .init()
-      .add(NexT.motion.middleWares.postList)
-      .bootstrap();
-  }
-  NexT.utils.updateSidebarPosition();
-});
-</script>
-
 
 
 
@@ -700,7 +651,6 @@ window.addEventListener('pjax:success', () => {
 
 
 
-    <div id="pjax">
 
   
 
@@ -727,6 +677,5 @@ window.addEventListener('pjax:success', () => {
   }, window.Gitalk);
 </script>
 
-    </div>
 </body>
 </html>

@@ -21,6 +21,8 @@
 
 
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
 
 
 <script id="hexo-configurations">
@@ -348,7 +350,7 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\04\22\简单的系统监控脚本\" rel="bookmark">简单的系统监控脚本</a></div>
+      <div class="popular-posts-title"><a href="\2012\10\30\脚本实现实时显示linux网络流量\" rel="bookmark">脚本实现实时显示linux网络流量</a></div>
       
     </li>
   
@@ -356,13 +358,6 @@
       
       
       <div class="popular-posts-title"><a href="\2013\05\19\开发自己的监控系统一、email篇\" rel="bookmark">开发自己的监控系统一、email篇</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2013\06\08\linux多线程网页截图-shell\" rel="bookmark">linux多线程网页截图-shell</a></div>
       
     </li>
   
@@ -384,6 +379,13 @@
       
       
       <div class="popular-posts-title"><a href="\2012\06\25\工作中常用的shell命令\" rel="bookmark">工作中常用的shell命令</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\04\22\简单的系统监控脚本\" rel="bookmark">简单的系统监控脚本</a></div>
       
     </li>
   
@@ -410,8 +412,8 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2012/05/10/MySQL备份方法总结/" rel="next" title="MySQL备份方法总结">
-                  <i class="fa fa-chevron-left"></i> MySQL备份方法总结
+                <a href="/2012/05/08/iptables范例/" rel="next" title="iptables范例">
+                  <i class="fa fa-chevron-left"></i> iptables范例
                 </a>
               
             </div>
@@ -420,8 +422,8 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2012/05/10/iptables模块介绍：recent/" rel="prev" title="iptables模块介绍：recent">
-                  iptables模块介绍：recent <i class="fa fa-chevron-right"></i>
+                <a href="/2012/05/10/MySQL备份方法总结/" rel="prev" title="MySQL备份方法总结">
+                  MySQL备份方法总结 <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -585,7 +587,7 @@
 
         
 <div class="busuanzi-count">
-  <script pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     <span class="post-meta-item-icon">
       <i class="fa fa-user"></i>
     </span>
@@ -624,62 +626,11 @@
 
 
   <script src="/lib/anime.min.js?v=3.1.0"></script>
-  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
   <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
 <script src="/js/utils.js?v=7.4.0"></script>
 <script src="/js/schemes/pisces.js?v=7.4.0"></script>
 
 <script src="/js/next-boot.js?v=7.4.0"></script>
-  <script>
-var pjax = new Pjax({
-  selectors: [
-    'head title',
-    '#page-configurations',
-    '.content-wrap',
-    '.post-toc-wrap',
-    '#pjax'
-  ],
-  switches: {
-    '.post-toc-wrap': Pjax.switches.innerHTML
-  },
-  analytics: false,
-  cacheBust: false,
-  scrollTo : !CONFIG.bookmark.enable
-});
-
-window.addEventListener('pjax:success', () => {
-  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
-    var id = element.id || '';
-    var src = element.src || '';
-    var code = element.text || element.textContent || element.innerHTML || '';
-    var parent = element.parentNode;
-    parent.removeChild(element);
-    var script = document.createElement('script');
-    if (id !=='') {
-      script.id = element.id;
-    }
-    if (src !== '') {
-      script.src = src;
-      // Force synchronous loading of peripheral JS.
-      script.async = false;
-    }
-    if (code !== '') {
-      script.appendChild(document.createTextNode(code));
-    }
-    parent.appendChild(script);
-  });
-  NexT.boot.refresh();
-  // Define Motion Sequence & Bootstrap Motion.
-  if (CONFIG.motion.enable) {
-    NexT.motion.integrator
-      .init()
-      .add(NexT.motion.middleWares.postList)
-      .bootstrap();
-  }
-  NexT.utils.updateSidebarPosition();
-});
-</script>
-
 
 
 
@@ -706,7 +657,6 @@ window.addEventListener('pjax:success', () => {
 
 
 
-    <div id="pjax">
 
   
 
@@ -733,6 +683,5 @@ window.addEventListener('pjax:success', () => {
   }, window.Gitalk);
 </script>
 
-    </div>
 </body>
 </html>
