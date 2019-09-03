@@ -65,12 +65,10 @@
 <meta property="og:site_name" content="csz&#39;s blog">
 <meta property="og:description" content="&amp;#x6982;&amp;#x5FF5;MySQL&amp;#x7684;&amp;#x6162;&amp;#x67E5;&amp;#x8BE2;&amp;#xFF0C;&amp;#x5168;&amp;#x540D;&amp;#x662F;&amp;#x6162;&amp;#x67E5;&amp;#x8BE2;&amp;#x65E5;&amp;#x5FD7;&amp;#xFF0C;&amp;#x662F;MySQL&amp;#x63D0;&amp;#x4F9B;&amp;#x7684;&amp;#x4E00;&amp;#x79CD;&amp;#x65E5;&amp;#x5FD">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://blogs.cszhi.com/2014/02/21/mysql慢查询/d:%5CDocuments%5CMarkDown%5Cimages%5C1566439768376.png">
 <meta property="og:updated_time" content="2014-02-20T16:00:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mysql慢查询">
 <meta name="twitter:description" content="&amp;#x6982;&amp;#x5FF5;MySQL&amp;#x7684;&amp;#x6162;&amp;#x67E5;&amp;#x8BE2;&amp;#xFF0C;&amp;#x5168;&amp;#x540D;&amp;#x662F;&amp;#x6162;&amp;#x67E5;&amp;#x8BE2;&amp;#x65E5;&amp;#x5FD7;&amp;#xFF0C;&amp;#x662F;MySQL&amp;#x63D0;&amp;#x4F9B;&amp;#x7684;&amp;#x4E00;&amp;#x79CD;&amp;#x65E5;&amp;#x5FD">
-<meta name="twitter:image" content="http://blogs.cszhi.com/2014/02/21/mysql慢查询/d:%5CDocuments%5CMarkDown%5Cimages%5C1566439768376.png">
   <link rel="canonical" href="http://blogs.cszhi.com/2014/02/21/mysql慢查询/">
 
 
@@ -314,7 +312,7 @@
               
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               
-              <span></span>
+              <span>2:30</span>
             </span>
           
 
@@ -523,7 +521,6 @@ range checked for eache record(index map:N)&#xFF1A;&#x6CA1;&#x6709;&#x597D;&#x76
 <h5 id="innodb-log-buffer-size"><a href="#innodb-log-buffer-size" class="headerlink" title="innodb_log_buffer_size"></a>innodb_log_buffer_size</h5><p>log&#x7F13;&#x5B58;&#x5927;&#x5C0F;&#xFF0C;&#x4E00;&#x822C;&#x4E3A;1-8M&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;1M&#xFF0C;&#x5BF9;&#x4E8E;&#x8F83;&#x5927;&#x7684;&#x4E8B;&#x52A1;&#xFF0C;&#x53EF;&#x4EE5;&#x589E;&#x5927;&#x7F13;&#x5B58;&#x5927;&#x5C0F;&#x3002;<br>&#x53EF;&#x8BBE;&#x7F6E;&#x4E3A;4M&#x6216;8M&#x3002;</p>
 <h5 id="innodb-additional-mem-pool-size"><a href="#innodb-additional-mem-pool-size" class="headerlink" title="innodb_additional_mem_pool_size"></a>innodb_additional_mem_pool_size</h5><p>&#x8BE5;&#x53C2;&#x6570;&#x6307;&#x5B9A;InnoDB&#x7528;&#x6765;&#x5B58;&#x50A8;&#x6570;&#x636E;&#x5B57;&#x5178;&#x548C;&#x5176;&#x4ED6;&#x5185;&#x90E8;&#x6570;&#x636E;&#x7ED3;&#x6784;&#x7684;&#x5185;&#x5B58;&#x6C60;&#x5927;&#x5C0F;&#x3002;&#x7F3A;&#x7701;&#x503C;&#x662F;1M&#x3002;&#x901A;&#x5E38;&#x4E0D;&#x7528;&#x592A;&#x5927;&#xFF0C;&#x53EA;&#x8981;&#x591F;&#x7528;&#x5C31;&#x884C;&#xFF0C;&#x5E94;&#x8BE5;&#x4E0E;&#x8868;&#x7ED3;&#x6784;&#x7684;&#x590D;&#x6742;&#x5EA6;&#x6709;&#x5173;&#x7CFB;&#x3002;&#x5982;&#x679C;&#x4E0D;&#x591F;&#x7528;&#xFF0C;MySQL&#x4F1A;&#x5728;&#x9519;&#x8BEF;&#x65E5;&#x5FD7;&#x4E2D;&#x5199;&#x5165;&#x4E00;&#x6761;&#x8B66;&#x544A;&#x4FE1;&#x606F;&#x3002;<br>&#x6839;&#x636E;MySQL&#x624B;&#x518C;&#xFF0C;&#x5BF9;&#x4E8E;2G&#x5185;&#x5B58;&#x7684;&#x673A;&#x5668;&#xFF0C;&#x63A8;&#x8350;&#x503C;&#x662F;20M&#xFF0C;&#x53EF;&#x9002;&#x5F53;&#x589E;&#x52A0;&#x3002;</p>
 <h5 id="innodb-thread-concurrency-8"><a href="#innodb-thread-concurrency-8" class="headerlink" title="innodb_thread_concurrency=8"></a>innodb_thread_concurrency=8</h5><p>&#x63A8;&#x8350;&#x8BBE;&#x7F6E;&#x4E3A; 2*(NumCPUs+NumDisks)&#xFF0C;&#x9ED8;&#x8BA4;&#x4E00;&#x822C;&#x4E3A;8</p>
-<p><img src="/2014/02/21/mysql&#x6162;&#x67E5;&#x8BE2;/d:%5CDocuments%5CMarkDown%5Cimages%5C1566439768376.png" alt="1566439768376"></p>
 <h3 id="&#x8BBE;&#x7F6E;innodb-buffer-pool-size&#x5927;&#x5C0F;"><a href="#&#x8BBE;&#x7F6E;innodb-buffer-pool-size&#x5927;&#x5C0F;" class="headerlink" title="&#x8BBE;&#x7F6E;innodb_buffer_pool_size&#x5927;&#x5C0F;"></a>&#x8BBE;&#x7F6E;innodb_buffer_pool_size&#x5927;&#x5C0F;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show global variables like &apos;innodb_buffer_pool_size&apos;;</span><br><span class="line">+-------------------------+-----------+</span><br><span class="line">| Variable_name           | Value     |</span><br><span class="line">+-------------------------+-----------+</span><br><span class="line">| innodb_buffer_pool_size | 134217728 |</span><br><span class="line">+-------------------------+-----------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
 
 <p>&#x90A3;&#x4E48;&#x5982;&#x4F55;&#x8BBE;&#x7F6E;&#x8BE5;&#x53C2;&#x6570;&#x5927;&#x5C0F;&#x5462;&#xFF1F;&#x9996;&#x5148;&#x67E5;&#x770B;&#x8FD0;&#x884C;&#x65F6;buffer pool&#x76F8;&#x5173;&#x6570;&#x636E;&#x6307;&#x6807;&#xFF1A;</p>
@@ -551,6 +548,37 @@ range checked for eache record(index map:N)&#xFF1A;&#x6CA1;&#x6709;&#x597D;&#x76
     
     
       
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\05\10\MySQL备份方法总结\" rel="bookmark">MySQL备份方法总结</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\05\08\MySQL忘记root密码后强制修改密码的方法\" rel="bookmark">MySQL忘记root密码后强制修改密码的方法</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2019\08\29\mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解\" rel="bookmark">mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解</a></div>
+      
+    </li>
+  
+  </ul>
 
         
       
@@ -735,12 +763,12 @@ range checked for eache record(index map:N)&#xFF1A;&#x6CA1;&#x6709;&#x597D;&#x76
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数"></span>
+    <span title="站点总字数">256k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长"></span>
+    <span title="站点阅读时长">10:39</span>
 </div>
 
         
