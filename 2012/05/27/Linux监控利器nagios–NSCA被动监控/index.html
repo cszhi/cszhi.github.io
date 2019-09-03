@@ -58,19 +58,19 @@
 </script>
 
   <meta name="description" content="&amp;#x524D;&amp;#x8A00;PS&amp;#xFF1A;&amp;#x5173;&amp;#x4E8E;nagios&amp;#x7684;&amp;#x88AB;&amp;#x52A8;&amp;#x76D1;&amp;#x63A7;&amp;#xFF08;nsca&amp;#xFF09;&amp;#x597D;&amp;#x51E0;&amp;#x4E2A;&amp;#x6708;&amp;#x524D;&amp;#x5C31;&amp;#x60F3;&amp;#x6574;&amp;#x7406;&amp;#x4E86;&amp;#xFF0C;&amp;#x6">
-<meta name="keywords" content="linux,monitor">
+<meta name="keywords" content="monitor,linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux监控利器nagios–NSCA被动监控">
 <meta property="og:url" content="http://blogs.cszhi.com/2012/05/27/Linux监控利器nagios–NSCA被动监控/index.html">
 <meta property="og:site_name" content="csz&#39;s blog">
 <meta property="og:description" content="&amp;#x524D;&amp;#x8A00;PS&amp;#xFF1A;&amp;#x5173;&amp;#x4E8E;nagios&amp;#x7684;&amp;#x88AB;&amp;#x52A8;&amp;#x76D1;&amp;#x63A7;&amp;#xFF08;nsca&amp;#xFF09;&amp;#x597D;&amp;#x51E0;&amp;#x4E2A;&amp;#x6708;&amp;#x524D;&amp;#x5C31;&amp;#x60F3;&amp;#x6574;&amp;#x7406;&amp;#x4E86;&amp;#xFF0C;&amp;#x6">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://i1148.photobucket.com/albums/o572/cszhi/blog/nsca.png">
-<meta property="og:updated_time" content="2019-09-03T08:05:05.268Z">
+<meta property="og:image" content="http://blogs.cszhi.com/2012/05/27/Linux监控利器nagios–NSCA被动监控/1567519196048.png">
+<meta property="og:updated_time" content="2019-09-03T13:59:58.195Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux监控利器nagios–NSCA被动监控">
 <meta name="twitter:description" content="&amp;#x524D;&amp;#x8A00;PS&amp;#xFF1A;&amp;#x5173;&amp;#x4E8E;nagios&amp;#x7684;&amp;#x88AB;&amp;#x52A8;&amp;#x76D1;&amp;#x63A7;&amp;#xFF08;nsca&amp;#xFF09;&amp;#x597D;&amp;#x51E0;&amp;#x4E2A;&amp;#x6708;&amp;#x524D;&amp;#x5C31;&amp;#x60F3;&amp;#x6574;&amp;#x7406;&amp;#x4E86;&amp;#xFF0C;&amp;#x6">
-<meta name="twitter:image" content="http://i1148.photobucket.com/albums/o572/cszhi/blog/nsca.png">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2012/05/27/Linux监控利器nagios–NSCA被动监控/1567519196048.png">
   <link rel="canonical" href="http://blogs.cszhi.com/2012/05/27/Linux监控利器nagios–NSCA被动监控/">
 
 
@@ -357,7 +357,7 @@
 
 <h3 id="&#x6D4B;&#x8BD5;&#x53D1;&#x9001;&#x6570;&#x636E;&#x7ED9;&#x88AB;&#x52A8;&#x76D1;&#x6D4B;&#x670D;&#x52A1;&#xFF1A;"><a href="#&#x6D4B;&#x8BD5;&#x53D1;&#x9001;&#x6570;&#x636E;&#x7ED9;&#x88AB;&#x52A8;&#x76D1;&#x6D4B;&#x670D;&#x52A1;&#xFF1A;" class="headerlink" title="&#x6D4B;&#x8BD5;&#x53D1;&#x9001;&#x6570;&#x636E;&#x7ED9;&#x88AB;&#x52A8;&#x76D1;&#x6D4B;&#x670D;&#x52A1;&#xFF1A;"></a><strong>&#x6D4B;&#x8BD5;&#x53D1;&#x9001;&#x6570;&#x636E;&#x7ED9;&#x88AB;&#x52A8;&#x76D1;&#x6D4B;&#x670D;&#x52A1;&#xFF1A;</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;localhost;NSCA;0;testOK&quot;</span>|./send_nsca -H 127.0.0.1 -d <span class="string">&quot;;&quot;</span> -c /root/send_nsca.cfg</span><br></pre></td></tr></table></figure>
 
-<p>&#x901A;&#x8FC7;&#x7BA1;&#x9053;&#x5C06;&#x6570;&#x636E;&#x4F20;&#x7ED9;send_nsca&#x7A0B;&#x5E8F;&#xFF0C;send nsca&#x518D;&#x5C06;&#x6570;&#x636E;&#x53D1;&#x9001;&#x5230;nsca&#x670D;&#x52A1;&#xFF0C;&#x5176;&#x4E2D;localhost&#x662F;nsca&#x76D1;&#x542C;&#x7684;&#x4E3B;&#x673A;&#x540D;&#xFF0C;NSCA&#x662F;Nagios&#x4E2D;&#x5B9A;&#x4E49;&#x7684;&#x88AB;&#x52A8;&#x76D1;&#x6D4B;&#x670D;&#x52A1;&#x7684;&#x540D;&#x5B57;&#xFF0C;0&#x544A;&#x8BC9;nsca&#x6B63;&#x5E38;&#xFF0C;testOK&#x662F;&#x9644;&#x52A0;&#x4FE1;&#x606F;&#xFF0C;&#x5728;web&#x7AEF;&#x7684;&#x663E;&#x793A;&#x5982;&#x4E0B;&#xFF1A;<br><img src="http://i1148.photobucket.com/albums/o572/cszhi/blog/nsca.png" alt="nsca"></p>
+<p>&#x901A;&#x8FC7;&#x7BA1;&#x9053;&#x5C06;&#x6570;&#x636E;&#x4F20;&#x7ED9;send_nsca&#x7A0B;&#x5E8F;&#xFF0C;send nsca&#x518D;&#x5C06;&#x6570;&#x636E;&#x53D1;&#x9001;&#x5230;nsca&#x670D;&#x52A1;&#xFF0C;&#x5176;&#x4E2D;localhost&#x662F;nsca&#x76D1;&#x542C;&#x7684;&#x4E3B;&#x673A;&#x540D;&#xFF0C;NSCA&#x662F;Nagios&#x4E2D;&#x5B9A;&#x4E49;&#x7684;&#x88AB;&#x52A8;&#x76D1;&#x6D4B;&#x670D;&#x52A1;&#x7684;&#x540D;&#x5B57;&#xFF0C;0&#x544A;&#x8BC9;nsca&#x6B63;&#x5E38;&#xFF0C;testOK&#x662F;&#x9644;&#x52A0;&#x4FE1;&#x606F;&#xFF0C;&#x5728;web&#x7AEF;&#x7684;&#x663E;&#x793A;&#x5982;&#x4E0B;&#xFF1A;<br><img src="/2012/05/27/Linux&#x76D1;&#x63A7;&#x5229;&#x5668;nagios&#x2013;NSCA&#x88AB;&#x52A8;&#x76D1;&#x63A7;/1567519196048.png" alt="1567519196048"></p>
 <ul>
 <li>-H 127.0.0.1&#x662F;&#x6570;&#x636E;&#x53D1;&#x5F80;&#x7684;&#x76EE;&#x7684;&#x5730;&#xFF0C;&#x5373;nagios&#x76D1;&#x63A7;&#x673A;&#xFF1B;</li>
 <li>-d &#x2018;&#xFF1B;&#x2019;&#x662F;&#x6570;&#x636E;&#x7684;&#x5206;&#x9694;&#x7B26;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;[TAB]&#xFF1B;</li>
@@ -395,7 +395,28 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\10\iptables模块介绍：recent\" rel="bookmark">iptables模块介绍：recent</a></div>
+      <div class="popular-posts-title"><a href="\2012\08\14\使用mail命令发送邮件\" rel="bookmark">使用mail命令发送邮件</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2013\05\19\开发自己的监控系统一、email篇\" rel="bookmark">开发自己的监控系统一、email篇</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2014\01\03\简单备份监控程序\" rel="bookmark">简单备份监控程序</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2013\05\22\开发自己的监控系统三、移动篇（android）\" rel="bookmark">开发自己的监控系统三、移动篇（android）</a></div>
       
     </li>
   
@@ -409,28 +430,7 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\03\11\Linux下大文件跨网传输的方法\" rel="bookmark">Linux下大文件跨网传输的方法</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\13\tar远程备份\" rel="bookmark">tar远程备份</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
+      <div class="popular-posts-title"><a href="\2012\03\11\LINUX踢人\" rel="bookmark">LINUX踢人</a></div>
       
     </li>
   
@@ -445,9 +445,9 @@
           
           <div class="post-tags">
             
-              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
-            
               <a href="/tags/monitor/" rel="tag"><i class="fa fa-tag"></i> monitor</a>
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
             
           </div>
         
