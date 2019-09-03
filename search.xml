@@ -25,6 +25,17 @@
       </tags>
   </entry>
   <entry>
+    <title><![CDATA[Docker容器Removal In Progress删除方案]]></title>
+    <url>%2F2019%2F05%2F20%2FDocker%E5%AE%B9%E5%99%A8Removal%20In%20Progress%E5%88%A0%E9%99%A4%E6%96%B9%E6%A1%88%2F</url>
+    <content type="text"><![CDATA[1&#x3001;&#x5220;&#x9664;&#x65E0;&#x7528;&#x5BB9;&#x5668;&#x65F6;&#x62A5;&#x9519; 123[root@node3 ~]# docker rm ms-product.20190517ms-product.20190517Error response from daemon: container c4739fbec54da9ce6e18a14dc90a0f97da0d62a48df6f54c1e9ee94253e71ce8: driver &quot;overlay&quot; failed to remove root filesystem: remove /data/docker/overlay/abb6dcd4eebf472581036d0970829e9f1cecfcaa53b942a4ba29b8da143d9ac9/merged: device or resource busy 2&#x3001;&#x67E5;&#x770B;&#x8FD8;&#x6709;&#x54EA;&#x4E2A;&#x8FDB;&#x7A0B;&#x5360;&#x7528;&#x4E86;&#x5BB9;&#x5668;&#x8D44;&#x6E90; 1234567[root@node3 ~]# grep docker /proc/*/mountinfo | grep c4739fbec54d/proc/159001/mountinfo:1326 1301 0:183 / /var/lib/docker/containers/c4739fbec54da9ce6e18a14dc90a0f97da0d62a48df6f54c1e9ee94253e71ce8/mounts/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k/proc/159001/mountinfo:1418 1393 0:183 / /var/lib/docker/overlay/8700c0ace6dc832714c7f9906423082f6c3345cc07b938f8a2515659f73f563e/merged/rootfs/data/docker/containers/c4739fbec54da9ce6e18a14dc90a0f97da0d62a48df6f54c1e9ee94253e71ce8/mounts/shm rw,nosuid,nodev,noexec,relatime - tmpfs shm rw,size=65536k[root@node3 ~]# ps auxwf |grep 159001root 181519 0.0 0.0 112648 980 pts/0 S+ 09:27 0:00 | \_ grep --color=auto 159001root 159001 7.7 0.1 6483088 104544 ? Ssl May07 1450:08 | | \_ /usr/bin/cadvisor -logtostderr &#x53EF;&#x4EE5;&#x770B;&#x51FA;&#x662F;cadvisor&#x5BB9;&#x5668;&#x6B63;&#x5728;&#x5360;&#x7528;&#x4E86;&#x5176;&#x5B83;&#x5BB9;&#x5668;&#x7684;&#x8D44;&#x6E90; 3&#x3001;&#x505C;&#x6B62;cadvisor 1[root@node3 ~]# docker stop cadvisor 4&#x3001;&#x518D;&#x6B21;&#x6267;&#x884C;&#x5220;&#x9664; 12[root@node3 ~]# docker rm ms-product.20190517ms-product.20190517]]></content>
+      <categories>
+        <category>运维</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Docker CE 部署]]></title>
     <url>%2F2018%2F11%2F23%2FDocker%20CE%20%E9%83%A8%E7%BD%B2%2F</url>
     <content type="text"><![CDATA[&#x7CFB;&#x7EDF;&#xFF1A;CentOS7 &#x6700;&#x5C0F;&#x5316;&#x5B89;&#x88C5;&#x5378;&#x8F7D;&#x65E7;&#x7248;&#x672C;&#xFF08;&#x5982;&#x679C;&#x4E4B;&#x524D;&#x6709;&#x90E8;&#x7F72;&#xFF09;1yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine &#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;1yum install yum-utils device-mapper-persistent-data lvm2 &#x6DFB;&#x52A0;&#x56FD;&#x5185;&#x6E90;1yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo &#x5B89;&#x88C5;Docker CE1234yum install docker-ceCentOS7.4&#x4EE5;&#x4E0B;&#x7248;&#x672C;&#x5B89;&#x88C5;&#xFF1A;yum install docker-ce-18.06.2.ce-3.el7.x86_64 &#x542F;&#x52A8;Docker CE12systemctl enable dockersystemctl start docker Docker &#x662F;&#x5426;&#x5B89;&#x88C5;&#x6B63;&#x786E;1docker run hello-world &#x4F7F;&#x7528;&#x79C1;&#x6709;&#x955C;&#x50CF;&#x4ED3;&#x5E93;&#x51C6;&#x5907;&#x4F7F;&#x7528;&#x79C1;&#x6709;&#x955C;&#x50CF;&#x4ED3;&#x5E93;&#x524D;&#xFF0C;&#x5148;&#x7F16;&#x8F91;&#x6587;&#x4EF6; /etc/docker/daemon.json&#xFF0C;&#x914D;&#x7F6E;&#x5982;&#x4E0B;&#xFF1A; 1234[root@docker ~]# cat /etc/docker/daemon.json { &quot;insecure-registries&quot;:&quot;reg.cszhi.com&quot;]} &#x7F16;&#x8F91;&#x5B8C;&#x540E;&#x91CD;&#x542F;docker&#xFF1A; 1service docker restart]]></content>
@@ -293,14 +304,25 @@
         <category>运维</category>
       </categories>
       <tags>
-        <tag>monitor</tag>
         <tag>linux</tag>
+        <tag>monitor</tag>
       </tags>
   </entry>
   <entry>
     <title><![CDATA[硬盘分区为整数]]></title>
     <url>%2F2012%2F05%2F19%2F%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E4%B8%BA%E6%95%B4%E6%95%B0%2F</url>
     <content type="text"><![CDATA[&#x6700;&#x7CBE;&#x786E;&#x786C;&#x76D8;&#x5206;&#x533A;&#x7684;&#x7B97;&#x6CD5;&#x5982;&#x4E0B;&#xFF1A; &#x786C;&#x76D8;&#x4E00;&#x822C;&#x6709;255&#x78C1;&#x5934;&#xFF0C;63&#x6247;&#x533A;&#xFF0C;&#x6545;&#x6BCF;&#x67F1;&#x9762;&#x5927;&#x5C0F;&#x4E3A;&#xFF1A; 1512byte x 255 x 63&#xFF1D;8225280bytes &#xFF1D;7.84423828125 MB &#x5982;&#x679C;&#x8981;&#x5206;40GB,&#x90A3;&#x4E48;&#x8981; 140x1024MB=40960MB &#x9700;&#x8981;&#x67F1;&#x9762;&#x6570;&#x4E3A; 140960&#xF7;7.84423828125=5221.66 &#x53D6;&#x6574;&#x6570;&#x65E2;&#x4E3A;5222&#x4E2A;&#x67F1;&#x9762;&#x5E94;&#x5206;M&#x6570;&#x4E3A; 15222x7.84423828125=40962.6123046875MB &#x4E0D;&#x7BA1;&#x5C0F;&#x6570;&#x70B9;&#x540E;&#x9762;&#x51E0;&#x4F4D;&#x90FD;&#x8FDB;1&#xFF0C;&#x4E5F;&#x5C31;&#x662F;40963MB&#xFF0C;windows&#x5C31;&#x8BA4;&#x4E3A;&#x662F;40GB&#x4E86;&#x3002;&#x8FD9;&#x4E2A;&#x65B9;&#x6CD5;NTFS&#x548C;FAT32&#x901A;&#x7528;&#x3002; &#x4E0B;&#x9762;&#x9644;10GB&#x5230;200GB&#x6574;10GB&#x9012;&#x589E;&#x7684;&#x7CBE;&#x786E;&#x8BA1;&#x7B97;&#x7ED3;&#x679C;&#xFF1A; 1234567891011121314151617181910GB &#xFF1D; 10245MB20GB &#xFF1D; 20482MB30GB &#xFF1D; 30726MB40GB &#xFF1D; 40963MB50GB &#xFF1D; 51208MB60GB &#xFF1D; 61444MB70GB &#xFF1D; 71681MB80GB &#xFF1D; 81926MB90GB &#xFF1D; 92162MB100GB &#xFF1D; 102407MB110GB &#xFF1D; 112644MB120GB &#xFF1D; 122888MB130GB &#xFF1D; 133125MB140GB &#xFF1D; 143362MB150GB &#xFF1D; 153606MB160GB &#xFF1D; 163843MB170GB &#xFF1D; 174088MB180GB &#xFF1D; 184324MB190GB &#xFF1D; 194561MB &#x6B64;&#x7CBE;&#x786E;&#x5206;&#x533A;&#x7ED3;&#x679C;&#xFF0C;&#x5728;&#x7BA1;&#x7406;&#x5DE5;&#x5177;-&#x78C1;&#x76D8;&#x7BA1;&#x7406;&#x754C;&#x9762;&#xFF0C;&#x548C;Windows&#x8D44;&#x6E90;&#x7BA1;&#x7406;&#x5668;&#x91CC;&#x9762;&#x663E;&#x793A;&#x7684;&#x662F;&#x6574;&#x6570;&#xFF0C;10G&#x5C31;&#x662F;10.00GB&#xFF0C;20G&#x5C31;&#x662F;20.00GB&#xFF0C;40G&#x5C31;&#x662F;40.00GB&#x3002;]]></content>
+      <categories>
+        <category>运维</category>
+      </categories>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[tar远程备份]]></title>
+    <url>%2F2012%2F05%2F13%2Ftar%E8%BF%9C%E7%A8%8B%E5%A4%87%E4%BB%BD%2F</url>
+    <content type="text"><![CDATA[&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A; 1tar czf - file| ssh server &quot;tar zxf -&quot; &#x538B;&#x7F29;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A; 1tar czf - file| ssh server &quot;cat &gt; file.tar.gz&quot; &#x89E3;&#x538B;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A; 1ssh server &quot;tar zxf -&quot; &lt; file.tar.gz &#x89E3;&#x538B;&#x5230;&#x672C;&#x5730;&#xFF1A; 1ssh server &quot;cat file.tar.gz&quot; | tar zxf - &#x53E6;&#x5916;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;-T file&#x5907;&#x4EFD;&#x6307;&#x5B9A;&#x6587;&#x4EF6;&#x3002; &#x6D4B;&#x8BD5;&#xFF08;&#x4EC5;&#x4F9B;&#x53C2;&#x8003;&#xFF09;&#xFF1A;&#x6D4B;&#x8BD5;&#x6570;&#x636E;&#xFF1A;y&#x76EE;&#x5F55; &#x5927;&#x5C0F;&#xFF1A;12G &#x6587;&#x4EF6;&#x6570;&#xFF1A;37895 &#x6D4B;&#x8BD5;&#x547D;&#x4EE4;&#xFF1A;1&#x3001;time scp -r y 192.168.35.224:/test #&#x76F4;&#x63A5;&#x4F7F;&#x7528;scp&#x4F20;&#x8F93;2&#x3001;time tar cf &#x2013; y |ssh 192.168.35.224 &#x201C;cd /test2;tar xf -&#x201D; #&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF0C;&#x4E0D;&#x538B;&#x7F29;3&#x3001;time tar zcf &#x2013; y |ssh 192.168.35.224 &#x201C;cd /test3;tar zxf -&#x201D; #&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF0C;&#x538B;&#x7F29; &#x7ED3;&#x679C;&#xFF1A; &#x547D;&#x4EE4; 1 2 3 &#x8017;&#x65F6; 38m4.291s 23m4.931s 33m35.911s]]></content>
       <categories>
         <category>运维</category>
       </categories>
@@ -328,29 +350,6 @@
       </categories>
       <tags>
         <tag>nginx</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[tar远程备份]]></title>
-    <url>%2F2012%2F05%2F13%2Ftar%E8%BF%9C%E7%A8%8B%E5%A4%87%E4%BB%BD%2F</url>
-    <content type="text"><![CDATA[&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A; 1tar czf - file| ssh server &quot;tar zxf -&quot; &#x538B;&#x7F29;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A; 1tar czf - file| ssh server &quot;cat &gt; file.tar.gz&quot; &#x89E3;&#x538B;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A; 1ssh server &quot;tar zxf -&quot; &lt; file.tar.gz &#x89E3;&#x538B;&#x5230;&#x672C;&#x5730;&#xFF1A; 1ssh server &quot;cat file.tar.gz&quot; | tar zxf - &#x53E6;&#x5916;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;-T file&#x5907;&#x4EFD;&#x6307;&#x5B9A;&#x6587;&#x4EF6;&#x3002; &#x6D4B;&#x8BD5;&#xFF08;&#x4EC5;&#x4F9B;&#x53C2;&#x8003;&#xFF09;&#xFF1A;&#x6D4B;&#x8BD5;&#x6570;&#x636E;&#xFF1A;y&#x76EE;&#x5F55; &#x5927;&#x5C0F;&#xFF1A;12G &#x6587;&#x4EF6;&#x6570;&#xFF1A;37895 &#x6D4B;&#x8BD5;&#x547D;&#x4EE4;&#xFF1A;1&#x3001;time scp -r y 192.168.35.224:/test #&#x76F4;&#x63A5;&#x4F7F;&#x7528;scp&#x4F20;&#x8F93;2&#x3001;time tar cf &#x2013; y |ssh 192.168.35.224 &#x201C;cd /test2;tar xf -&#x201D; #&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF0C;&#x4E0D;&#x538B;&#x7F29;3&#x3001;time tar zcf &#x2013; y |ssh 192.168.35.224 &#x201C;cd /test3;tar zxf -&#x201D; #&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF0C;&#x538B;&#x7F29; &#x7ED3;&#x679C;&#xFF1A; &#x547D;&#x4EE4; 1 2 3 &#x8017;&#x65F6; 38m4.291s 23m4.931s 33m35.911s]]></content>
-      <categories>
-        <category>运维</category>
-      </categories>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[iptables模块介绍：connlimit]]></title>
-    <url>%2F2012%2F05%2F10%2Fiptables%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D%EF%BC%9Aconnlimit%2F</url>
-    <content type="text"><![CDATA[connlimit&#x6A21;&#x5757;&#x5141;&#x8BB8;&#x4F60;&#x9650;&#x5236;&#x6BCF;&#x4E2A;&#x5BA2;&#x6237;&#x7AEF;ip&#x7684;&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;&#xFF0C;&#x5373;&#x6BCF;&#x4E2A;ip&#x540C;&#x65F6;&#x8FDE;&#x63A5;&#x5230;&#x4E00;&#x4E2A;&#x670D;&#x52A1;&#x5668;&#x4E2A;&#x6570;&#x3002;connlimit&#x6A21;&#x5757;&#x4E3B;&#x8981;&#x53EF;&#x4EE5;&#x9650;&#x5236;&#x5185;&#x7F51;&#x7528;&#x6237;&#x7684;&#x7F51;&#x7EDC;&#x4F7F;&#x7528;&#xFF0C;&#x5BF9;&#x670D;&#x52A1;&#x5668;&#x800C;&#x8A00;&#x5219;&#x53EF;&#x4EE5;&#x9650;&#x5236;&#x6BCF;&#x4E2A;ip&#x53D1;&#x8D77;&#x7684;&#x8FDE;&#x63A5;&#x6570;&#x3002; &#x53C2;&#x6570;&#xFF1A; 12--connlimit-above n &#x9650;&#x5236;&#x4E3A;&#x591A;&#x5C11;&#x4E2A;--connlimit-mask n &#x8FD9;&#x7EC4;&#x4E3B;&#x673A;&#x7684;&#x63A9;&#x7801;,&#x9ED8;&#x8BA4;&#x662F;connlimit-mask 32 ,&#x5373;&#x6BCF;ip. &#x4F8B;&#xFF1A;&#xFF03;&#x5141;&#x8BB8;&#x6BCF;&#x4E2A;&#x5BA2;&#x6237;&#x673A;&#x540C;&#x65F6;&#x4E24;&#x4E2A;telnet&#x8FDE;&#x63A5; 123iptables -A INPUT -p tcp --syn --dport 23 -m connlimit --connlimit-above 2 -j REJECT&#x6216;iptables -A INPUT -p tcp --syn --dport 23 -m connlimit ! --connlimit-above 2 -j ACCEPT #&#x53EA;&#x5141;&#x8BB8;&#x6BCF;&#x7EC4;C&#x7C7B;ip&#x540C;&#x65F6;16&#x4E2A;http&#x8FDE;&#x63A5; 1iptables -p tcp --syn --dport 80 -m connlimit --connlimit-above 16 --connlimit-mask 24 -j REJECT #&#x53EA;&#x5141;&#x8BB8;&#x6BCF;&#x4E2A;ip&#x540C;&#x65F6;5&#x4E2A;80&#x7AEF;&#x53E3;&#x8F6C;&#x53D1;,&#x8D85;&#x8FC7;&#x7684;&#x4E22;&#x5F03;: 1iptables -I FORWARD -p tcp --syn --dport 80 -m connlimit --connlimit-above 5 -j DROP #&#x53EA;&#x5141;&#x8BB8;&#x6BCF;&#x7EC4;C&#x7C7B;ip&#x540C;&#x65F6;10&#x4E2A;80&#x7AEF;&#x53E3;&#x8F6C;&#x53D1;: 1iptables -I FORWARD -p tcp --syn --dport 80 -m connlimit --connlimit-above 10 --connlimit-mask 24 -j DROP #&#x4E3A;&#x4E86;&#x9632;&#x6B62;DOS&#x592A;&#x591A;&#x8FDE;&#x63A5;&#x8FDB;&#x6765;,&#x90A3;&#x4E48;&#x53EF;&#x4EE5;&#x5141;&#x8BB8;&#x6700;&#x591A;15&#x4E2A;&#x521D;&#x59CB;&#x8FDE;&#x63A5;,&#x8D85;&#x8FC7;&#x7684;&#x4E22;&#x5F03;. 12iptables -A INPUT -s 192.186.1.0/24 -p tcp --syn -m connlimit --connlimit-above 15 -j DROPiptables -A INPUT -s 192.186.1.0/24 -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT]]></content>
-      <categories>
-        <category>运维</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
-        <tag>iptables</tag>
       </tags>
   </entry>
   <entry>
@@ -386,6 +385,18 @@
       </categories>
       <tags>
         <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[iptables模块介绍：connlimit]]></title>
+    <url>%2F2012%2F05%2F10%2Fiptables%E6%A8%A1%E5%9D%97%E4%BB%8B%E7%BB%8D%EF%BC%9Aconnlimit%2F</url>
+    <content type="text"><![CDATA[connlimit&#x6A21;&#x5757;&#x5141;&#x8BB8;&#x4F60;&#x9650;&#x5236;&#x6BCF;&#x4E2A;&#x5BA2;&#x6237;&#x7AEF;ip&#x7684;&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;&#xFF0C;&#x5373;&#x6BCF;&#x4E2A;ip&#x540C;&#x65F6;&#x8FDE;&#x63A5;&#x5230;&#x4E00;&#x4E2A;&#x670D;&#x52A1;&#x5668;&#x4E2A;&#x6570;&#x3002;connlimit&#x6A21;&#x5757;&#x4E3B;&#x8981;&#x53EF;&#x4EE5;&#x9650;&#x5236;&#x5185;&#x7F51;&#x7528;&#x6237;&#x7684;&#x7F51;&#x7EDC;&#x4F7F;&#x7528;&#xFF0C;&#x5BF9;&#x670D;&#x52A1;&#x5668;&#x800C;&#x8A00;&#x5219;&#x53EF;&#x4EE5;&#x9650;&#x5236;&#x6BCF;&#x4E2A;ip&#x53D1;&#x8D77;&#x7684;&#x8FDE;&#x63A5;&#x6570;&#x3002; &#x53C2;&#x6570;&#xFF1A; 12--connlimit-above n &#x9650;&#x5236;&#x4E3A;&#x591A;&#x5C11;&#x4E2A;--connlimit-mask n &#x8FD9;&#x7EC4;&#x4E3B;&#x673A;&#x7684;&#x63A9;&#x7801;,&#x9ED8;&#x8BA4;&#x662F;connlimit-mask 32 ,&#x5373;&#x6BCF;ip. &#x4F8B;&#xFF1A;&#xFF03;&#x5141;&#x8BB8;&#x6BCF;&#x4E2A;&#x5BA2;&#x6237;&#x673A;&#x540C;&#x65F6;&#x4E24;&#x4E2A;telnet&#x8FDE;&#x63A5; 123iptables -A INPUT -p tcp --syn --dport 23 -m connlimit --connlimit-above 2 -j REJECT&#x6216;iptables -A INPUT -p tcp --syn --dport 23 -m connlimit ! --connlimit-above 2 -j ACCEPT #&#x53EA;&#x5141;&#x8BB8;&#x6BCF;&#x7EC4;C&#x7C7B;ip&#x540C;&#x65F6;16&#x4E2A;http&#x8FDE;&#x63A5; 1iptables -p tcp --syn --dport 80 -m connlimit --connlimit-above 16 --connlimit-mask 24 -j REJECT #&#x53EA;&#x5141;&#x8BB8;&#x6BCF;&#x4E2A;ip&#x540C;&#x65F6;5&#x4E2A;80&#x7AEF;&#x53E3;&#x8F6C;&#x53D1;,&#x8D85;&#x8FC7;&#x7684;&#x4E22;&#x5F03;: 1iptables -I FORWARD -p tcp --syn --dport 80 -m connlimit --connlimit-above 5 -j DROP #&#x53EA;&#x5141;&#x8BB8;&#x6BCF;&#x7EC4;C&#x7C7B;ip&#x540C;&#x65F6;10&#x4E2A;80&#x7AEF;&#x53E3;&#x8F6C;&#x53D1;: 1iptables -I FORWARD -p tcp --syn --dport 80 -m connlimit --connlimit-above 10 --connlimit-mask 24 -j DROP #&#x4E3A;&#x4E86;&#x9632;&#x6B62;DOS&#x592A;&#x591A;&#x8FDE;&#x63A5;&#x8FDB;&#x6765;,&#x90A3;&#x4E48;&#x53EF;&#x4EE5;&#x5141;&#x8BB8;&#x6700;&#x591A;15&#x4E2A;&#x521D;&#x59CB;&#x8FDE;&#x63A5;,&#x8D85;&#x8FC7;&#x7684;&#x4E22;&#x5F03;. 12iptables -A INPUT -s 192.186.1.0/24 -p tcp --syn -m connlimit --connlimit-above 15 -j DROPiptables -A INPUT -s 192.186.1.0/24 -p tcp -m state --state ESTABLISHED,RELATED -j ACCEPT]]></content>
+      <categories>
+        <category>运维</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+        <tag>iptables</tag>
       </tags>
   </entry>
   <entry>
@@ -442,8 +453,8 @@
         <category>运维</category>
       </categories>
       <tags>
-        <tag>shell</tag>
         <tag>linux</tag>
+        <tag>shell</tag>
         <tag>ops</tag>
       </tags>
   </entry>
@@ -455,8 +466,8 @@
         <category>运维</category>
       </categories>
       <tags>
-        <tag>shell</tag>
         <tag>linux</tag>
+        <tag>shell</tag>
         <tag>ops</tag>
       </tags>
   </entry>
@@ -532,17 +543,6 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[dd指令的使用]]></title>
-    <url>%2F2012%2F01%2F29%2Fdd%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BD%BF%E7%94%A8%2F</url>
-    <content type="text"><![CDATA[dd &#x662F; Linux/UNIX &#x4E0B;&#x7684;&#x4E00;&#x4E2A;&#x975E;&#x5E38;&#x6709;&#x7528;&#x7684;&#x547D;&#x4EE4;&#xFF0C;&#x4F5C;&#x7528;&#x662F;&#x7528;&#x6307;&#x5B9A;&#x5927;&#x5C0F;&#x7684;&#x5757;&#x62F7;&#x8D1D;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#xFF0C;&#x5E76;&#x5728;&#x62F7;&#x8D1D;&#x7684;&#x540C;&#x65F6;&#x8FDB;&#x884C;&#x6307;&#x5B9A;&#x7684;&#x8F6C;&#x6362;&#x3002; &#x6570;&#x636E;&#x5907;&#x4EFD;&#x4E0E;&#x6062;&#x590D;&#x6574;&#x76D8;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x4E0E;&#x6062;&#x590D;&#xFF08;1&#xFF09;&#x5907;&#x4EFD; ##&#x5C06;&#x672C;&#x5730;&#x7684;/dev/hdx&#x6574;&#x76D8;&#x5907;&#x4EFD;&#x5230;/dev/hdy 1dd if=/dev/hdx of=/dev/hdy ##&#x5C06;/dev/hdx&#x5168;&#x76D8;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x5230;&#x6307;&#x5B9A;&#x8DEF;&#x5F84;&#x7684;image&#x6587;&#x4EF6; 1dd if=/dev/hdx of=/path/to/image ##&#x5907;&#x4EFD;/dev/hdx&#x5168;&#x76D8;&#x6570;&#x636E;&#xFF0C;&#x5E76;&#x5229;&#x7528;gzip&#x5DE5;&#x5177;&#x8FDB;&#x884C;&#x538B;&#x7F29;&#xFF0C;&#x4FDD;&#x5B58;&#x5230;&#x6307;&#x5B9A;&#x8DEF;&#x5F84;&#xFF08;bzip2&#x5DE5;&#x5177;&#x4E5F;&#x4E00;&#x6837;&#x53EF;&#x4F7F;&#x7528;&#xFF09; 1dd if=/dev/hdx | gzip &gt; /path/to/image.gz &#xFF08;2&#xFF09;&#x6062;&#x590D; ##&#x5C06;&#x5907;&#x4EFD;&#x6587;&#x4EF6;&#x6062;&#x590D;&#x5230;&#x6307;&#x5B9A;&#x76D8; 1dd if=/path/to/image of=/dev/hdx ##&#x5C06;&#x538B;&#x7F29;&#x7684;&#x5907;&#x4EFD;&#x6587;&#x4EF6;&#x6062;&#x590D;&#x5230;&#x6307;&#x5B9A;&#x76D8; 1gzip -dc /path/to/image.gz | dd of=/dev/hdx &#x5229;&#x7528;netcat&#x4E0E;dd&#x6307;&#x4EE4;&#x8FDB;&#x884C;&#x8FDC;&#x7A0B;&#x5907;&#x4EFD;&#xFF08;1&#xFF09;&#x5907;&#x4EFD; &#x5047;&#x8BBE;&#xFF1A;&#x63A5;&#x6536;&#x7AEF;&#x7684;IP&#x5730;&#x5740;&#x4E3A;&#xFF1A;192.168.1.200&#xFF1B;&#x53D1;&#x9001;&#x7AEF;&#x7684;IP&#x5730;&#x5740;&#x4E3A;&#xFF1A;192.168.1.100 &#x7B2C;&#x4E00;&#x6B65;&#xFF1A;&#x5728;&#x63A5;&#x6536;&#x7AEF;&#x4E0A;&#x6267;&#x884C;&#x547D;&#x4EE4;&#xFF1A; 1nc -l 1234 | dd of=/dev/sdb1 &#x6216;&#x8005; nc -l 1234 | gzip -dc | dd of=/dev/sdb1 &#xFF0C;&#x5373;&#xFF1A;nc&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA;&#x4E3A;&#x6807;&#x51C6;&#x8F93;&#x51FA;&#xFF0C;&#x901A;&#x8FC7;&#x7BA1;&#x9053;&#x5C06;nc&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA;&#x4F5C;&#x4E3A;dd&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x5165;&#xFF0C;&#x6700;&#x540E;&#x5C06;&#x6570;&#x636E;&#x5199;&#x5165;/dev/sdb1&#x4E2D; &#xFF08;2&#xFF09;&#x6062;&#x590D; &#x7B2C;&#x4E8C;&#x6B65;&#xFF1A;&#x5728;&#x53D1;&#x9001;&#x7AEF;&#x4E0A;&#x6267;&#x884C;&#x547D;&#x4EE4;&#xFF1A; 1dd if=/dev/hda1 | nc 192.168.1.200 1234 &#x6216;&#x8005; dd if=/dev/hda1 | gzip | nc 192.168.1.200 1234 &#x5373;&#xFF1A;&#x5C06;/dev/hda1&#x8BBE;&#x5907;&#x4E0A;&#x7684;&#x6570;&#x636E;&#x4F5C;&#x4E3A;dd&#x7684;&#x8F93;&#x5165;&#xFF0C;&#x800C;&#x6807;&#x51C6;&#x8F93;&#x51FA;&#x4F5C;&#x4E3A;dd&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA;&#xFF0C;&#x4F46;&#x662F;&#x7531;&#x4E8E;&#x7BA1;&#x9053;&#xFF0C;&#x6240;&#x4EE5;&#x5C06;dd&#x7684;&#x6807;&#x51C6;&#x8F93;&#x51FA;&#x5C06;&#x4F5C;&#x4E3A;nc&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA; &#x5907;&#x4EFD;MBR&#xFF08;1&#xFF09;&#x5907;&#x4EFD; ##&#x5907;&#x4EFD;&#x78C1;&#x76D8;&#x5F00;&#x59CB;&#x7684;512Byte&#x5927;&#x5C0F;&#x7684;MBR&#x4FE1;&#x606F;&#x5230;&#x6307;&#x5B9A;&#x6587;&#x4EF6; 1dd if=/dev/hdx of=/path/to/image count=1 bs=512 &#xFF08;2&#xFF09;&#x6062;&#x590D; ##&#x5C06;&#x5907;&#x4EFD;&#x7684;MBR&#x4FE1;&#x606F;&#x5199;&#x5230;&#x78C1;&#x76D8;&#x5F00;&#x59CB;&#x90E8;&#x5206; 1dd if=/path/to/image of=/dev/hdx &#x5907;&#x4EFD;&#x8F6F;&#x76D8;##&#x5C06;&#x8F6F;&#x9A71;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x5230;&#x5F53;&#x524D;&#x76EE;&#x5F55;&#x7684;disk.img&#x6587;&#x4EF6; 1dd if=/dev/fd0 of=disk.img count=1 bs=1440k &#x62F7;&#x8D1D;&#x5185;&#x5B58;&#x6570;&#x636E;&#x5230;&#x786C;&#x76D8;##&#x5C06;&#x5185;&#x5B58;&#x91CC;&#x7684;&#x6570;&#x636E;&#x62F7;&#x8D1D;&#x5230;backup&#x76EE;&#x5F55;&#x4E0B;&#x7684;mem.bin&#x6587;&#x4EF6; 1dd if=/dev/mem of=/backup/mem.bin bs=1024 &#x5C06;&#x5149;&#x76D8;&#x5236;&#x4F5C;&#x6210;ISO&#x955C;&#x50CF;&#x6587;&#x4EF6;##&#x62F7;&#x8D1D;&#x5149;&#x76D8;&#x6570;&#x636E;&#x5230;backup&#x6587;&#x4EF6;&#x5939;&#x4E0B;&#xFF0C;&#x5E76;&#x4FDD;&#x5B58;&#x4E3A;cd.iso&#x6587;&#x4EF6;&#xFF0C;&#x518D;&#x8FDB;&#x884C;&#x523B;&#x5F55; 12dd if=/dev/cdrom of=/backup/cd.isocdrecord -v cd.iso &#x589E;&#x52A0;swap&#x5206;&#x533A;&#x6587;&#x4EF6;&#x5927;&#x5C0F;&#x7B2C;&#x4E00;&#x6B65;&#xFF1A;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x8DB3;&#x591F;&#x5927;&#x7684;&#x6587;&#x4EF6;&#xFF08;250M&#xFF09; 1dd if=/dev/zero of=/swapfile bs=1024 count=262144 &#x7B2C;&#x4E8C;&#x6B65;&#xFF1A;&#x628A;&#x8FD9;&#x4E2A;&#x6587;&#x4EF6;&#x53D8;&#x6210;swap&#x6587;&#x4EF6; 1mkswap /swapfile &#x7B2C;&#x4E09;&#x6B65;&#xFF1A;&#x542F;&#x7528;&#x8FD9;&#x4E2A;swap&#x6587;&#x4EF6; 1swapon /swapfile &#x7B2C;&#x56DB;&#x6B65;&#xFF1A;&#x5728;&#x6BCF;&#x6B21;&#x5F00;&#x673A;&#x7684;&#x65F6;&#x5019;&#x81EA;&#x52A8;&#x52A0;&#x8F7D;swap&#x6587;&#x4EF6;, &#x9700;&#x8981;&#x5728; /etc/fstab &#x6587;&#x4EF6;&#x4E2D;&#x589E;&#x52A0;&#x4E00;&#x884C; 1/swapfile swap swap defaults 0 0 &#x6CE8;&#x610F;&#xFF1A;&#x67E5;&#x770B;&#x5F53;&#x524D;swap&#x4F7F;&#x7528;&#x60C5;&#x51B5;&#xFF0C;&#x8BF7;&#x67E5;&#x770B;&#x6587;&#x4EF6;/proc/swaps&#xFF1B;&#x521B;&#x5EFA;&#x4EA4;&#x6362;&#x5206;&#x533A;&#x5176;&#x5B9E;&#x8FD8;&#x6709;&#x53E6;&#x4E00;&#x79CD;&#x65B9;&#x6CD5;&#xFF1A;fdisk&#x6307;&#x4EE4;&#x6CD5; &#x9500;&#x6BC1;&#x78C1;&#x76D8;&#x6570;&#x636E;##&#x5229;&#x7528;&#x968F;&#x673A;&#x7684;&#x6570;&#x636E;&#x586B;&#x5145;&#x786C;&#x76D8;&#xFF0C;&#x5728;&#x67D0;&#x4E9B;&#x5FC5;&#x8981;&#x7684;&#x573A;&#x5408;&#x53EF;&#x4EE5;&#x7528;&#x6765;&#x9500;&#x6BC1;&#x6570;&#x636E;&#x3002;&#x6267;&#x884C;&#x6B64;&#x64CD;&#x4F5C;&#x4EE5;&#x540E;&#xFF0C;/dev/hda1&#x5C06;&#x65E0;&#x6CD5;&#x6302;&#x8F7D;&#xFF0C;&#x521B;&#x5EFA;&#x548C;&#x62F7;&#x8D1D;&#x64CD;&#x4F5C;&#x65E0;&#x6CD5;&#x6267;&#x884C; 1dd if=/dev/urandom of=/dev/hda1]]></content>
-      <categories>
-        <category>运维</category>
-      </categories>
-      <tags>
-        <tag>linux</tag>
-      </tags>
-  </entry>
-  <entry>
     <title><![CDATA[MySQL将显示结果输出到文件]]></title>
     <url>%2F2012%2F01%2F29%2FMySQL%E5%B0%86%E6%98%BE%E7%A4%BA%E7%BB%93%E6%9E%9C%E8%BE%93%E5%87%BA%E5%88%B0%E6%96%87%E4%BB%B6%2F</url>
     <content type="text"><![CDATA[1&#x3001;&#x5982;&#x679C;MYSQL&#x670D;&#x52A1;&#x5668;&#x5C31;&#x662F;&#x4F60;&#x8981;&#x5BFC;&#x51FA;&#x6587;&#x4EF6;&#x7684;&#x673A;&#x5668;&#xFF0C;&#x90A3;&#x4E48;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x7528;select &#x2026;into outfile&#x8BED;&#x53E5;&#x3002; 1select * from rank into outfile &quot;/home/a.txt&quot; 2&#x3001;&#x5982;&#x679C;MYSQL&#x670D;&#x52A1;&#x5668;&#x662F;&#x5355;&#x72EC;&#x7684;&#x673A;&#x5668;&#xFF0C;&#x6211;&#x4EEC;&#x662F;&#x5728;&#x4E00;&#x4E2A;client&#x4E0A;&#x8FDB;&#x884C;&#x64CD;&#x4F5C;&#xFF0C;&#x6211;&#x4EEC;&#x8981;&#x628A;&#x6570;&#x636E;&#x7ED3;&#x679C;&#x5BFC;&#x5165;&#x5230;client&#x673A;&#x5668;&#x4E0A;&#x3002;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;mysql -e&#x8BED;&#x53E5;&#x3002; 1mysql -uroot -proot -P3306 -h10.35.13.89 dbname -e &quot;select * from rank&quot; &gt; /home/a.txt 3&#x3001;&#x4F7F;&#x7528;mysql&#x7684;tee&#xFF08;T&#xFF09;&#x547D;&#x4EE4;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x628A;MYSQL&#x7684;&#x6240;&#x6709;&#x8F93;&#x51FA;&#x90FD;&#x8F93;&#x5165;&#x5230;&#x6307;&#x5B9A;&#x6587;&#x4EF6;&#x3002; 12345678mysql&gt;tee /home/a.txtmysql&gt;select * from rank;mysql&gt;exit&#x6216;mysql&gt; \T output.txtLogging to file &apos;output.txt&apos;mysql&gt; \tOutfile disabled.]]></content>
@@ -551,6 +551,17 @@
       </categories>
       <tags>
         <tag>mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[dd指令的使用]]></title>
+    <url>%2F2012%2F01%2F29%2Fdd%E6%8C%87%E4%BB%A4%E7%9A%84%E4%BD%BF%E7%94%A8%2F</url>
+    <content type="text"><![CDATA[dd &#x662F; Linux/UNIX &#x4E0B;&#x7684;&#x4E00;&#x4E2A;&#x975E;&#x5E38;&#x6709;&#x7528;&#x7684;&#x547D;&#x4EE4;&#xFF0C;&#x4F5C;&#x7528;&#x662F;&#x7528;&#x6307;&#x5B9A;&#x5927;&#x5C0F;&#x7684;&#x5757;&#x62F7;&#x8D1D;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#xFF0C;&#x5E76;&#x5728;&#x62F7;&#x8D1D;&#x7684;&#x540C;&#x65F6;&#x8FDB;&#x884C;&#x6307;&#x5B9A;&#x7684;&#x8F6C;&#x6362;&#x3002; &#x6570;&#x636E;&#x5907;&#x4EFD;&#x4E0E;&#x6062;&#x590D;&#x6574;&#x76D8;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x4E0E;&#x6062;&#x590D;&#xFF08;1&#xFF09;&#x5907;&#x4EFD; ##&#x5C06;&#x672C;&#x5730;&#x7684;/dev/hdx&#x6574;&#x76D8;&#x5907;&#x4EFD;&#x5230;/dev/hdy 1dd if=/dev/hdx of=/dev/hdy ##&#x5C06;/dev/hdx&#x5168;&#x76D8;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x5230;&#x6307;&#x5B9A;&#x8DEF;&#x5F84;&#x7684;image&#x6587;&#x4EF6; 1dd if=/dev/hdx of=/path/to/image ##&#x5907;&#x4EFD;/dev/hdx&#x5168;&#x76D8;&#x6570;&#x636E;&#xFF0C;&#x5E76;&#x5229;&#x7528;gzip&#x5DE5;&#x5177;&#x8FDB;&#x884C;&#x538B;&#x7F29;&#xFF0C;&#x4FDD;&#x5B58;&#x5230;&#x6307;&#x5B9A;&#x8DEF;&#x5F84;&#xFF08;bzip2&#x5DE5;&#x5177;&#x4E5F;&#x4E00;&#x6837;&#x53EF;&#x4F7F;&#x7528;&#xFF09; 1dd if=/dev/hdx | gzip &gt; /path/to/image.gz &#xFF08;2&#xFF09;&#x6062;&#x590D; ##&#x5C06;&#x5907;&#x4EFD;&#x6587;&#x4EF6;&#x6062;&#x590D;&#x5230;&#x6307;&#x5B9A;&#x76D8; 1dd if=/path/to/image of=/dev/hdx ##&#x5C06;&#x538B;&#x7F29;&#x7684;&#x5907;&#x4EFD;&#x6587;&#x4EF6;&#x6062;&#x590D;&#x5230;&#x6307;&#x5B9A;&#x76D8; 1gzip -dc /path/to/image.gz | dd of=/dev/hdx &#x5229;&#x7528;netcat&#x4E0E;dd&#x6307;&#x4EE4;&#x8FDB;&#x884C;&#x8FDC;&#x7A0B;&#x5907;&#x4EFD;&#xFF08;1&#xFF09;&#x5907;&#x4EFD; &#x5047;&#x8BBE;&#xFF1A;&#x63A5;&#x6536;&#x7AEF;&#x7684;IP&#x5730;&#x5740;&#x4E3A;&#xFF1A;192.168.1.200&#xFF1B;&#x53D1;&#x9001;&#x7AEF;&#x7684;IP&#x5730;&#x5740;&#x4E3A;&#xFF1A;192.168.1.100 &#x7B2C;&#x4E00;&#x6B65;&#xFF1A;&#x5728;&#x63A5;&#x6536;&#x7AEF;&#x4E0A;&#x6267;&#x884C;&#x547D;&#x4EE4;&#xFF1A; 1nc -l 1234 | dd of=/dev/sdb1 &#x6216;&#x8005; nc -l 1234 | gzip -dc | dd of=/dev/sdb1 &#xFF0C;&#x5373;&#xFF1A;nc&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA;&#x4E3A;&#x6807;&#x51C6;&#x8F93;&#x51FA;&#xFF0C;&#x901A;&#x8FC7;&#x7BA1;&#x9053;&#x5C06;nc&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA;&#x4F5C;&#x4E3A;dd&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x5165;&#xFF0C;&#x6700;&#x540E;&#x5C06;&#x6570;&#x636E;&#x5199;&#x5165;/dev/sdb1&#x4E2D; &#xFF08;2&#xFF09;&#x6062;&#x590D; &#x7B2C;&#x4E8C;&#x6B65;&#xFF1A;&#x5728;&#x53D1;&#x9001;&#x7AEF;&#x4E0A;&#x6267;&#x884C;&#x547D;&#x4EE4;&#xFF1A; 1dd if=/dev/hda1 | nc 192.168.1.200 1234 &#x6216;&#x8005; dd if=/dev/hda1 | gzip | nc 192.168.1.200 1234 &#x5373;&#xFF1A;&#x5C06;/dev/hda1&#x8BBE;&#x5907;&#x4E0A;&#x7684;&#x6570;&#x636E;&#x4F5C;&#x4E3A;dd&#x7684;&#x8F93;&#x5165;&#xFF0C;&#x800C;&#x6807;&#x51C6;&#x8F93;&#x51FA;&#x4F5C;&#x4E3A;dd&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA;&#xFF0C;&#x4F46;&#x662F;&#x7531;&#x4E8E;&#x7BA1;&#x9053;&#xFF0C;&#x6240;&#x4EE5;&#x5C06;dd&#x7684;&#x6807;&#x51C6;&#x8F93;&#x51FA;&#x5C06;&#x4F5C;&#x4E3A;nc&#x6307;&#x4EE4;&#x7684;&#x8F93;&#x51FA; &#x5907;&#x4EFD;MBR&#xFF08;1&#xFF09;&#x5907;&#x4EFD; ##&#x5907;&#x4EFD;&#x78C1;&#x76D8;&#x5F00;&#x59CB;&#x7684;512Byte&#x5927;&#x5C0F;&#x7684;MBR&#x4FE1;&#x606F;&#x5230;&#x6307;&#x5B9A;&#x6587;&#x4EF6; 1dd if=/dev/hdx of=/path/to/image count=1 bs=512 &#xFF08;2&#xFF09;&#x6062;&#x590D; ##&#x5C06;&#x5907;&#x4EFD;&#x7684;MBR&#x4FE1;&#x606F;&#x5199;&#x5230;&#x78C1;&#x76D8;&#x5F00;&#x59CB;&#x90E8;&#x5206; 1dd if=/path/to/image of=/dev/hdx &#x5907;&#x4EFD;&#x8F6F;&#x76D8;##&#x5C06;&#x8F6F;&#x9A71;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x5230;&#x5F53;&#x524D;&#x76EE;&#x5F55;&#x7684;disk.img&#x6587;&#x4EF6; 1dd if=/dev/fd0 of=disk.img count=1 bs=1440k &#x62F7;&#x8D1D;&#x5185;&#x5B58;&#x6570;&#x636E;&#x5230;&#x786C;&#x76D8;##&#x5C06;&#x5185;&#x5B58;&#x91CC;&#x7684;&#x6570;&#x636E;&#x62F7;&#x8D1D;&#x5230;backup&#x76EE;&#x5F55;&#x4E0B;&#x7684;mem.bin&#x6587;&#x4EF6; 1dd if=/dev/mem of=/backup/mem.bin bs=1024 &#x5C06;&#x5149;&#x76D8;&#x5236;&#x4F5C;&#x6210;ISO&#x955C;&#x50CF;&#x6587;&#x4EF6;##&#x62F7;&#x8D1D;&#x5149;&#x76D8;&#x6570;&#x636E;&#x5230;backup&#x6587;&#x4EF6;&#x5939;&#x4E0B;&#xFF0C;&#x5E76;&#x4FDD;&#x5B58;&#x4E3A;cd.iso&#x6587;&#x4EF6;&#xFF0C;&#x518D;&#x8FDB;&#x884C;&#x523B;&#x5F55; 12dd if=/dev/cdrom of=/backup/cd.isocdrecord -v cd.iso &#x589E;&#x52A0;swap&#x5206;&#x533A;&#x6587;&#x4EF6;&#x5927;&#x5C0F;&#x7B2C;&#x4E00;&#x6B65;&#xFF1A;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x8DB3;&#x591F;&#x5927;&#x7684;&#x6587;&#x4EF6;&#xFF08;250M&#xFF09; 1dd if=/dev/zero of=/swapfile bs=1024 count=262144 &#x7B2C;&#x4E8C;&#x6B65;&#xFF1A;&#x628A;&#x8FD9;&#x4E2A;&#x6587;&#x4EF6;&#x53D8;&#x6210;swap&#x6587;&#x4EF6; 1mkswap /swapfile &#x7B2C;&#x4E09;&#x6B65;&#xFF1A;&#x542F;&#x7528;&#x8FD9;&#x4E2A;swap&#x6587;&#x4EF6; 1swapon /swapfile &#x7B2C;&#x56DB;&#x6B65;&#xFF1A;&#x5728;&#x6BCF;&#x6B21;&#x5F00;&#x673A;&#x7684;&#x65F6;&#x5019;&#x81EA;&#x52A8;&#x52A0;&#x8F7D;swap&#x6587;&#x4EF6;, &#x9700;&#x8981;&#x5728; /etc/fstab &#x6587;&#x4EF6;&#x4E2D;&#x589E;&#x52A0;&#x4E00;&#x884C; 1/swapfile swap swap defaults 0 0 &#x6CE8;&#x610F;&#xFF1A;&#x67E5;&#x770B;&#x5F53;&#x524D;swap&#x4F7F;&#x7528;&#x60C5;&#x51B5;&#xFF0C;&#x8BF7;&#x67E5;&#x770B;&#x6587;&#x4EF6;/proc/swaps&#xFF1B;&#x521B;&#x5EFA;&#x4EA4;&#x6362;&#x5206;&#x533A;&#x5176;&#x5B9E;&#x8FD8;&#x6709;&#x53E6;&#x4E00;&#x79CD;&#x65B9;&#x6CD5;&#xFF1A;fdisk&#x6307;&#x4EE4;&#x6CD5; &#x9500;&#x6BC1;&#x78C1;&#x76D8;&#x6570;&#x636E;##&#x5229;&#x7528;&#x968F;&#x673A;&#x7684;&#x6570;&#x636E;&#x586B;&#x5145;&#x786C;&#x76D8;&#xFF0C;&#x5728;&#x67D0;&#x4E9B;&#x5FC5;&#x8981;&#x7684;&#x573A;&#x5408;&#x53EF;&#x4EE5;&#x7528;&#x6765;&#x9500;&#x6BC1;&#x6570;&#x636E;&#x3002;&#x6267;&#x884C;&#x6B64;&#x64CD;&#x4F5C;&#x4EE5;&#x540E;&#xFF0C;/dev/hda1&#x5C06;&#x65E0;&#x6CD5;&#x6302;&#x8F7D;&#xFF0C;&#x521B;&#x5EFA;&#x548C;&#x62F7;&#x8D1D;&#x64CD;&#x4F5C;&#x65E0;&#x6CD5;&#x6267;&#x884C; 1dd if=/dev/urandom of=/dev/hda1]]></content>
+      <categories>
+        <category>运维</category>
+      </categories>
+      <tags>
+        <tag>linux</tag>
       </tags>
   </entry>
   <entry>

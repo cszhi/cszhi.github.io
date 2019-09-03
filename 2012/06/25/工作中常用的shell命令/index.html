@@ -57,18 +57,18 @@
   };
 </script>
 
-  <meta name="description" content="&amp;#x5217;&amp;#x51FA;&amp;#x6240;&amp;#x6709; ESTABLISHED &amp;#x72B6;&amp;#x6001;&amp;#x7684;&amp;#x8FDE;&amp;#x63A5;&amp;#xFF1A; 1netstat -nta | fgrep &amp;quot;ESTABLISHED&amp;quot; | cut -b 49-75 | cut -d &amp;apos;:&amp;apos; -f1 | sort | uniq -c">
+  <meta name="description" content="&amp;#x5217;&amp;#x51FA;&amp;#x6240;&amp;#x6709; ESTABLISHED &amp;#x72B6;&amp;#x6001;&amp;#x7684;&amp;#x8FDE;&amp;#x63A5;&amp;#xFF1A; 1netstat -nta | fgrep &amp;quot;ESTABLISHED&amp;quot; | cut -b 49-75 | cut -d &amp;apos;:&amp;apos; -f1 | sort | uniq -c |">
 <meta name="keywords" content="shell">
 <meta property="og:type" content="article">
 <meta property="og:title" content="工作中常用的shell命令">
 <meta property="og:url" content="http://blogs.cszhi.com/2012/06/25/工作中常用的shell命令/index.html">
 <meta property="og:site_name" content="csz&#39;s blog">
-<meta property="og:description" content="&amp;#x5217;&amp;#x51FA;&amp;#x6240;&amp;#x6709; ESTABLISHED &amp;#x72B6;&amp;#x6001;&amp;#x7684;&amp;#x8FDE;&amp;#x63A5;&amp;#xFF1A; 1netstat -nta | fgrep &amp;quot;ESTABLISHED&amp;quot; | cut -b 49-75 | cut -d &amp;apos;:&amp;apos; -f1 | sort | uniq -c">
+<meta property="og:description" content="&amp;#x5217;&amp;#x51FA;&amp;#x6240;&amp;#x6709; ESTABLISHED &amp;#x72B6;&amp;#x6001;&amp;#x7684;&amp;#x8FDE;&amp;#x63A5;&amp;#xFF1A; 1netstat -nta | fgrep &amp;quot;ESTABLISHED&amp;quot; | cut -b 49-75 | cut -d &amp;apos;:&amp;apos; -f1 | sort | uniq -c |">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-03T08:15:18.361Z">
+<meta property="og:updated_time" content="2019-09-03T14:22:05.775Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="工作中常用的shell命令">
-<meta name="twitter:description" content="&amp;#x5217;&amp;#x51FA;&amp;#x6240;&amp;#x6709; ESTABLISHED &amp;#x72B6;&amp;#x6001;&amp;#x7684;&amp;#x8FDE;&amp;#x63A5;&amp;#xFF1A; 1netstat -nta | fgrep &amp;quot;ESTABLISHED&amp;quot; | cut -b 49-75 | cut -d &amp;apos;:&amp;apos; -f1 | sort | uniq -c">
+<meta name="twitter:description" content="&amp;#x5217;&amp;#x51FA;&amp;#x6240;&amp;#x6709; ESTABLISHED &amp;#x72B6;&amp;#x6001;&amp;#x7684;&amp;#x8FDE;&amp;#x63A5;&amp;#xFF1A; 1netstat -nta | fgrep &amp;quot;ESTABLISHED&amp;quot; | cut -b 49-75 | cut -d &amp;apos;:&amp;apos; -f1 | sort | uniq -c |">
   <link rel="canonical" href="http://blogs.cszhi.com/2012/06/25/工作中常用的shell命令/">
 
 
@@ -317,10 +317,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <a id="more"></a>
-
-<p><strong>&#x5217;&#x51FA;&#x6240;&#x6709; ESTABLISHED &#x72B6;&#x6001;&#x7684;&#x8FDE;&#x63A5;&#xFF1A;</strong></p>
+        <p><strong>&#x5217;&#x51FA;&#x6240;&#x6709; ESTABLISHED &#x72B6;&#x6001;&#x7684;&#x8FDE;&#x63A5;&#xFF1A;</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -nta | fgrep <span class="string">&quot;ESTABLISHED&quot;</span> | cut -b 49-75 | cut -d <span class="string">&apos;:&apos;</span> -f1 | sort | uniq -c | sort -n -r --key=1,7 | head -25</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
 
 <p><strong>&#x5217;&#x51FA;&#x6240;&#x6709;&#x8FDE;&#x63A5;&#x72B6;&#x6001;&#x7684;&#x7EDF;&#x8BA1;&#xFF1A;</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -nta | fgrep <span class="string">&quot;:&quot;</span> | cut -b 77-90 | sort | uniq -c</span><br></pre></td></tr></table></figure>
@@ -527,7 +527,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -617,7 +617,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">10:39</span>
+    <span title="站点阅读时长">10:40</span>
 </div>
 
         
