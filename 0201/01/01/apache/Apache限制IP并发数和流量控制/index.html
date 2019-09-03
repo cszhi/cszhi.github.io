@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x4F7F;&amp;#x7528;mod_limitipconn&amp;#x6A21;&amp;#x5757;&amp;#x9650;&amp;#x5236;IP&amp;#x5E76;&amp;#x53D1;&amp;#x8FDE;&amp;#x63A5;&amp;#x6570;&amp;#x5B89;&amp;#x88C5;&amp;#xFF1A; 1234wget http://dominia.org/djao/limit/mod_limitipconn-0.24.tar.bz2tar">
+<meta property="og:type" content="article">
+<meta property="og:title" content="csz&#39;s blog">
+<meta property="og:url" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x4F7F;&amp;#x7528;mod_limitipconn&amp;#x6A21;&amp;#x5757;&amp;#x9650;&amp;#x5236;IP&amp;#x5E76;&amp;#x53D1;&amp;#x8FDE;&amp;#x63A5;&amp;#x6570;&amp;#x5B89;&amp;#x88C5;&amp;#xFF1A; 1234wget http://dominia.org/djao/limit/mod_limitipconn-0.24.tar.bz2tar">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/1567498214907.png">
+<meta property="og:image" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/1567498221747.png">
+<meta property="og:updated_time" content="2019-09-03T08:10:37.916Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="csz&#39;s blog">
+<meta name="twitter:description" content="&amp;#x4F7F;&amp;#x7528;mod_limitipconn&amp;#x6A21;&amp;#x5757;&amp;#x9650;&amp;#x5236;IP&amp;#x5E76;&amp;#x53D1;&amp;#x8FDE;&amp;#x63A5;&amp;#x6570;&amp;#x5B89;&amp;#x88C5;&amp;#xFF1A; 1234wget http://dominia.org/djao/limit/mod_limitipconn-0.24.tar.bz2tar">
+<meta name="twitter:image" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/1567498214907.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title> | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：0200-12-31 23:59:17" itemprop="dateCreated datePublished" datetime="0200-12-31T23:59:17+08:00">0200-12-31</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="&#x4F7F;&#x7528;mod-limitipconn&#x6A21;&#x5757;&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;"><a href="#&#x4F7F;&#x7528;mod-limitipconn&#x6A21;&#x5757;&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;" class="headerlink" title="&#x4F7F;&#x7528;mod_limitipconn&#x6A21;&#x5757;&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;"></a><strong>&#x4F7F;&#x7528;mod_limitipconn&#x6A21;&#x5757;&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;</strong></h2><p>&#x5B89;&#x88C5;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget http://dominia.org/djao/<span class="built_in">limit</span>/mod_limitipconn-0.24.tar.bz2</span><br><span class="line">tar jxvf mod_limitipconn-0.24.tar.bz2</span><br><span class="line"><span class="built_in">cd</span> mod_limitipconn-0.24</span><br><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apxs -c -i mod_limitipconn.c</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>&#x7F16;&#x8F91;httpd.conf</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ExtendedStatus On</span><br><span class="line">LoadModule limitipconn_module modules/mod_limitipconn.so</span><br><span class="line"> </span><br><span class="line">&lt;ifModule mod_limitipconn.c&gt;</span><br><span class="line">&lt;location /&gt;                                              #&#x5BF9;&#x5E94;&#x6839;&#x76EE;&#x5F55;</span><br><span class="line">      MaxConnPerIP 5                                  &#xFF03;&#x6700;&#x5927;&#x5E76;&#x53D1;&#x6570;&#x4E3A;5</span><br><span class="line">      NoIPLimit image/*                               &#xFF03;&#x5BF9;&#x56FE;&#x7247;&#x4E0D;&#x505A;&#x9650;&#x5236;</span><br><span class="line">&lt;/location&gt;</span><br><span class="line">&lt;location /test&gt;                                       &#xFF03;&#x5BF9;&#x6839;&#x76EE;&#x5F55;&#x4E0B;&#x7684;test&#x76EE;&#x5F55;&#x505A;&#x9650;&#x5236;</span><br><span class="line">     MaxConnPerIP 2                                   &#xFF03;&#x6700;&#x5927;&#x5E76;&#x53D1;&#x6570;&#x4E3A;2</span><br><span class="line">&lt;/location&gt;</span><br><span class="line">&lt;/ifModule&gt;</span><br></pre></td></tr></table></figure>
+
+<p>&#x5982;&#x679C;&#x60F3;&#x9650;&#x5236;&#x865A;&#x62DF;&#x4E3B;&#x673A;&#x7684;ip&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;&#xFF0C;&#x53EF;&#x4EE5;&#x4FEE;&#x6539;extra/httpd-vhost.conf&#x628A; IfModule mod_limitipconn.c &#x8FD9;&#x4E00;&#x6BB5;&#x590D;&#x5236;&#x5230;Virtualhost&#x4E2D;&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#x3002;</p>
+<p>&#x6D4B;&#x8BD5;&#xFF1A;<br>&#x6D4B;&#x8BD5;&#x5F88;&#x7B80;&#x5355;&#xFF0C;&#x628A;&#x6700;&#x5927;&#x8FDE;&#x63A5;&#x6570;&#x8C03;&#x5C0F;&#x4E00;&#x70B9;&#xFF0C;&#x968F;&#x4FBF;&#x4E00;&#x4E2A;&#x6D4F;&#x89C8;&#x5668;&#x8BBF;&#x95EE;&#x9875;&#x9762;&#xFF0C;&#x7136;&#x540E;&#x6309;&#x7740;F5&#xFF0C;&#x8BA9;&#x9875;&#x9762;&#x4E0D;&#x65AD;&#x5237;&#x65B0;&#xFF0C;&#x4E00;&#x4E0B;&#x5C31;&#x53EF;&#x4EE5;&#x5F39;&#x51FA;503&#x9519;&#x8BEF;</p>
+<h2 id="&#x4F7F;&#x7528;mod-bandwidth&#x6A21;&#x5757;&#x9650;&#x5236;&#x5E26;&#x5BBD;"><a href="#&#x4F7F;&#x7528;mod-bandwidth&#x6A21;&#x5757;&#x9650;&#x5236;&#x5E26;&#x5BBD;" class="headerlink" title="&#x4F7F;&#x7528;mod_bandwidth&#x6A21;&#x5757;&#x9650;&#x5236;&#x5E26;&#x5BBD;"></a><strong>&#x4F7F;&#x7528;mod_bandwidth&#x6A21;&#x5757;&#x9650;&#x5236;&#x5E26;&#x5BBD;</strong></h2><p>mod_bandwidth&#x53EF;&#x4EE5;&#x5BF9;IP&#x7684;&#x5E76;&#x53D1;&#x6570;&#x8FDB;&#x884C;&#x63A7;&#x5236;&#xFF0C;&#x4E5F;&#x53EF;&#x4EE5;&#x5BF9;&#x4E0B;&#x8F7D;&#x6D41;&#x91CF;&#x8FDB;&#x884C;&#x63A7;&#x5236;&#xFF0C;&#x4E5F;&#x53EF;&#x4EE5;&#x5BF9;&#x67D0;&#x4E2A;&#x76EE;&#x5F55;&#x7684;&#x6D41;&#x91CF;&#x8FDB;&#x884C;&#x63A7;&#x5236;&#x3002;<br>&#x5B89;&#x88C5;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget http://bwmod.sourceforge.net/files/mod_bw-0.7.tgz</span><br><span class="line">tar zxvf mod_bw-0.7.tgz</span><br><span class="line"><span class="built_in">cd</span> mod_bw</span><br><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apxs -c -i mod_bw.c</span><br></pre></td></tr></table></figure>
+
+<p>&#x7F16;&#x8F91;httpd.conf&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LoadModule bw_module modules/mod_bw.so</span><br><span class="line"> </span><br><span class="line">&lt;virtualHost *:80&gt;</span><br><span class="line">        ServerName vhost1.cszhi.com</span><br><span class="line">        DocumentRoot    /var/www/vhost1</span><br><span class="line">        BandwidthModule On</span><br><span class="line">        ForceBandWidthModule On</span><br><span class="line">        Bandwidth all 1024000</span><br><span class="line">        MinBandwidth all 50000          &#xFF03;&#x6BCF;&#x4E2A;&#x5BA2;&#x6237;&#x7AEF;&#x6700;&#x9AD8;&#x901F;&#x5EA6;&#x53EF;&#x8FBE;50KB</span><br><span class="line">        LargeFileLimit * 500 50000</span><br><span class="line">        MaxConnection all 6</span><br><span class="line">&lt;/virtualHost&gt;</span><br></pre></td></tr></table></figure>
+
+<p>&#x5176;&#x5B83;&#x53C2;&#x6570;&#x4E8B;&#x4F8B;&#x8BF4;&#x660E;&#xFF0C;&#x8BE6;&#x7EC6;&#x7684;&#x89C1;&#x6E90;&#x7801;&#x5305;&#x91CC;&#x7684;mod_bw.txt&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">BandWidth localhost 0                                      #&#x5BF9;localhost&#x4E0D;&#x9650;&#x901F;</span><br><span class="line">BandWidth 192.168.1.5 102400                       #&#x5BF9;192.168.1.5&#x9650;&#x901F;&#x4E3A;100KB</span><br><span class="line">BandWidth &#x201C;u:^Mozilla(.*)&#x201D; 10240              #&#x7528;mozilla&#x65F6;&#x9650;&#x901F;10KB</span><br><span class="line">BandWidth &#x201C;u:wget&#x201D; 102400                      &#xFF03;&#x5982;&#x679C;&#x7528;wget&#x4E0B;&#x8F7D;&#x65F6;&#x9650;&#x901F;10KB</span><br><span class="line">MinBandWidth all -1                                      &#xFF03;&#x4FDD;&#x8BC1;&#x6BCF;&#x4E2A;&#x5BA2;&#x6237;&#x7AEF;&#x6700;&#x9AD8;&#x901F;&#x5EA6;&#x53EF;&#x8FBE;10KB</span><br><span class="line">LargeFileLimit .jpg 100 10240                      &#xFF03;jpg&#x6587;&#x4EF6;&#x8D85;&#x8FC7;100KB&#xFF0C;&#x9650;&#x901F;10KB</span><br><span class="line">&#xFF03;&#x4E0B;&#x9762;&#x7684;510&#x633A;&#x597D;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x8BBE;&#x7F6E;&#xFF0C;apache&#x81EA;&#x5DF1;&#x4F1A;&#x62A5;&#x9519;&#xFF0C;&#x5C31;&#x6839;&#x62A5;404&#x5DEE;&#x4E0D;&#x591A;&#xFF0C;&#x9875;&#x9762;&#x975E;&#x5E38;&#x7684;&#x4E11;</span><br><span class="line">ErrorDocument 510 /exceed_speed.html</span><br><span class="line">BandWidthError 510</span><br><span class="line">MaxConnection all 10                                       #&#x6240;&#x6709;ip&#x6700;&#x5927;&#x8FDE;&#x63A5;&#x6570;&#x4E3A;10</span><br><span class="line">MaxConnection 192.168.1.5 5                         &#xFF03;192.168.1.5&#x6700;&#x5927;&#x8FDE;&#x63A5;&#x6570;&#x4E3A;5</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6D4B;&#x8BD5;&#xFF1A;</strong><br>&#x4F7F;&#x7528;mod_bw.so&#x6A21;&#x5757;&#x524D;&#xFF1A;<br><img src="/0201/01/01/apache/Apache&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x6570;&#x548C;&#x6D41;&#x91CF;&#x63A7;&#x5236;/1567498214907.png" alt="1567498214907"><br>&#x4F7F;&#x7528;mod_bw.so&#x6A21;&#x5757;&#x540E;&#xFF1A;<br><img src="/0201/01/01/apache/Apache&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x6570;&#x548C;&#x6D41;&#x91CF;&#x63A7;&#x5236;/1567498221747.png" alt="1567498221747"></p>
+<p><strong>&#x5B89;&#x88C5;&#x8FC7;&#x7A0B;&#x4E2D;&#x53EF;&#x80FD;&#x51FA;&#x73B0;&#x7684;&#x95EE;&#x9898;&#xFF1A;</strong></p>
+<p>1&#x3001;&#x6DFB;&#x52A0;&#x5B8C;mod_bw.so&#x6A21;&#x5757;&#xFF0C;&#x91CD;&#x542F;apache&#x65F6;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@vps httpd]<span class="comment"># /etc/init.d/httpd restart</span></span><br><span class="line">Stopping httpd:                                            [FAILED]</span><br><span class="line">Starting httpd: httpd: Syntax error on line 203 of /etc/httpd/conf/httpd.conf: Cannot load /etc/httpd/modules/mod_bw.so into server: /etc/httpd/modules/mod_bw.so: undefined symbol: apr_atomic_cas</span><br><span class="line">                                                           [FAILED]</span><br></pre></td></tr></table></figure>
+
+<p>&#x4FEE;&#x6539;&#x4E00;&#x4E0B;mod_bw.c &#x5C31;&#x53EF;&#x4EE5;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#ifdef APR_MAJOR_VERSION   //&#x6DFB;&#x52A0;&#x8FD9;&#x884C;</span><br><span class="line">#if (APR_MAJOR_VERSION &lt; 1)</span><br><span class="line">    #define apr_atomic_inc32 apr_atomic_inc</span><br><span class="line">    #define apr_atomic_dec32 apr_atomic_dec</span><br><span class="line">    #define apr_atomic_add32 apr_atomic_add</span><br><span class="line">    #define apr_atomic_cas32 apr_atomic_cas</span><br><span class="line">    #define apr_atomic_set32 apr_atomic_set</span><br><span class="line">#endif</span><br><span class="line">#endif  //&#x6DFB;&#x52A0;&#x8FD9;&#x884C;</span><br></pre></td></tr></table></figure>
+
+<p>&#x91CD;&#x65B0;&#x7F16;&#x8BD1;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/apache2/bin/apxs -c -i mod_bw.c</span><br></pre></td></tr></table></figure>
+
+<p>2&#x3001;&#x5982;&#x679C;&#x670D;&#x52A1;&#x5668;&#x6CA1;&#x6709;&#x5B89;&#x88C5;apxs&#xFF0C;&#x53EF;&#x4EE5;&#x53C2;&#x7167;&#x4EE5;&#x4E0B;&#x65B9;&#x6CD5;&#x5B89;&#x88C5;&#xFF1A;<br>apxs&#x662F;&#x4E00;&#x4E2A;&#x4E3A;Apache HTTP&#x670D;&#x52A1;&#x5668;&#x7F16;&#x8BD1;&#x548C;&#x5B89;&#x88C5;&#x6269;&#x5C55;&#x6A21;&#x5757;&#x7684;&#x5DE5;&#x5177;&#xFF0C;&#x7528;&#x4E8E;&#x7F16;&#x8BD1;&#x4E00;&#x4E2A;&#x6216;&#x591A;&#x4E2A;&#x6E90;&#x7A0B;&#x5E8F;&#x6216;&#x76EE;&#x6807;&#x4EE3;&#x7801;&#x6587;&#x4EF6;&#x4E3A;&#x52A8;&#x6001;&#x5171;&#x4EAB;&#x5BF9;&#x8C61;&#xFF0C;&#x4F7F;&#x4E4B;&#x53EF;&#x4EE5;&#x7528;&#x7531;mod_so&#x63D0;&#x4F9B;&#x7684;LoadModule&#x6307;&#x4EE4;&#x5728;&#x8FD0;&#x884C;&#x65F6;&#x52A0;&#x8F7D;&#x5230;Apache&#x670D;&#x52A1;&#x5668;&#x4E2D;&#x3002;</p>
+<p>&#x8F93;&#x5165;&#x547D;&#x4EE4;&#x67E5;&#x770B;&#x662F;&#x5426;&#x6709;httpd-devel&#x8FD9;&#x4E2A;&#x5305;&#xFF0C;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x9700;&#x8981;&#x5B89;&#x88C5;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpm -qa|grep httpd</span><br><span class="line">yum -y install httpd-devel</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2009/03/11/DDoS攻击原理及防护方法论/" rel="prev" title="DDoS攻击原理及防护方法论">
+                  DDoS攻击原理及防护方法论 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用mod-limitipconn模块限制IP并发连接数"><span class="nav-number">1.</span> <span class="nav-text">使用mod_limitipconn模块限制IP并发连接数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用mod-bandwidth模块限制带宽"><span class="nav-number">2.</span> <span class="nav-text">使用mod_bandwidth模块限制带宽</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

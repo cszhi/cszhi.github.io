@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x7B80;&amp;#x4ECB;&amp;#x4E00;&amp;#x4E2A;&amp;#x8DE8;&amp;#x5E73;&amp;#x53F0;&amp;#x7684;&amp;#x8D44;&amp;#x6599;&amp;#x5907;&amp;#x4EFD;&amp;#x4E0E;&amp;#x540C;&amp;#x6B65;&amp;#x5DE5;&amp;#x5177; &amp;#x539F;&amp;#x7406;&amp;#x5728;&amp;#x8FDB;&amp;#x884C;&amp;#x540C;&amp;#x6B65;&amp;#x4E4B">
+<meta name="keywords" content="linux,ops">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rsync简明教程">
+<meta property="og:url" content="http://blogs.cszhi.com/2012/03/12/rsync简明教程/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x7B80;&amp;#x4ECB;&amp;#x4E00;&amp;#x4E2A;&amp;#x8DE8;&amp;#x5E73;&amp;#x53F0;&amp;#x7684;&amp;#x8D44;&amp;#x6599;&amp;#x5907;&amp;#x4EFD;&amp;#x4E0E;&amp;#x540C;&amp;#x6B65;&amp;#x5DE5;&amp;#x5177; &amp;#x539F;&amp;#x7406;&amp;#x5728;&amp;#x8FDB;&amp;#x884C;&amp;#x540C;&amp;#x6B65;&amp;#x4E4B">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-03T07:42:58.619Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="rsync简明教程">
+<meta name="twitter:description" content="&amp;#x7B80;&amp;#x4ECB;&amp;#x4E00;&amp;#x4E2A;&amp;#x8DE8;&amp;#x5E73;&amp;#x53F0;&amp;#x7684;&amp;#x8D44;&amp;#x6599;&amp;#x5907;&amp;#x4EFD;&amp;#x4E0E;&amp;#x540C;&amp;#x6B65;&amp;#x5DE5;&amp;#x5177; &amp;#x539F;&amp;#x7406;&amp;#x5728;&amp;#x8FDB;&amp;#x884C;&amp;#x540C;&amp;#x6B65;&amp;#x4E4B">
+  <link rel="canonical" href="http://blogs.cszhi.com/2012/03/12/rsync简明教程/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>rsync简明教程 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/03/12/rsync简明教程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">rsync简明教程
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-03-12 00:00:00" itemprop="dateCreated datePublished" datetime="2012-03-12T00:00:00+08:00">2012-03-12</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="&#x7B80;&#x4ECB;"><a href="#&#x7B80;&#x4ECB;" class="headerlink" title="&#x7B80;&#x4ECB;"></a>&#x7B80;&#x4ECB;</h2><p>&#x4E00;&#x4E2A;&#x8DE8;&#x5E73;&#x53F0;&#x7684;&#x8D44;&#x6599;&#x5907;&#x4EFD;&#x4E0E;&#x540C;&#x6B65;&#x5DE5;&#x5177;</p>
+<h2 id="&#x539F;&#x7406;"><a href="#&#x539F;&#x7406;" class="headerlink" title="&#x539F;&#x7406;"></a>&#x539F;&#x7406;</h2><p>&#x5728;&#x8FDB;&#x884C;&#x540C;&#x6B65;&#x4E4B;&#x524D;&#xFF0C;&#x4F1A;&#x5148;&#x6BD4;&#x8F83;&#x5206;&#x6790;&#x4E24;&#x7AEF;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x627E;&#x51FA;&#x6570;&#x636E;&#x53D1;&#x751F;&#x6539;&#x53D8;&#x8FC7;&#x591A;&#x6587;&#x4EF6;&#xFF0C;&#x518D;&#x5C06;&#x8FD9;&#x4E9B;&#x6587;&#x4EF6;&#x4F20;&#x8F93;&#x5230;&#x76EE;&#x7684;&#x7AEF;&#xFF0C;&#x5B8C;&#x6210;&#x5907;&#x4EFD;&#x5DE5;&#x4F5C;</p>
+<a id="more"></a>
+
+<h2 id="&#x4F18;&#x70B9;"><a href="#&#x4F18;&#x70B9;" class="headerlink" title="&#x4F18;&#x70B9;"></a>&#x4F18;&#x70B9;</h2><p>1&#x3001;&#x53EF;&#x4EE5;&#x8FDB;&#x884C;&#x589E;&#x91CF;&#x5907;&#x4EFD;&#xFF0C;&#x5373;&#x4F7F;&#x5907;&#x4EFD;&#x4E2D;&#x65AD;&#xFF0C;&#x4E0B;&#x6B21;&#x5907;&#x4EFD;&#x4F1A;&#x4ECE;&#x4ECE;&#x4E0A;&#x6B21;&#x4E2D;&#x65AD;&#x7684;&#x4F4D;&#x7F6E;&#x7EE7;&#x7EED;<br>2&#x3001;&#x53EF;&#x4EE5;&#x5229;&#x7528;ssh&#x8FDB;&#x884C;&#x6570;&#x636E;&#x52A0;&#x5BC6;&#x4F20;&#x8F93;<br>3&#x3001;&#x5F00;&#x6E90;&#x3001;&#x8DE8;&#x5E73;&#x53F0;</p>
+<h2 id="&#x7F3A;&#x70B9;"><a href="#&#x7F3A;&#x70B9;" class="headerlink" title="&#x7F3A;&#x70B9;"></a>&#x7F3A;&#x70B9;</h2><p>1&#x3001;&#x9047;&#x5230;&#x6587;&#x4EF6;&#x6570;&#x6216;&#x76EE;&#x5F55;&#x5C42;&#x6570;&#x591A;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x6548;&#x7387;&#x8F83;&#x5DEE;&#x3002;&#x6587;&#x4EF6;&#x6570;&#x5230;&#x8FBE;&#x4E00;&#x5B9A;&#x6570;&#x91CF;&#x65F6;&#xFF0C;rsync&#x53EF;&#x80FD;&#x65E0;&#x6CD5;&#x6267;&#x884C;<br>2&#x3001;&#x64CD;&#x4F5C;&#x65F6;&#x52A1;&#x5FC5;&#x5C0F;&#x5FC3;&#xFF0C;&#x5426;&#x5219;&#x5BB9;&#x6613;&#x8986;&#x76D6;&#x6216;&#x8BEF;&#x5220;&#x9664;&#x6570;&#x636E;</p>
+<h2 id="&#x8FD0;&#x884C;&#x6A21;&#x5F0F;"><a href="#&#x8FD0;&#x884C;&#x6A21;&#x5F0F;" class="headerlink" title="&#x8FD0;&#x884C;&#x6A21;&#x5F0F;"></a>&#x8FD0;&#x884C;&#x6A21;&#x5F0F;</h2><h4 id="1&#x3001;&#x5728;&#x672C;&#x673A;&#x4E0A;&#x8FD0;&#x884C;&#xFF0C;&#x7528;&#x6CD5;&#x4E0E;cp&#x51E0;&#x4E4E;&#x4E00;&#x6A21;&#x4E00;&#x6837;&#xFF1A;"><a href="#1&#x3001;&#x5728;&#x672C;&#x673A;&#x4E0A;&#x8FD0;&#x884C;&#xFF0C;&#x7528;&#x6CD5;&#x4E0E;cp&#x51E0;&#x4E4E;&#x4E00;&#x6A21;&#x4E00;&#x6837;&#xFF1A;" class="headerlink" title="1&#x3001;&#x5728;&#x672C;&#x673A;&#x4E0A;&#x8FD0;&#x884C;&#xFF0C;&#x7528;&#x6CD5;&#x4E0E;cp&#x51E0;&#x4E4E;&#x4E00;&#x6A21;&#x4E00;&#x6837;&#xFF1A;"></a>1&#x3001;&#x5728;&#x672C;&#x673A;&#x4E0A;&#x8FD0;&#x884C;&#xFF0C;&#x7528;&#x6CD5;&#x4E0E;cp&#x51E0;&#x4E4E;&#x4E00;&#x6A21;&#x4E00;&#x6837;&#xFF1A;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rsync -av /etc /tmp&#xFF08;&#x5C06;/etc&#x76EE;&#x5F55;&#x5907;&#x4EFD;&#x5230;/tmp/etc&#x76EE;&#x5F55;&#x91CC;&#xFF09;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2&#x3001;&#x901A;&#x8FC7;ssh&#x901A;&#x9053;&#x5728;&#x4F20;&#x8F93;&#x6570;&#x636E;&#xFF1A;"><a href="#2&#x3001;&#x901A;&#x8FC7;ssh&#x901A;&#x9053;&#x5728;&#x4F20;&#x8F93;&#x6570;&#x636E;&#xFF1A;" class="headerlink" title="2&#x3001;&#x901A;&#x8FC7;ssh&#x901A;&#x9053;&#x5728;&#x4F20;&#x8F93;&#x6570;&#x636E;&#xFF1A;"></a>2&#x3001;&#x901A;&#x8FC7;ssh&#x901A;&#x9053;&#x5728;&#x4F20;&#x8F93;&#x6570;&#x636E;&#xFF1A;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rsync -av -e ssh user@192.168.1.1:/etc /tmp&#xFF08;&#x5C06;192.168.1.1&#x4E0A;&#x7684;/etc&#x76EE;&#x5F55;&#x5907;&#x4EFD;&#x5230;&#x672C;&#x673A;&#x7684;/tmp&#x76EE;&#x5F55;&#xFF09;</span><br><span class="line">rsync -av -e ssh user@192.168.1.1:/etc/ /tmp&#xFF08;&#x5C06;192.168.1.1&#x4E0A;&#x7684;/etc&#x76EE;&#x5F55;&#x4E0B;&#x7684;&#x6587;&#x4EF6;&#x5907;&#x4EFD;&#x5230;&#x672C;&#x673A;&#x7684;/tmp&#x76EE;&#x5F55;&#xFF09;</span><br></pre></td></tr></table></figure>
+
+<h4 id="3&#x3001;&#x4F7F;&#x7528;daemon&#x7684;&#x65B9;&#x5F0F;&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5907;&#x4EFD;&#x4F20;&#x8F93;"><a href="#3&#x3001;&#x4F7F;&#x7528;daemon&#x7684;&#x65B9;&#x5F0F;&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5907;&#x4EFD;&#x4F20;&#x8F93;" class="headerlink" title="3&#x3001;&#x4F7F;&#x7528;daemon&#x7684;&#x65B9;&#x5F0F;&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5907;&#x4EFD;&#x4F20;&#x8F93;"></a>3&#x3001;&#x4F7F;&#x7528;daemon&#x7684;&#x65B9;&#x5F0F;&#x5BF9;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5907;&#x4EFD;&#x4F20;&#x8F93;</h4><blockquote>
+<p>&#x6B64;&#x65F6;rsync&#x670D;&#x52A1;&#x7AEF;&#x9700;&#x542F;&#x7528;873&#x7AEF;&#x53E3;</p>
+</blockquote>
+<p>&#x73AF;&#x5883;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">server: 192.168.1.101</span><br><span class="line">client: 192.168.1.104</span><br></pre></td></tr></table></figure>
+
+<p>&#x8BF4;&#x660E;&#xFF1A;</p>
+<p>&#x5C06;server&#x4E0A;&#x7684;/var/log&#x91CC;&#x7684;&#x6587;&#x4EF6;&#x540C;&#x6B65;&#x5230;client&#x7684;/tmp/log&#x76EE;&#x5F55;</p>
+<p>&#x670D;&#x52A1;&#x7AEF;&#x914D;&#x7F6E;&#xFF1A;</p>
+<p>&#x9996;&#x5148;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x914D;&#x7F6E;&#x6587;&#x4EF6;/etc/rsyncd.conf</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@kof ~]<span class="comment"># vim /etc/rsyncd.conf</span></span><br><span class="line">uid = root     <span class="comment">#&#x8BBE;&#x7F6E;&#x6267;&#x884C;rsync&#x7684;&#x672C;&#x5730;&#x7528;&#x6237;</span></span><br><span class="line">gid = root     <span class="comment">#&#x8BBE;&#x7F6E;&#x6267;&#x884C;rsync&#x7684;&#x672C;&#x5730;&#x7EC4;</span></span><br><span class="line"><span class="comment">#use chroot = yes     #&#x662F;&#x5426;chroot</span></span><br><span class="line">max connections = 4     <span class="comment">#&#x6700;&#x5927;&#x540C;&#x65F6;&#x8FDE;&#x63A5;&#x6570;</span></span><br><span class="line">pid file = /var/run/rsyncd.pid     <span class="comment">#&#x6307;&#x5B9A;rsync&#x670D;&#x52A1;&#x8FDB;&#x7A0B;&#x7684;pid file</span></span><br><span class="line">lock file = /var/run/rsync.lock     <span class="comment">#&#x6307;&#x5B9A;rsync&#x670D;&#x52A1;&#x7AEF;&#x9501;&#x5B9A;&#x6587;&#x4EF6;log file = /var/log/rsyncd.log     #&#x6307;&#x5B9A;rsync&#x7684;log&#x8F93;&#x51FA;&#x8DEF;&#x5F84;</span></span><br><span class="line">[downloads]     <span class="comment">#&#x6A21;&#x5757;&#x8BBE;&#x5B9A;&#xFF0C;&#x53EF;&#x8BBE;&#x7F6E;&#x591A;&#x4E2A;&#x6A21;&#x5757;</span></span><br><span class="line">path = /var/<span class="built_in">log</span>     <span class="comment">#&#x540C;&#x6B65;&#x6587;&#x4EF6;&#x7684;&#x771F;&#x5B9E;&#x8DEF;&#x5F84;</span></span><br><span class="line">ignore errors</span><br><span class="line"><span class="built_in">read</span> only = <span class="literal">true</span>     <span class="comment">#&#x662F;&#x5426;&#x53EA;&#x8BFB;</span></span><br><span class="line">list = <span class="literal">true</span></span><br><span class="line">hosts allow = 192.168.1.0/24     <span class="comment">#&#x5141;&#x8BB8;&#x540C;&#x6B65;&#x5230;ip/&#x7F51;&#x6BB5;</span></span><br><span class="line">hosts deny = 0.0.0.0/32</span><br><span class="line">auth users = backup     <span class="comment">#&#x8EAB;&#x4EFD;&#x9A8C;&#x8BC1;&#x7528;&#x6237;&#x3002;&#x8FD9;&#x4E0D;&#x662F;&#x7CFB;&#x7EDF;&#x7528;&#x6237;&#xFF0C;&#x800C;&#x662F;rsync&#x670D;&#x52A1;&#x81EA;&#x5B9A;&#x7684;</span></span><br><span class="line">secrets file = /etc/rsyncd.pwd     <span class="comment">#downloads&#x6A21;&#x5757;&#x7684;&#x5BC6;&#x7801;&#x6587;&#x4EF6;</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x521B;&#x5EFA;&#x5BC6;&#x7801;&#x6587;&#x4EF6;/etc/rsyncd.pwd</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@kof ~]<span class="comment"># vim /etc/rsyncd.pwd</span></span><br><span class="line">backup:jjj     <span class="comment">#&#x7528;&#x6237;backup&#xFF0C;&#x5BC6;&#x7801;jjj</span></span><br><span class="line">[root@kof ~]<span class="comment"># chmod 600 /etc/rsyncd.pwd     #&#x51FA;&#x4E8E;&#x5B89;&#x5168;&#x8003;&#x8651;&#xFF0C;&#x6587;&#x4EF6;&#x53EA;&#x6709;&#x5C5E;&#x7EC4;&#x53EF;&#x8BFB;&#x5199;</span></span><br><span class="line">[root@kof ~]<span class="comment"># rsync --daemon     #&#x4EE5;&#x5B88;&#x62A4;&#x8FDB;&#x7A0B;&#x6A21;&#x5F0F;&#x542F;&#x52A8;rsync&#x670D;&#x52A1;&#xFF0C;&#x201C;--config=&#x201D;&#x53C2;&#x6570;&#x53EF;&#x4EE5;&#x6307;&#x5B9A;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;/etc/rsyncd.pwd</span></span><br><span class="line">[root@kof ~]<span class="comment"># netstat -tunlp |grep 873     #&#x68C0;&#x67E5;&#x662F;&#x5426;&#x6B63;&#x5E38;&#x542F;&#x52A8;</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x5BA2;&#x6237;&#x7AEF;&#x914D;&#x7F6E;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@client ~]<span class="comment"># vim /etc/rsync.pwd     #&#x521B;&#x5EFA;&#x5BC6;&#x7801;&#x6587;&#x4EF6;</span></span><br><span class="line">jjj</span><br><span class="line">[root@client ~]<span class="comment"># chmod 600 /etc/rsync.pwd     #&#x4FEE;&#x6539;&#x5BC6;&#x7801;&#x6587;&#x4EF6;&#x6743;&#x9650;</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x5F00;&#x59CB;&#x540C;&#x6B65;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@client ~]<span class="comment"># rsync -avzP --password-file=/etc/rsync.pwd backup@192.168.1.101::downloads/* /tmp/log</span></span><br><span class="line">avzP     <span class="comment">#z&#x662F;&#x538B;&#x7F29; P&#x662F;&#x663E;&#x793A;&#x4F20;&#x8F93;&#x8FDB;&#x5EA6;</span></span><br><span class="line">--password-file     <span class="comment">#&#x6307;&#x5B9A;&#x5BC6;&#x7801;&#x6587;&#x4EF6;&#xFF0C;&#x5982;&#x4E0D;&#x6307;&#x5B9A;&#xFF0C;&#x4F1A;&#x5728;shell&#x4E2D;&#x63D0;&#x793A;&#x624B;&#x5DE5;&#x8F93;&#x5165;</span></span><br><span class="line">backup@192.168.1.101::downloads/*     <span class="comment">#&#x6E90;&#x6587;&#x4EF6;&#xFF0C;downloads&#x662F;&#x6A21;&#x5757;&#x540D;</span></span><br><span class="line">/tmp/<span class="built_in">log</span>     <span class="comment">#&#x76EE;&#x6807;&#x6587;&#x4EF6;</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x4E5F;&#x53EF;&#x4ECE;&#x5BA2;&#x6237;&#x7AEF;&#x540C;&#x6B65;&#x5230;&#x670D;&#x52A1;&#x7AEF;&#xFF0C;&#x670D;&#x52A1;&#x7AEF;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x7684;read only&#x5FC5;&#x987B;&#x6539;&#x4E3A;false&#x3002;</p>
+<p>&#x4E0B;&#x9762;&#x662F;rsync&#x7684;&#x90E8;&#x5206;&#x8BED;&#x6CD5;&#x8BF4;&#x660E;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@linux ~]<span class="comment"># rsync [-avrlptgoD] [-e ssh] [user@host:/dir] [/local/path]</span></span><br><span class="line">&#x53C2;&#x6570;&#xFF1A;</span><br><span class="line">-v &#xFF1A;&#x89C2;&#x5BDF;&#x6A21;&#x5F0F;&#xFF0C;&#x53EF;&#x4EE5;&#x5217;&#x51FA;&#x66F4;&#x591A;&#x7684;&#x4FE1;&#x606F;&#xFF1B;</span><br><span class="line">-q &#xFF1A;&#x4E0E; -v  &#x76F8;&#x53CD;&#xFF0C;&#x5B89;&#x9759;&#x6A21;&#x5F0F;&#xFF0C;&#x8F93;&#x51FA;&#x7684;&#x4FE1;&#x606F;&#x6BD4;&#x8F83;&#x5C11;&#xFF1B;</span><br><span class="line">-r &#xFF1A;&#x9012;&#x5F52;&#x590D;&#x5236;&#xFF01;&#x53EF;&#x4EE5;&#x9488;&#x5BF9;&#x300E;&#x76EE;&#x5F55;&#x300F;&#x6765;&#x5904;&#x7406;&#xFF01;&#x5F88;&#x91CD;&#x8981;&#xFF01;</span><br><span class="line">-u &#xFF1A;&#x4EC5;&#x66F4;&#x65B0; (update)&#xFF0C;&#x4E0D;&#x4F1A;&#x8986;&#x76D6;&#x76EE;&#x6807;&#x7684;&#x65B0;&#x6863;&#x6848;&#xFF1B;</span><br><span class="line">-l &#xFF1A;&#x590D;&#x5236;&#x8FDE;&#x7ED3;&#x6587;&#x4EF6;&#x7684;&#x5C5E;&#x6027;&#xFF0C;&#x800C;&#x975E;&#x8FDE;&#x7ED3;&#x7684;&#x76EE;&#x6807;&#x6E90;&#x6587;&#x4EF6;&#x5185;&#x5BB9;&#xFF1B;</span><br><span class="line">-p &#xFF1A;&#x590D;&#x5236;&#x65F6;&#xFF0C;&#x8FDE;&#x540C;&#x5C5E;&#x6027; (permission) &#x4E5F;&#x4FDD;&#x5B58;&#x4E0D;&#x53D8;&#xFF01;</span><br><span class="line">-g &#xFF1A;&#x4FDD;&#x5B58;&#x6E90;&#x6587;&#x4EF6;&#x7684;&#x62E5;&#x6709;&#x7FA4;&#x7EC4;&#xFF1B;</span><br><span class="line">-o &#xFF1A;&#x4FDD;&#x5B58;&#x6E90;&#x6587;&#x4EF6;&#x7684;&#x62E5;&#x6709;&#x4EBA;&#xFF1B;</span><br><span class="line">-D &#xFF1A;&#x4FDD;&#x5B58;&#x6E90;&#x6587;&#x4EF6;&#x7684;&#x88C5;&#x7F6E;&#x5C5E;&#x6027; (device)</span><br><span class="line">-t &#xFF1A;&#x4FDD;&#x5B58;&#x6E90;&#x6587;&#x4EF6;&#x7684;&#x65F6;&#x95F4;&#x53C2;&#x6570;&#xFF1B;</span><br><span class="line">-I &#xFF1A;&#x5FFD;&#x7565;&#x66F4;&#x65B0;&#x65F6;&#x95F4; (mtime) &#x7684;&#x5C5E;&#x6027;&#xFF0C;&#x6863;&#x6848;&#x6BD4;&#x5BF9;&#x4E0A;&#x4F1A;&#x6BD4;&#x8F83;&#x5FEB;&#x901F;&#xFF1B;</span><br><span class="line">-z &#xFF1A;&#x52A0;&#x4E0A;&#x538B;&#x7F29;&#x7684;&#x53C2;&#x6570;&#xFF01;</span><br><span class="line">-e &#xFF1A;&#x4F7F;&#x7528;&#x7684;&#x4FE1;&#x9053;&#x534F;&#x8BAE;&#xFF0C;&#x4F8B;&#x5982;&#x4F7F;&#x7528; ssh &#x901A;&#x9053;&#xFF0C;&#x5219; -e ssh</span><br><span class="line">-a &#xFF1A;&#x76F8;&#x5F53;&#x4E8E; -rlptgoD &#xFF0C;&#x6240;&#x4EE5;&#x8FD9;&#x4E2A; -a &#x662F;&#x6700;&#x5E38;&#x7528;&#x7684;&#x53C2;&#x6570;&#x4E86;&#xFF01;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+            
+              <a href="/tags/ops/" rel="tag"><i class="fa fa-tag"></i> ops</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2012/03/11/Linux下大文件跨网传输的方法/" rel="next" title="Linux下大文件跨网传输的方法">
+                  <i class="fa fa-chevron-left"></i> Linux下大文件跨网传输的方法
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2012/04/13/使用脚本防止ssh暴力破解/" rel="prev" title="使用脚本防止ssh暴力破解">
+                  使用脚本防止ssh暴力破解 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理"><span class="nav-number">2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优点"><span class="nav-number">3.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缺点"><span class="nav-number">4.</span> <span class="nav-text">缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行模式"><span class="nav-number">5.</span> <span class="nav-text">运行模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、在本机上运行，用法与cp几乎一模一样："><span class="nav-number">5.0.1.</span> <span class="nav-text">1、在本机上运行，用法与cp几乎一模一样：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、通过ssh通道在传输数据："><span class="nav-number">5.0.2.</span> <span class="nav-text">2、通过ssh通道在传输数据：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、使用daemon的方式对数据进行备份传输"><span class="nav-number">5.0.3.</span> <span class="nav-text">3、使用daemon的方式对数据进行备份传输</span></a></li></ol></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

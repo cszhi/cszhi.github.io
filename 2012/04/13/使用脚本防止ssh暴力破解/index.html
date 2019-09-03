@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x524D;&amp;#x6BB5;&amp;#x65F6;&amp;#x95F4;&amp;#x4E70;&amp;#x4E86;&amp;#x4E2A;&amp;#x7F8E;&amp;#x56FD;&amp;#x7684;vps&amp;#xFF0C;&amp;#x4E3B;&amp;#x8981;&amp;#x7528;&amp;#x4E8E;&amp;#x5B66;&amp;#x4E60;&amp;#xFF0C;&amp;#x4E5F;&amp;#x6CA1;&amp;#x592A;&amp;#x6CE8;&amp;#x610F;&amp;#x5B89;&amp;#x51">
+<meta name="keywords" content="linux,ops">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用脚本防止ssh暴力破解">
+<meta property="og:url" content="http://blogs.cszhi.com/2012/04/13/使用脚本防止ssh暴力破解/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x524D;&amp;#x6BB5;&amp;#x65F6;&amp;#x95F4;&amp;#x4E70;&amp;#x4E86;&amp;#x4E2A;&amp;#x7F8E;&amp;#x56FD;&amp;#x7684;vps&amp;#xFF0C;&amp;#x4E3B;&amp;#x8981;&amp;#x7528;&amp;#x4E8E;&amp;#x5B66;&amp;#x4E60;&amp;#xFF0C;&amp;#x4E5F;&amp;#x6CA1;&amp;#x592A;&amp;#x6CE8;&amp;#x610F;&amp;#x5B89;&amp;#x51">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-03T07:47:13.919Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用脚本防止ssh暴力破解">
+<meta name="twitter:description" content="&amp;#x524D;&amp;#x6BB5;&amp;#x65F6;&amp;#x95F4;&amp;#x4E70;&amp;#x4E86;&amp;#x4E2A;&amp;#x7F8E;&amp;#x56FD;&amp;#x7684;vps&amp;#xFF0C;&amp;#x4E3B;&amp;#x8981;&amp;#x7528;&amp;#x4E8E;&amp;#x5B66;&amp;#x4E60;&amp;#xFF0C;&amp;#x4E5F;&amp;#x6CA1;&amp;#x592A;&amp;#x6CE8;&amp;#x610F;&amp;#x5B89;&amp;#x51">
+  <link rel="canonical" href="http://blogs.cszhi.com/2012/04/13/使用脚本防止ssh暴力破解/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>使用脚本防止ssh暴力破解 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/04/13/使用脚本防止ssh暴力破解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">使用脚本防止ssh暴力破解
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-04-13 00:00:00" itemprop="dateCreated datePublished" datetime="2012-04-13T00:00:00+08:00">2012-04-13</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>&#x524D;&#x6BB5;&#x65F6;&#x95F4;&#x4E70;&#x4E86;&#x4E2A;&#x7F8E;&#x56FD;&#x7684;vps&#xFF0C;&#x4E3B;&#x8981;&#x7528;&#x4E8E;&#x5B66;&#x4E60;&#xFF0C;&#x4E5F;&#x6CA1;&#x592A;&#x6CE8;&#x610F;&#x5B89;&#x5168;&#x65B9;&#x9762;&#x3002;&#x4ECA;&#x5929;&#x968F;&#x4FBF;&#x770B;&#x4E86;&#x4E0B;/var/log/secure&#x65E5;&#x5FD7;&#xFF1A;</p>
+<a id="more"></a>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Apr 11 11:10:05 kof sshd[18518]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 36824 ssh2</span><br><span class="line">Apr 11 11:10:10 kof sshd[18520]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 36966 ssh2</span><br><span class="line">Apr 11 11:10:15 kof sshd[18522]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 37132 ssh2</span><br><span class="line">Apr 11 11:10:19 kof sshd[18524]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 37326 ssh2</span><br><span class="line">Apr 11 11:10:24 kof sshd[18528]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 37476 ssh2</span><br><span class="line">Apr 11 11:10:29 kof sshd[18535]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 37642 ssh2</span><br><span class="line">Apr 11 11:10:34 kof sshd[18537]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 37819 ssh2</span><br><span class="line">Apr 11 11:10:39 kof sshd[18539]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 38023 ssh2</span><br><span class="line">Apr 11 11:10:44 kof sshd[18541]: Failed password <span class="keyword">for</span> root from 1.226.82.197 port 38200 ssh2</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+
+<p>&#x5927;&#x91CF;&#x7684;ssh&#x8BA4;&#x8BC1;&#x5931;&#x8D25;&#x65E5;&#x5FD7; &#xFF01;&#x5E73;&#x5747;5&#x79D2;&#x949F;&#x5C31;&#x6709;&#x4E00;&#x6B21;&#xFF01;</p>
+<p>&#x81EA;&#x5DF1;&#x52A8;&#x624B;&#xFF0C;&#x4E30;&#x8863;&#x8DB3;&#x98DF;&#xFF0C;&#x9A6C;&#x4E0A;&#x52A8;&#x624B;&#x5199;&#x4E2A;&#x811A;&#x672C;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">LIMIT=30     <span class="comment">#&#x8FD9;&#x8FB9;&#x53EF;&#x4EE5;&#x81EA;&#x5B9A;&#x4E49;&#x9650;&#x5236;&#x6B21;&#x6570;</span></span><br><span class="line">LOGFILE=<span class="string">&quot;/var/log/block_ssh.log&quot;</span>     <span class="comment">#&#x65E5;&#x5FD7;&#x8DEF;&#x5F84;</span></span><br><span class="line">TIME=$(date <span class="string">&apos;+%b %e %H&apos;</span>)     <span class="comment">#example: Apr 11 11</span></span><br><span class="line">BLOCK_IP=$(grep <span class="string">&quot;<span class="variable">$TIME</span>&quot;</span> /var/<span class="built_in">log</span>/secure|grep Failed|awk <span class="string">&apos;{print $(NF-3)}&apos;</span>|sort|uniq -c|awk <span class="string">&apos;$1&gt;&quot;$LIMIT&quot;{print $1&quot;:&quot;$2}&apos;</span>)     <span class="comment">#&#x5C06;1&#x5C0F;&#x65F6;&#x5185;ssh&#x8BA4;&#x8BC1;&#x5931;&#x8D25;&#x8D85;&#x8FC7;30&#x6B21;&#x7684;ip&#x6293;&#x51FA;&#x6765;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$BLOCK_IP</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">     IP=$(<span class="built_in">echo</span> <span class="variable">$i</span>|awk -F: <span class="string">&apos;{print $2}&apos;</span>)</span><br><span class="line">     iptables-save|grep INPUT|grep DROP|grep <span class="variable">$IP</span>&gt;/dev/null     <span class="comment">#&#x5148;&#x5224;&#x65AD;&#x4E0B;&#x662F;&#x5426;&#x5DF2;&#x7ECF;&#x88AB;&#x5C4F;&#x853D;</span></span><br><span class="line">     <span class="keyword">if</span> [ $? -gt 0 ];<span class="keyword">then</span></span><br><span class="line">          iptables -A INPUT -s <span class="variable">$IP</span> -p tcp --dport 22 -j DROP     <span class="comment">#&#x5C4F;&#x853D;ip</span></span><br><span class="line">          NOW=$(date <span class="string">&apos;+%Y-%m-%d %H:%M&apos;</span>)</span><br><span class="line">          <span class="built_in">echo</span> -e <span class="string">&quot;<span class="variable">$NOW</span> : <span class="variable">$IP</span>&quot;</span>&gt;&gt;<span class="variable">${LOGFILE}</span></span><br><span class="line">     <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x57FA;&#x672C;&#x601D;&#x8DEF;&#x662F;&#x7EDF;&#x8BA1;&#x51FA;1&#x5C0F;&#x65F6;ssh&#x8BA4;&#x8BC1;&#x5931;&#x8D25;&#x8D85;&#x8FC7;30&#x6B21;&#x7684;IP&#xFF0C;&#x5982;&#x679C;&#x6CA1;&#x5C4F;&#x853D;&#x8FC7;&#x7684;&#x5C31;&#x5C06;&#x5176;&#x52A0;&#x5165;iptables&#x5C4F;&#x853D;&#x3002;<br>&#x8FD9;&#x91CC;&#x5C31;&#x4E0D;&#x8BBE;&#x7F6E;&#x767D;&#x540D;&#x5355;&#x4E86;&#xFF0C;&#x6B63;&#x5E38;ip&#x5728;&#x4E00;&#x4E2A;&#x5C0F;&#x65F6;&#x5185;&#x4E0D;&#x4F1A;&#x6709;&#x90A3;&#x4E48;&#x591A;&#x7684;Failed&#x8BA4;&#x8BC1;&#x3002;</p>
+<p>&#x7ED9;&#x4E88;&#x811A;&#x672C;&#x6267;&#x884C;&#x6743;&#x9650;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 755 /root/block_ssh.sh</span><br></pre></td></tr></table></figure>
+
+<p>&#x6700;&#x540E;&#x52A0;&#x5165;&#x5230;crontab&#x5B9A;&#x65F6;&#x4EFB;&#x52A1;&#xFF0C;10&#x5206;&#x949F;&#x8FD0;&#x884C;&#x4E00;&#x6B21;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;*/10 * * * * root /root/block_ssh.sh&quot;</span> &gt;&gt;/etc/crontab</span><br></pre></td></tr></table></figure>
+
+<p>&#x811A;&#x672C;&#x8FD0;&#x884C;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x540E;&#x7684;&#x65E5;&#x5FD7;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@vps ~]<span class="comment"># more /var/log/block_ssh_ip.log</span></span><br><span class="line">2012-04-13 02:10 : 210.75.241.20</span><br><span class="line">2012-04-13 02:10 : 59.60.7.102</span><br><span class="line">2012-04-13 11:30 : 189.47.32.19</span><br><span class="line">2012-04-13 13:30 : 184.107.119.213</span><br><span class="line">2012-04-13 18:30 : 222.122.20.145</span><br><span class="line">2012-04-14 05:10 : 188.127.226.66</span><br><span class="line">2012-04-14 09:00 : 69.163.33.98</span><br><span class="line">2012-04-14 10:10 : 184.106.165.164</span><br><span class="line">2012-04-14 22:10 : 65.117.150.99</span><br><span class="line">2012-04-15 06:00 : 124.205.252.158</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6700;&#x540E;&#x9644;&#x4E0A;&#x63D0;&#x9AD8;ssh&#x5B89;&#x5168;&#x6027;&#x7684;&#x65B9;&#x6CD5;&#xFF1A;</strong></p>
+<p>&#x4E0B;&#x9762;&#x5185;&#x5BB9;&#x8F6C;&#x81EA;&#xFF1A;<a href="http://www.opsers.org/linux-home/base/ssh-security-methods-to-improve.html" target="_blank" rel="noopener">http://www.opsers.org/linux-home/base/ssh-security-methods-to-improve.html</a></p>
+<ol>
+<li>&#x4FEE;&#x6539;sshd&#x670D;&#x52A1;&#x5668;&#x7684;&#x914D;&#x7F6E;&#x6587;&#x4EF6;/etc/ssh/sshd_config&#xFF0C;&#x5C06;&#x90E8;&#x5206;&#x53C2;&#x6570;&#x53C2;&#x7167;&#x5982;&#x4E0B;&#x4FEE;&#x6539;&#xFF0C;&#x589E;&#x5F3A;&#x5B89;&#x5168;&#x6027;&#x3002;</li>
+</ol>
+<p>&#x7CFB;&#x7EDF;&#x7F3A;&#x7701;&#x4F7F;&#x7528;22&#x53F7;&#x7AEF;&#x53E3;&#xFF0C;&#x5C06;&#x76D1;&#x542C;&#x7AEF;&#x53E3;&#x66F4;&#x6539;&#x4E3A;&#x5176;&#x4ED6;&#x6570;&#x503C;&#xFF08;&#x6700;&#x597D;&#x662F;1024&#x4EE5;&#x4E0A;&#x7684;&#x9AD8;&#x7AEF;&#x53E3;&#xFF0C;&#x4EE5;&#x514D;&#x548C;&#x5176;&#x4ED6;&#x5E38;&#x89C4;&#x670D;&#x52A1;&#x7AEF;&#x53E3;&#x51B2;&#x7A81;&#xFF09;&#xFF0C;&#x8FD9;&#x6837;&#x53EF;&#x4EE5;&#x589E;&#x52A0;&#x5165;&#x4FB5;&#x8005;&#x63A2;&#x6D4B;&#x7CFB;&#x7EDF;&#x662F;&#x5426;&#x8FD0;&#x884C;&#x4E86; sshd&#x5B88;&#x62A4;&#x8FDB;&#x7A0B;&#x7684;&#x96BE;&#x5EA6;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Port 5555</span><br></pre></td></tr></table></figure>
+
+<p>&#x5BF9;&#x4E8E;&#x5728;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x5B89;&#x88C5;&#x4E86;&#x591A;&#x4E2A;&#x7F51;&#x5361;&#x6216;&#x914D;&#x7F6E;&#x591A;&#x4E2A;IP&#x5730;&#x5740;&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x8BBE;&#x5B9A;sshd&#x53EA;&#x5728;&#x5176;&#x4E2D;&#x4E00;&#x4E2A;&#x6307;&#x5B9A;&#x7684;&#x63A5;&#x53E3;&#x5730;&#x5740;&#x76D1;&#x542C;&#xFF0C;&#x8FD9;&#x6837;&#x53EF;&#x4EE5;&#x51CF;&#x5C11;sshd&#x7684;&#x5165;&#x53E3;&#xFF0C;&#x964D;&#x4F4E;&#x5165;&#x4FB5;&#x7684;&#x53EF;&#x80FD;&#x6027;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ListenAddress 192.168.0.1</span><br></pre></td></tr></table></figure>
+
+<p>&#x5982;&#x679C;&#x5141;&#x8BB8;&#x7528;&#x6237;&#x4F7F;&#x7528;root&#x7528;&#x6237;&#x767B;&#x5F55;&#xFF0C;&#x90A3;&#x4E48;&#x9ED1;&#x5BA2;&#x4EEC;&#x53EF;&#x4EE5;&#x9488;&#x5BF9;root&#x7528;&#x6237;&#x5C1D;&#x8BD5;&#x66B4;&#x529B;&#x7834;&#x89E3;&#x5BC6;&#x7801;&#xFF0C;&#x7ED9;&#x7CFB;&#x7EDF;&#x5B89;&#x5168;&#x5E26;&#x6765;&#x98CE;&#x9669;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PermitRootLogin no</span><br></pre></td></tr></table></figure>
+
+<p>&#x5141;&#x8BB8;&#x4F7F;&#x7528;&#x7A7A;&#x5BC6;&#x7801;&#x7CFB;&#x7EDF;&#x5C31;&#x50CF;&#x4E0D;&#x8BBE;&#x9632;&#x7684;&#x5821;&#x5792;&#xFF0C;&#x4EFB;&#x4F55;&#x5B89;&#x5168;&#x63AA;&#x65BD;&#x90FD;&#x662F;&#x4E00;&#x53E5;&#x7A7A;&#x8BDD;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PermitEmptyPasswords no</span><br></pre></td></tr></table></figure>
+
+<p>&#x53EA;&#x5141;&#x8BB8;&#x6307;&#x5B9A;&#x7684;&#x67D0;&#x4E9B;&#x7528;&#x6237;&#x901A;&#x8FC7;ssh&#x8BBF;&#x95EE;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x5C06;ssh&#x4F7F;&#x7528;&#x6743;&#x9650;&#x9650;&#x5B9A;&#x5728;&#x6700;&#x5C0F;&#x7684;&#x8303;&#x56F4;&#x5185;&#x3002;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AllowUsers sshuser1 sshuser2</span><br></pre></td></tr></table></figure>
+
+<p>&#x540C;&#x4E0A;&#x9762;&#x7684;AllowUsers&#x7C7B;&#x4F3C;&#xFF0C;&#x9650;&#x5B9A;&#x6307;&#x5B9A;&#x7684;&#x7528;&#x6237;&#x7EC4;&#x901A;&#x8FC7;ssh&#x8BBF;&#x95EE;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x4E8C;&#x8005;&#x5BF9;&#x4E8E;&#x9650;&#x5B9A;&#x8BBF;&#x95EE;&#x670D;&#x52A1;&#x5668;&#x6709;&#x76F8;&#x540C;&#x7684;&#x6548;&#x679C;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AllowGroups sshgroup</span><br></pre></td></tr></table></figure>
+
+<p>&#x7981;&#x6B62;&#x4F7F;&#x7528;&#x7248;&#x672C;1&#x534F;&#x8BAE;&#xFF0C;&#x56E0;&#x4E3A;&#x5176;&#x5B58;&#x5728;&#x8BBE;&#x8BA1;&#x7F3A;&#x9677;&#xFF0C;&#x5F88;&#x5BB9;&#x6613;&#x4F7F;&#x5BC6;&#x7801;&#x88AB;&#x9ED1;&#x6389;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Protocol 2</span><br></pre></td></tr></table></figure>
+
+<p>&#x5173;&#x95ED;X11Forwarding&#xFF0C;&#x9632;&#x6B62;&#x4F1A;&#x8BDD;&#x88AB;&#x52AB;&#x6301;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X11Forwarding no</span><br></pre></td></tr></table></figure>
+
+<p>sshd&#x670D;&#x52A1;&#x8FD0;&#x884C;&#x65F6;&#x6BCF;&#x4E00;&#x4E2A;&#x8FDE;&#x63A5;&#x90FD;&#x8981;&#x4F7F;&#x7528;&#x4E00;&#x5927;&#x5757;&#x53EF;&#x89C2;&#x7684;&#x5185;&#x5B58;&#xFF0C;&#x8FD9;&#x4E5F;&#x662F;ssh&#x5B58;&#x5728;&#x62D2;&#x7EDD;&#x670D;&#x52A1;&#x653B;&#x51FB;&#x7684;&#x539F;&#x56E0;&#x3002;&#x4E00;&#x53F0;&#x670D;&#x52A1;&#x5668;&#x9664;&#x975E;&#x5B58;&#x5728;&#x8BB8;&#x591A;&#x7BA1;&#x7406;&#x5458;&#x540C;&#x65F6;&#x7BA1;&#x7406;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x5426;&#x5219;&#x4E0A;&#x9762;&#x8FD9; &#x4E2A;&#x8FDE;&#x63A5;&#x6570;&#x8BBE;&#x7F6E;&#x662F;&#x591F;&#x7528;&#x4E86;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MaxStartups 5</span><br></pre></td></tr></table></figure>
+
+<p>&#x6CE8;&#x610F;&#xFF1A;&#x4EE5;&#x4E0A;&#x53C2;&#x6570;&#x8BBE;&#x7F6E;&#x4EC5;&#x4EC5;&#x662F;&#x4E00;&#x4E2A;&#x793A;&#x4F8B;&#xFF0C;&#x7528;&#x6237;&#x5177;&#x4F53;&#x4F7F;&#x7528;&#x65F6;&#x5E94;&#x6839;&#x636E;&#x5404;&#x81EA;&#x7684;&#x73AF;&#x5883;&#x505A;&#x76F8;&#x5E94;&#x7684;&#x66F4;&#x6539;&#x3002;</p>
+<ol start="2">
+<li>&#x4FEE;&#x6539;sshd&#x670D;&#x52A1;&#x5668;&#x7684;&#x914D;&#x7F6E;&#x6587;&#x4EF6;/etc/ssh/sshd_config&#x7684;&#x8BFB;&#x5199;&#x6743;&#x9650;&#xFF0C;&#x5BF9;&#x6240;&#x6709;&#x975E;root&#x7528;&#x6237;&#x8BBE;&#x7F6E;&#x53EA;&#x8BFB;&#x6743;&#x9650;&#xFF0C;&#x9632;&#x6B62;&#x975E;&#x6388;&#x6743;&#x7528;&#x6237;&#x4FEE;&#x6539;sshd &#x670D;&#x52A1;&#x7684;&#x5B89;&#x5168;&#x8BBE;&#x7F6E;&#x3002;</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 644 /etc/ssh/sshd_config</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>&#x8BBE;&#x7F6E;TCP Wrappers&#x3002;&#x670D;&#x52A1;&#x5668;&#x9ED8;&#x8BA4;&#x63A5;&#x53D7;&#x6240;&#x6709;&#x7684;&#x8BF7;&#x6C42;&#x8FDE;&#x63A5;&#xFF0C;&#x8FD9;&#x662F;&#x975E;&#x5E38;&#x5371;&#x9669;&#x7684;&#x3002;&#x4F7F;&#x7528;TCP Wrappers&#x53EF;&#x4EE5;&#x963B;&#x6B62;&#x6216;&#x5141;&#x8BB8;&#x5E94;&#x7528;&#x670D;&#x52A1;&#x4EC5;&#x5BF9;&#x67D0;&#x4E9B;&#x4E3B;&#x673A;&#x5F00;&#x653E;&#xFF0C;&#x7ED9;&#x7CFB;&#x7EDF;&#x5728;&#x589E;&#x52A0;&#x4E00;&#x9053;&#x5B89;&#x5168;&#x5C4F;&#x969C;&#x3002;&#x8FD9;&#x90E8;&#x5206;&#x8BBE;&#x7F6E;&#x5171;&#x6D89;&#x8BA1;&#x5230;&#x4E24;&#x4E2A;&#x6587;&#x4EF6;&#xFF1A;hosts.allow&#x548C; hosts.deny&#x3002;</li>
+</ol>
+<p>&#x5C06;&#x90A3;&#x4E9B;&#x660E;&#x786E;&#x5141;&#x8BB8;&#x7684;&#x8BF7;&#x6C42;&#x6DFB;&#x52A0;&#x5230;/etc/hosts.allow&#x4E2D;&#x3002;&#x5982;&#x7CFB;&#x7EDF;&#x4EC5;&#x5141;&#x8BB8;IP&#x5730;&#x5740;&#x4E3A;192.168.0.15&#x548C;10.0.0.11&#x7684;&#x4E3B;&#x673A;&#x4F7F;&#x7528; sshd&#x670D;&#x52A1;&#xFF0C;&#x5219;&#x6DFB;&#x52A0;&#x5982;&#x4E0B;&#x5185;&#x5BB9;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sshd:192.168.0.15 10.0.0.11</span><br></pre></td></tr></table></figure>
+
+<p>&#x5C06;&#x9700;&#x8981;&#x7981;&#x6B62;&#x4F7F;&#x7528;&#x7684;&#x4FE1;&#x606F;&#x6DFB;&#x52A0;&#x5230;/etc/hosts.deny&#x4E2D;&#x3002;&#x5982;&#x5BF9;&#x9664;&#x4E86;&#x5728;hosts.allow&#x5217;&#x8868;&#x4E2D;&#x660E;&#x786E;&#x5141;&#x8BB8;&#x4F7F;&#x7528;sshd&#x7684;&#x7528;&#x6237;&#x5916;&#xFF0C;&#x6240;&#x6709;&#x5176;&#x4ED6;&#x7528;&#x6237;&#x90FD;&#x7981;&#x6B62;&#x4F7F;&#x7528;sshd&#x670D;&#x52A1;&#xFF0C;&#x5219;&#x6DFB;&#x52A0;&#x5982;&#x4E0B;&#x5185;&#x5BB9;&#x5230;hosts.deny&#x6587;&#x4EF6;&#x4E2D;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sshd:All</span><br></pre></td></tr></table></figure>
+
+<p>&#x6CE8;&#x610F;&#xFF1A;&#x7CFB;&#x7EDF;&#x5BF9;&#x4E0A;&#x8FF0;&#x4E24;&#x4E2A;&#x6587;&#x4EF6;&#x7684;&#x5224;&#x65AD;&#x987A;&#x5E8F;&#x662F;&#x5148;&#x68C0;&#x67E5;hosts.allow&#x6587;&#x4EF6;&#x518D;&#x67E5;&#x770B;hosts.deny&#x6587;&#x4EF6;&#xFF0C;&#x56E0;&#x6B64;&#x4E00;&#x4E2A;&#x7528;&#x6237;&#x5728;hosts.allow&#x5141;&#x8BB8;&#x4F7F;&#x7528;&#x7F51;&#x7EDC;&#x8D44;&#x6E90;&#xFF0C;&#x800C;&#x540C;&#x65F6;&#x5728;hosts.deny&#x4E2D;&#x7981;&#x6B62;&#x4F7F;&#x7528;&#x8BE5;&#x7F51;&#x7EDC;&#x8D44;&#x6E90;&#xFF0C;&#x5728;&#x8FD9;&#x79CD;&#x60C5;&#x51B5;&#x4E0B;&#x7CFB;&#x7EDF;&#x4F18;&#x5148;&#x9009;&#x62E9;&#x4F7F;&#x7528;hosts.allow&#x914D;&#x7F6E;&#xFF0C;&#x5141;&#x8BB8;&#x7528;&#x6237;&#x4F7F;&#x7528;&#x8BE5;&#x7F51;&#x7EDC;&#x8D44;&#x6E90;&#x3002;</p>
+<ol start="4">
+<li>&#x5C3D;&#x91CF;&#x5173;&#x95ED;&#x4E00;&#x4E9B;&#x7CFB;&#x7EDF;&#x4E0D;&#x9700;&#x8981;&#x7684;&#x542F;&#x52A8;&#x670D;&#x52A1;&#x3002;&#x7CFB;&#x7EDF;&#x9ED8;&#x8BA4;&#x60C5;&#x51B5;&#x4E0B;&#x542F;&#x52A8;&#x4E86;&#x8BB8;&#x591A;&#x4E0E;&#x7F51;&#x7EDC;&#x76F8;&#x5173;&#x7684;&#x670D;&#x52A1;&#xFF0C;&#x56E0;&#x6B64;&#x76F8;&#x5BF9;&#x5E94;&#x7684;&#x5F00;&#x653E;&#x4E86;&#x8BB8;&#x591A;&#x7AEF;&#x53E3;&#x8FDB;&#x884C;LISTENING&#xFF08;&#x76D1;&#x542C;&#xFF09;&#x3002;&#x6211;&#x4EEC;&#x77E5;&#x9053;&#xFF0C;&#x5F00;&#x653E;&#x7684;&#x7AEF;&#x53E3;&#x8D8A;&#x591A;&#xFF0C;&#x7CFB;&#x7EDF;&#x4ECE;&#x5916;&#x90E8;&#x88AB;&#x5165;&#x4FB5;&#x7684;&#x53EF;&#x80FD;&#x4E5F;&#x5C31;&#x8D8A;&#x5927;&#xFF0C;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x8981;&#x5C3D;&#x91CF;&#x5173;&#x95ED;&#x4E00;&#x4E9B;&#x4E0D;&#x9700;&#x8981;&#x7684;&#x542F;&#x52A8;&#x670D;&#x52A1;&#xFF0C;&#x4ECE;&#x800C;&#x5C3D;&#x53EF;&#x80FD;&#x7684;&#x5173;&#x95ED;&#x7AEF;&#x53E3;&#xFF0C;&#x63D0;&#x4F9B;&#x7CFB;&#x7EDF;&#x7684;&#x5B89;&#x5168;&#x6027;&#x3002;</li>
+</ol>
+<p>&#x901A;&#x8FC7;&#x4EE5;&#x4E0A;&#x6B65;&#x9AA4;&#x57FA;&#x672C;&#x4E0A;&#x5C06;sshd&#x670D;&#x52A1;&#x8BBE;&#x7F6E;&#x4E0A;&#x53EF;&#x80FD;&#x51FA;&#x73B0;&#x7684;&#x6F0F;&#x6D1E;&#x5835;&#x4E0A;&#x4E86;&#xFF0C;&#x4E0D;&#x9700;&#x8981;&#x6295;&#x8D44;&#xFF0C;&#x53EA;&#x8981;&#x6211;&#x4EEC;&#x7A0D;&#x5FAE;&#x82B1;&#x70B9;&#x65F6;&#x95F4;&#x8C03;&#x6574;&#x4E00;&#x4E0B;&#x914D;&#x7F6E;&#xFF0C;&#x5C31;&#x53EF;&#x6781;&#x5927;&#x63D0;&#x9AD8;&#x7CFB;&#x7EDF;&#x7684;&#x5B89;&#x5168;&#x73AF;&#x5883;&#xFF0C;&#x4F55;&#x4E50;&#x800C;&#x4E0D;&#x4E3A;&#x5462;&#xFF1F;</p>
+
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+            
+              <a href="/tags/ops/" rel="tag"><i class="fa fa-tag"></i> ops</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2012/03/12/rsync简明教程/" rel="next" title="rsync简明教程">
+                  <i class="fa fa-chevron-left"></i> rsync简明教程
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2012/04/18/test的用法与变量的测试替换/" rel="prev" title="test的用法与变量的测试替换">
+                  test的用法与变量的测试替换 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

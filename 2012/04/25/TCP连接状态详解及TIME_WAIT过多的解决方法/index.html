@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x4E0A;&amp;#x56FE;&amp;#x5BF9;&amp;#x6392;&amp;#x9664;&amp;#x548C;&amp;#x5B9A;&amp;#x4F4D;&amp;#x7F51;&amp;#x7EDC;&amp;#x6216;&amp;#x7CFB;&amp;#x7EDF;&amp;#x6545;&amp;#x969C;&amp;#x65F6;&amp;#x5927;&amp;#x6709;&amp;#x5E2E;&amp;#x52A9;&amp;#xFF0C;&amp;#x4F46;&amp;#x662F;&amp;#x600E;&amp;#x683">
+<meta name="keywords" content="linux,ops">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCP连接状态详解及TIME_WAIT过多的解决方法">
+<meta property="og:url" content="http://blogs.cszhi.com/2012/04/25/TCP连接状态详解及TIME_WAIT过多的解决方法/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x4E0A;&amp;#x56FE;&amp;#x5BF9;&amp;#x6392;&amp;#x9664;&amp;#x548C;&amp;#x5B9A;&amp;#x4F4D;&amp;#x7F51;&amp;#x7EDC;&amp;#x6216;&amp;#x7CFB;&amp;#x7EDF;&amp;#x6545;&amp;#x969C;&amp;#x65F6;&amp;#x5927;&amp;#x6709;&amp;#x5E2E;&amp;#x52A9;&amp;#xFF0C;&amp;#x4F46;&amp;#x662F;&amp;#x600E;&amp;#x683">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blogs.cszhi.com/2012/04/25/TCP连接状态详解及TIME_WAIT过多的解决方法/1567496992799.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2012/04/25/TCP连接状态详解及TIME_WAIT过多的解决方法/1567497018761.png">
+<meta property="og:updated_time" content="2019-09-03T07:50:47.828Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TCP连接状态详解及TIME_WAIT过多的解决方法">
+<meta name="twitter:description" content="&amp;#x4E0A;&amp;#x56FE;&amp;#x5BF9;&amp;#x6392;&amp;#x9664;&amp;#x548C;&amp;#x5B9A;&amp;#x4F4D;&amp;#x7F51;&amp;#x7EDC;&amp;#x6216;&amp;#x7CFB;&amp;#x7EDF;&amp;#x6545;&amp;#x969C;&amp;#x65F6;&amp;#x5927;&amp;#x6709;&amp;#x5E2E;&amp;#x52A9;&amp;#xFF0C;&amp;#x4F46;&amp;#x662F;&amp;#x600E;&amp;#x683">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2012/04/25/TCP连接状态详解及TIME_WAIT过多的解决方法/1567496992799.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/2012/04/25/TCP连接状态详解及TIME_WAIT过多的解决方法/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>TCP连接状态详解及TIME_WAIT过多的解决方法 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/04/25/TCP连接状态详解及TIME_WAIT过多的解决方法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">TCP连接状态详解及TIME_WAIT过多的解决方法
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-04-25 00:00:00" itemprop="dateCreated datePublished" datetime="2012-04-25T00:00:00+08:00">2012-04-25</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="/2012/04/25/TCP&#x8FDE;&#x63A5;&#x72B6;&#x6001;&#x8BE6;&#x89E3;&#x53CA;TIME_WAIT&#x8FC7;&#x591A;&#x7684;&#x89E3;&#x51B3;&#x65B9;&#x6CD5;/1567496992799.png" alt="1567496992799"></p>
+<p><img src="/2012/04/25/TCP&#x8FDE;&#x63A5;&#x72B6;&#x6001;&#x8BE6;&#x89E3;&#x53CA;TIME_WAIT&#x8FC7;&#x591A;&#x7684;&#x89E3;&#x51B3;&#x65B9;&#x6CD5;/1567497018761.png" alt="1567497018761"></p>
+<p>&#x4E0A;&#x56FE;&#x5BF9;&#x6392;&#x9664;&#x548C;&#x5B9A;&#x4F4D;&#x7F51;&#x7EDC;&#x6216;&#x7CFB;&#x7EDF;&#x6545;&#x969C;&#x65F6;&#x5927;&#x6709;&#x5E2E;&#x52A9;&#xFF0C;&#x4F46;&#x662F;&#x600E;&#x6837;&#x7262;&#x7262;&#x5730;&#x5C06;&#x8FD9;&#x5F20;&#x56FE;&#x523B;&#x5728;&#x8111;&#x4E2D;&#x5462;&#xFF1F;&#x90A3;&#x4E48;&#x4F60;&#x5C31;&#x4E00;&#x5B9A;&#x8981;&#x5BF9;&#x8FD9;&#x5F20;&#x56FE;&#x7684;&#x6BCF;&#x4E00;&#x4E2A;&#x72B6;&#x6001;&#xFF0C;&#x53CA;&#x8F6C;&#x6362;&#x7684;&#x8FC7;&#x7A0B;&#x6709;&#x6DF1;&#x523B;&#x5730;&#x8BA4;&#x8BC6;&#xFF0C;&#x4E0D;&#x80FD;&#x53EA;&#x505C;&#x7559;&#x5728;&#x4E00;&#x77E5;&#x534A;&#x89E3;&#x4E4B;&#x4E2D;&#x3002;&#x4E0B;&#x9762;&#x5BF9;&#x8FD9;&#x5F20;&#x56FE;&#x7684;11&#x79CD;&#x72B6;&#x6001;&#x8BE6;&#x7EC6;&#x89E3;&#x91CA;&#x4E00;&#x4E0B;&#xFF0C;&#x4EE5;&#x4FBF;&#x52A0;&#x5F3A;&#x8BB0;&#x5FC6;&#xFF01;&#x4E0D;&#x8FC7;&#x5728;&#x8FD9;&#x4E4B;&#x524D;&#xFF0C;&#x5148;&#x56DE;&#x987E;&#x4E00;&#x4E0B;TCP&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;&#x7684;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#x8FC7;&#x7A0B;&#xFF0C;&#x4EE5;&#x53CA;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x7684;&#x56DB;&#x6B21;&#x63E1;&#x624B;&#x8FC7;&#x7A0B;&#x3002;</p>
+<a id="more"></a>
+
+<p><strong>1&#x3001;&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;&#x534F;&#x8BAE;&#xFF08;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#xFF09;</strong><br>&#xFF08;1&#xFF09;&#x5BA2;&#x6237;&#x7AEF;&#x53D1;&#x9001;&#x4E00;&#x4E2A;&#x5E26;SYN&#x6807;&#x5FD7;&#x7684;TCP&#x62A5;&#x6587;&#x5230;&#x670D;&#x52A1;&#x5668;&#x3002;&#x8FD9;&#x662F;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#x8FC7;&#x7A0B;&#x4E2D;&#x7684;&#x62A5;&#x6587;1&#x3002;</p>
+<p>&#xFF08;2&#xFF09; &#x670D;&#x52A1;&#x5668;&#x7AEF;&#x56DE;&#x5E94;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#xFF0C;&#x8FD9;&#x662F;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#x4E2D;&#x7684;&#x7B2C;2&#x4E2A;&#x62A5;&#x6587;&#xFF0C;&#x8FD9;&#x4E2A;&#x62A5;&#x6587;&#x540C;&#x65F6;&#x5E26;ACK&#x6807;&#x5FD7;&#x548C;SYN&#x6807;&#x5FD7;&#x3002;&#x56E0;&#x6B64;&#x5B83;&#x8868;&#x793A;&#x5BF9;&#x521A;&#x624D;&#x5BA2;&#x6237;&#x7AEF;SYN&#x62A5;&#x6587;&#x7684;&#x56DE;&#x5E94;&#xFF1B;&#x540C;&#x65F6;&#x53C8;&#x6807;&#x5FD7;SYN&#x7ED9;&#x5BA2;&#x6237;&#x7AEF;&#xFF0C;&#x8BE2;&#x95EE;&#x5BA2;&#x6237;&#x7AEF;&#x662F;&#x5426;&#x51C6;&#x5907;&#x597D;&#x8FDB;&#x884C;&#x6570;&#x636E;&#x901A;&#x8BAF;&#x3002;</p>
+<p>&#xFF08;3&#xFF09; &#x5BA2;&#x6237;&#x5FC5;&#x987B;&#x518D;&#x6B21;&#x56DE;&#x5E94;&#x670D;&#x52A1;&#x6BB5;&#x4E00;&#x4E2A;ACK&#x62A5;&#x6587;&#xFF0C;&#x8FD9;&#x662F;&#x62A5;&#x6587;&#x6BB5;3&#x3002;</p>
+<p><strong>2&#x3001;&#x8FDE;&#x63A5;&#x7EC8;&#x6B62;&#x534F;&#x8BAE;&#xFF08;&#x56DB;&#x6B21;&#x63E1;&#x624B;&#xFF09;</strong><br>&#x7531;&#x4E8E;TCP&#x8FDE;&#x63A5;&#x662F;&#x5168;&#x53CC;&#x5DE5;&#x7684;&#xFF0C;&#x56E0;&#x6B64;&#x6BCF;&#x4E2A;&#x65B9;&#x5411;&#x90FD;&#x5FC5;&#x987B;&#x5355;&#x72EC;&#x8FDB;&#x884C;&#x5173;&#x95ED;&#x3002;&#x8FD9;&#x539F;&#x5219;&#x662F;&#x5F53;&#x4E00;&#x65B9;&#x5B8C;&#x6210;&#x5B83;&#x7684;&#x6570;&#x636E;&#x53D1;&#x9001;&#x4EFB;&#x52A1;&#x540E;&#x5C31;&#x80FD;&#x53D1;&#x9001;&#x4E00;&#x4E2A;FIN&#x6765;&#x7EC8;&#x6B62;&#x8FD9;&#x4E2A;&#x65B9;&#x5411;&#x7684;&#x8FDE;&#x63A5;&#x3002;&#x6536;&#x5230;&#x4E00;&#x4E2A; FIN&#x53EA;&#x610F;&#x5473;&#x7740;&#x8FD9;&#x4E00;&#x65B9;&#x5411;&#x4E0A;&#x6CA1;&#x6709;&#x6570;&#x636E;&#x6D41;&#x52A8;&#xFF0C;&#x4E00;&#x4E2A;TCP&#x8FDE;&#x63A5;&#x5728;&#x6536;&#x5230;&#x4E00;&#x4E2A;FIN&#x540E;&#x4ECD;&#x80FD;&#x53D1;&#x9001;&#x6570;&#x636E;&#x3002;&#x9996;&#x5148;&#x8FDB;&#x884C;&#x5173;&#x95ED;&#x7684;&#x4E00;&#x65B9;&#x5C06;&#x6267;&#x884C;&#x4E3B;&#x52A8;&#x5173;&#x95ED;&#xFF0C;&#x800C;&#x53E6;&#x4E00;&#x65B9;&#x6267;&#x884C;&#x88AB;&#x52A8;&#x5173;&#x95ED;&#x3002;</p>
+<p>&#xFF08;1&#xFF09; TCP&#x5BA2;&#x6237;&#x7AEF;&#x53D1;&#x9001;&#x4E00;&#x4E2A;FIN&#xFF0C;&#x7528;&#x6765;&#x5173;&#x95ED;&#x5BA2;&#x6237;&#x5230;&#x670D;&#x52A1;&#x5668;&#x7684;&#x6570;&#x636E;&#x4F20;&#x9001;&#xFF08;&#x62A5;&#x6587;&#x6BB5;4&#xFF09;&#x3002;<br>&#xFF08;2&#xFF09; &#x670D;&#x52A1;&#x5668;&#x6536;&#x5230;&#x8FD9;&#x4E2A;FIN&#xFF0C;&#x5B83;&#x53D1;&#x56DE;&#x4E00;&#x4E2A;ACK&#xFF0C;&#x786E;&#x8BA4;&#x5E8F;&#x53F7;&#x4E3A;&#x6536;&#x5230;&#x7684;&#x5E8F;&#x53F7;&#x52A0;1&#xFF08;&#x62A5;&#x6587;&#x6BB5;5&#xFF09;&#x3002;&#x548C;SYN&#x4E00;&#x6837;&#xFF0C;&#x4E00;&#x4E2A;FIN&#x5C06;&#x5360;&#x7528;&#x4E00;&#x4E2A;&#x5E8F;&#x53F7;&#x3002;<br>&#xFF08;3&#xFF09; &#x670D;&#x52A1;&#x5668;&#x5173;&#x95ED;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x8FDE;&#x63A5;&#xFF0C;&#x53D1;&#x9001;&#x4E00;&#x4E2A;FIN&#x7ED9;&#x5BA2;&#x6237;&#x7AEF;&#xFF08;&#x62A5;&#x6587;&#x6BB5;6&#xFF09;&#x3002;<br>&#xFF08;4&#xFF09; &#x5BA2;&#x6237;&#x6BB5;&#x53D1;&#x56DE;ACK&#x62A5;&#x6587;&#x786E;&#x8BA4;&#xFF0C;&#x5E76;&#x5C06;&#x786E;&#x8BA4;&#x5E8F;&#x53F7;&#x8BBE;&#x7F6E;&#x4E3A;&#x6536;&#x5230;&#x5E8F;&#x53F7;&#x52A0;1&#xFF08;&#x62A5;&#x6587;&#x6BB5;7&#xFF09;&#x3002;</p>
+<p>CLOSED: &#x8FD9;&#x4E2A;&#x6CA1;&#x4EC0;&#x4E48;&#x597D;&#x8BF4;&#x7684;&#x4E86;&#xFF0C;&#x8868;&#x793A;&#x521D;&#x59CB;&#x72B6;&#x6001;&#x3002;</p>
+<p>LISTEN: &#x8FD9;&#x4E2A;&#x4E5F;&#x662F;&#x975E;&#x5E38;&#x5BB9;&#x6613;&#x7406;&#x89E3;&#x7684;&#x4E00;&#x4E2A;&#x72B6;&#x6001;&#xFF0C;&#x8868;&#x793A;&#x670D;&#x52A1;&#x5668;&#x7AEF;&#x7684;&#x67D0;&#x4E2A;SOCKET&#x5904;&#x4E8E;&#x76D1;&#x542C;&#x72B6;&#x6001;&#xFF0C;&#x53EF;&#x4EE5;&#x63A5;&#x53D7;&#x8FDE;&#x63A5;&#x4E86;&#x3002;</p>
+<p>SYN_RCVD: &#x8FD9;&#x4E2A;&#x72B6;&#x6001;&#x8868;&#x793A;&#x63A5;&#x53D7;&#x5230;&#x4E86;SYN&#x62A5;&#x6587;&#xFF0C;&#x5728;&#x6B63;&#x5E38;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x8FD9;&#x4E2A;&#x72B6;&#x6001;&#x662F;&#x670D;&#x52A1;&#x5668;&#x7AEF;&#x7684;SOCKET&#x5728;&#x5EFA;&#x7ACB;TCP&#x8FDE;&#x63A5;&#x65F6;&#x7684;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#x4F1A;&#x8BDD;&#x8FC7;&#x7A0B;&#x4E2D;&#x7684;&#x4E00;&#x4E2A;&#x4E2D;&#x95F4;&#x72B6;&#x6001;&#xFF0C;&#x5F88;&#x77ED;&#x6682;&#xFF0C;&#x57FA;&#x672C;&#x4E0A;&#x7528;netstat&#x4F60;&#x662F;&#x5F88;&#x96BE;&#x770B;&#x5230;&#x8FD9;&#x79CD;&#x72B6;&#x6001;&#x7684;&#xFF0C;&#x9664;&#x975E;&#x4F60;&#x7279;&#x610F;&#x5199;&#x4E86;&#x4E00;&#x4E2A;&#x5BA2;&#x6237;&#x7AEF;&#x6D4B;&#x8BD5;&#x7A0B;&#x5E8F;&#xFF0C;&#x6545;&#x610F;&#x5C06;&#x4E09;&#x6B21;TCP&#x63E1;&#x624B;&#x8FC7;&#x7A0B;&#x4E2D;&#x6700;&#x540E;&#x4E00;&#x4E2A;ACK&#x62A5;&#x6587;&#x4E0D;&#x4E88;&#x53D1;&#x9001;&#x3002;&#x56E0;&#x6B64;&#x8FD9;&#x79CD;&#x72B6;&#x6001;&#x65F6;&#xFF0C;&#x5F53;&#x6536;&#x5230;&#x5BA2;&#x6237;&#x7AEF;&#x7684;ACK&#x62A5;&#x6587;&#x540E;&#xFF0C;&#x5B83;&#x4F1A;&#x8FDB;&#x5165;&#x5230;ESTABLISHED&#x72B6;&#x6001;&#x3002;</p>
+<p>SYN_SENT: &#x8FD9;&#x4E2A;&#x72B6;&#x6001;&#x4E0E;SYN_RCVD&#x9065;&#x60F3;&#x547C;&#x5E94;&#xFF0C;&#x5F53;&#x5BA2;&#x6237;&#x7AEF;SOCKET&#x6267;&#x884C;CONNECT&#x8FDE;&#x63A5;&#x65F6;&#xFF0C;&#x5B83;&#x9996;&#x5148;&#x53D1;&#x9001;SYN&#x62A5;&#x6587;&#xFF0C;&#x56E0;&#x6B64;&#x4E5F;&#x968F;&#x5373;&#x5B83;&#x4F1A;&#x8FDB;&#x5165;&#x5230;&#x4E86;SYN_SENT&#x72B6;&#x6001;&#xFF0C;&#x5E76;&#x7B49;&#x5F85;&#x670D;&#x52A1;&#x7AEF;&#x7684;&#x53D1;&#x9001;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#x4E2D;&#x7684;&#x7B2C;2&#x4E2A;&#x62A5;&#x6587;&#x3002;SYN_SENT&#x72B6;&#x6001;&#x8868;&#x793A;&#x5BA2;&#x6237;&#x7AEF;&#x5DF2;&#x53D1;&#x9001;SYN&#x62A5;&#x6587;&#x3002;</p>
+<p>ESTABLISHED&#xFF1A;&#x8FD9;&#x4E2A;&#x5BB9;&#x6613;&#x7406;&#x89E3;&#x4E86;&#xFF0C;&#x8868;&#x793A;&#x8FDE;&#x63A5;&#x5DF2;&#x7ECF;&#x5EFA;&#x7ACB;&#x4E86;&#x3002;</p>
+<p>FIN_WAIT_1: &#x8FD9;&#x4E2A;&#x72B6;&#x6001;&#x8981;&#x597D;&#x597D;&#x89E3;&#x91CA;&#x4E00;&#x4E0B;&#xFF0C;&#x5176;&#x5B9E;FIN_WAIT_1&#x548C;FIN_WAIT_2&#x72B6;&#x6001;&#x7684;&#x771F;&#x6B63;&#x542B;&#x4E49;&#x90FD;&#x662F;&#x8868;&#x793A;&#x7B49;&#x5F85;&#x5BF9;&#x65B9;&#x7684;FIN&#x62A5;&#x6587;&#x3002;&#x800C;&#x8FD9;&#x4E24;&#x79CD;&#x72B6;&#x6001;&#x7684;&#x533A;&#x522B;&#x662F;&#xFF1A;FIN_WAIT_1&#x72B6;&#x6001;&#x5B9E;&#x9645;&#x4E0A;&#x662F;&#x5F53;SOCKET&#x5728;ESTABLISHED&#x72B6;&#x6001;&#x65F6;&#xFF0C;&#x5B83;&#x60F3;&#x4E3B;&#x52A8;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#xFF0C;&#x5411;&#x5BF9;&#x65B9;&#x53D1;&#x9001;&#x4E86;FIN&#x62A5;&#x6587;&#xFF0C;&#x6B64;&#x65F6;&#x8BE5;SOCKET&#x5373;&#x8FDB;&#x5165;&#x5230;FIN_WAIT_1&#x72B6;&#x6001;&#x3002;&#x800C;&#x5F53;&#x5BF9;&#x65B9;&#x56DE;&#x5E94;ACK&#x62A5;&#x6587;&#x540E;&#xFF0C;&#x5219;&#x8FDB;&#x5165;&#x5230;FIN_WAIT_2&#x72B6;&#x6001;&#xFF0C;&#x5F53;&#x7136;&#x5728;&#x5B9E;&#x9645;&#x7684;&#x6B63;&#x5E38;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x65E0;&#x8BBA;&#x5BF9;&#x65B9;&#x4F55;&#x79CD;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x90FD;&#x5E94;&#x8BE5;&#x9A6C;&#x4E0A;&#x56DE;&#x5E94;ACK&#x62A5;&#x6587;&#xFF0C;&#x6240;&#x4EE5;FIN_WAIT_1&#x72B6;&#x6001;&#x4E00;&#x822C;&#x662F;&#x6BD4;&#x8F83;&#x96BE;&#x89C1;&#x5230;&#x7684;&#xFF0C;&#x800C;FIN_WAIT_2&#x72B6;&#x6001;&#x8FD8;&#x6709;&#x65F6;&#x5E38;&#x5E38;&#x53EF;&#x4EE5;&#x7528;netstat&#x770B;&#x5230;&#x3002;</p>
+<p>FIN_WAIT_2&#xFF1A;&#x4E0A;&#x9762;&#x5DF2;&#x7ECF;&#x8BE6;&#x7EC6;&#x89E3;&#x91CA;&#x4E86;&#x8FD9;&#x79CD;&#x72B6;&#x6001;&#xFF0C;&#x5B9E;&#x9645;&#x4E0A;FIN_WAIT_2&#x72B6;&#x6001;&#x4E0B;&#x7684;SOCKET&#xFF0C;&#x8868;&#x793A;&#x534A;&#x8FDE;&#x63A5;&#xFF0C;&#x4E5F;&#x5373;&#x6709;&#x4E00;&#x65B9;&#x8981;&#x6C42;close&#x8FDE;&#x63A5;&#xFF0C;&#x4F46;&#x53E6;&#x5916;&#x8FD8;&#x544A;&#x8BC9;&#x5BF9;&#x65B9;&#xFF0C;&#x6211;&#x6682;&#x65F6;&#x8FD8;&#x6709;&#x70B9;&#x6570;&#x636E;&#x9700;&#x8981;&#x4F20;&#x9001;&#x7ED9;&#x4F60;&#xFF0C;&#x7A0D;&#x540E;&#x518D;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x3002;</p>
+<p>TIME_WAIT: &#x8868;&#x793A;&#x6536;&#x5230;&#x4E86;&#x5BF9;&#x65B9;&#x7684;FIN&#x62A5;&#x6587;&#xFF0C;&#x5E76;&#x53D1;&#x9001;&#x51FA;&#x4E86;ACK&#x62A5;&#x6587;&#xFF0C;&#x5C31;&#x7B49;2MSL&#x540E;&#x5373;&#x53EF;&#x56DE;&#x5230;CLOSED&#x53EF;&#x7528;&#x72B6;&#x6001;&#x4E86;&#x3002;&#x5982;&#x679C;FIN_WAIT_1&#x72B6;&#x6001;&#x4E0B;&#xFF0C;&#x6536;&#x5230;&#x4E86;&#x5BF9;&#x65B9;&#x540C;&#x65F6;&#x5E26;FIN&#x6807;&#x5FD7;&#x548C;ACK&#x6807;&#x5FD7;&#x7684;&#x62A5;&#x6587;&#x65F6;&#xFF0C;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x8FDB;&#x5165;&#x5230;TIME_WAIT&#x72B6;&#x6001;&#xFF0C;&#x800C;&#x65E0;&#x987B;&#x7ECF;&#x8FC7;FIN_WAIT_2&#x72B6;&#x6001;&#x3002;</p>
+<p><strong>&#x6CE8;:MSL(&#x6700;&#x5927;&#x5206;&#x6BB5;&#x751F;&#x5B58;&#x671F;)&#x6307;&#x660E;TCP&#x62A5;&#x6587;&#x5728;Internet&#x4E0A;&#x6700;&#x957F;&#x751F;&#x5B58;&#x65F6;&#x95F4;,&#x6BCF;&#x4E2A;&#x5177;&#x4F53;&#x7684;TCP&#x5B9E;&#x73B0;&#x90FD;&#x5FC5;&#x987B;&#x9009;&#x62E9;&#x4E00;&#x4E2A;&#x786E;&#x5B9A;&#x7684;MSL&#x503C;.RFC 1122&#x5EFA;&#x8BAE;&#x662F;2&#x5206;&#x949F;,&#x4F46;BSD&#x4F20;&#x7EDF;&#x5B9E;&#x73B0;&#x91C7;&#x7528;&#x4E86;30&#x79D2;.TIME_WAIT &#x72B6;&#x6001;&#x6700;&#x5927;&#x4FDD;&#x6301;&#x65F6;&#x95F4;&#x662F;2 * MSL,&#x4E5F;&#x5C31;&#x662F;1-4&#x5206;&#x949F;.</strong></p>
+<p>CLOSING: &#x8FD9;&#x79CD;&#x72B6;&#x6001;&#x6BD4;&#x8F83;&#x7279;&#x6B8A;&#xFF0C;&#x5B9E;&#x9645;&#x60C5;&#x51B5;&#x4E2D;&#x5E94;&#x8BE5;&#x662F;&#x5F88;&#x5C11;&#x89C1;&#xFF0C;&#x5C5E;&#x4E8E;&#x4E00;&#x79CD;&#x6BD4;&#x8F83;&#x7F55;&#x89C1;&#x7684;&#x4F8B;&#x5916;&#x72B6;&#x6001;&#x3002;&#x6B63;&#x5E38;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x5F53;&#x4F60;&#x53D1;&#x9001;FIN&#x62A5;&#x6587;&#x540E;&#xFF0C;&#x6309;&#x7406;&#x6765;&#x8BF4;&#x662F;&#x5E94;&#x8BE5;&#x5148;&#x6536;&#x5230;&#xFF08;&#x6216;&#x540C;&#x65F6;&#x6536;&#x5230;&#xFF09;&#x5BF9;&#x65B9;&#x7684;ACK&#x62A5;&#x6587;&#xFF0C;&#x518D;&#x6536;&#x5230;&#x5BF9;&#x65B9;&#x7684;FIN&#x62A5;&#x6587;&#x3002;&#x4F46;&#x662F;CLOSING&#x72B6;&#x6001;&#x8868;&#x793A;&#x4F60;&#x53D1;&#x9001;FIN&#x62A5;&#x6587;&#x540E;&#xFF0C;&#x5E76;&#x6CA1;&#x6709;&#x6536;&#x5230;&#x5BF9;&#x65B9;&#x7684;ACK&#x62A5;&#x6587;&#xFF0C;&#x53CD;&#x800C;&#x5374;&#x4E5F;&#x6536;&#x5230;&#x4E86;&#x5BF9;&#x65B9;&#x7684;FIN&#x62A5;&#x6587;&#x3002;&#x4EC0;&#x4E48;&#x60C5;&#x51B5;&#x4E0B;&#x4F1A;&#x51FA;&#x73B0;&#x6B64;&#x79CD;&#x60C5;&#x51B5;&#x5462;&#xFF1F;&#x5176;&#x5B9E;&#x7EC6;&#x60F3;&#x4E00;&#x4E0B;&#xFF0C;&#x4E5F;&#x4E0D;&#x96BE;&#x5F97;&#x51FA;&#x7ED3;&#x8BBA;&#xFF1A;&#x90A3;&#x5C31;&#x662F;&#x5982;&#x679C;&#x53CC;&#x65B9;&#x51E0;&#x4E4E;&#x5728;&#x540C;&#x65F6;close&#x4E00;&#x4E2A;SOCKET&#x7684;&#x8BDD;&#xFF0C;&#x90A3;&#x4E48;&#x5C31;&#x51FA;&#x73B0;&#x4E86;&#x53CC;&#x65B9;&#x540C;&#x65F6;&#x53D1;&#x9001;FIN&#x62A5;&#x6587;&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x4E5F;&#x5373;&#x4F1A;&#x51FA;&#x73B0;CLOSING&#x72B6;&#x6001;&#xFF0C;&#x8868;&#x793A;&#x53CC;&#x65B9;&#x90FD;&#x6B63;&#x5728;&#x5173;&#x95ED;SOCKET&#x8FDE;&#x63A5;&#x3002;</p>
+<p>CLOSE_WAIT: &#x8FD9;&#x79CD;&#x72B6;&#x6001;&#x7684;&#x542B;&#x4E49;&#x5176;&#x5B9E;&#x662F;&#x8868;&#x793A;&#x5728;&#x7B49;&#x5F85;&#x5173;&#x95ED;&#x3002;&#x600E;&#x4E48;&#x7406;&#x89E3;&#x5462;&#xFF1F;&#x5F53;&#x5BF9;&#x65B9;close&#x4E00;&#x4E2A;SOCKET&#x540E;&#x53D1;&#x9001;FIN&#x62A5;&#x6587;&#x7ED9;&#x81EA;&#x5DF1;&#xFF0C;&#x4F60;&#x7CFB;&#x7EDF;&#x6BEB;&#x65E0;&#x7591;&#x95EE;&#x5730;&#x4F1A;&#x56DE;&#x5E94;&#x4E00;&#x4E2A;ACK&#x62A5;&#x6587;&#x7ED9;&#x5BF9;&#x65B9;&#xFF0C;&#x6B64;&#x65F6;&#x5219;&#x8FDB;&#x5165;&#x5230;CLOSE_WAIT&#x72B6;&#x6001;&#x3002;&#x63A5;&#x4E0B;&#x6765;&#x5462;&#xFF0C;&#x5B9E;&#x9645;&#x4E0A;&#x4F60;&#x771F;&#x6B63;&#x9700;&#x8981;&#x8003;&#x8651;&#x7684;&#x4E8B;&#x60C5;&#x662F;&#x5BDF;&#x770B;&#x4F60;&#x662F;&#x5426;&#x8FD8;&#x6709;&#x6570;&#x636E;&#x53D1;&#x9001;&#x7ED9;&#x5BF9;&#x65B9;&#xFF0C;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x7684;&#x8BDD;&#xFF0C;&#x90A3;&#x4E48;&#x4F60;&#x4E5F;&#x5C31;&#x53EF;&#x4EE5;close&#x8FD9;&#x4E2A;SOCKET&#xFF0C;&#x53D1;&#x9001;FIN&#x62A5;&#x6587;&#x7ED9;&#x5BF9;&#x65B9;&#xFF0C;&#x4E5F;&#x5373;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x3002;&#x6240;&#x4EE5;&#x4F60;&#x5728;CLOSE_WAIT&#x72B6;&#x6001;&#x4E0B;&#xFF0C;&#x9700;&#x8981;&#x5B8C;&#x6210;&#x7684;&#x4E8B;&#x60C5;&#x662F;&#x7B49;&#x5F85;&#x4F60;&#x53BB;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x3002;</p>
+<p>LAST_ACK: &#x8FD9;&#x4E2A;&#x72B6;&#x6001;&#x8FD8;&#x662F;&#x6BD4;&#x8F83;&#x5BB9;&#x6613;&#x597D;&#x7406;&#x89E3;&#x7684;&#xFF0C;&#x5B83;&#x662F;&#x88AB;&#x52A8;&#x5173;&#x95ED;&#x4E00;&#x65B9;&#x5728;&#x53D1;&#x9001;FIN&#x62A5;&#x6587;&#x540E;&#xFF0C;&#x6700;&#x540E;&#x7B49;&#x5F85;&#x5BF9;&#x65B9;&#x7684;ACK&#x62A5;&#x6587;&#x3002;&#x5F53;&#x6536;&#x5230;ACK&#x62A5;&#x6587;&#x540E;&#xFF0C;&#x4E5F;&#x5373;&#x53EF;&#x4EE5;&#x8FDB;&#x5165;&#x5230;CLOSED&#x53EF;&#x7528;&#x72B6;&#x6001;&#x4E86;&#x3002;</p>
+<p><strong>&#x6700;&#x540E;&#x6709;2&#x4E2A;&#x95EE;&#x9898;&#x7684;&#x56DE;&#x7B54;&#xFF0C;&#x6211;&#x81EA;&#x5DF1;&#x5206;&#x6790;&#x540E;&#x7684;&#x7ED3;&#x8BBA;&#xFF08;&#x4E0D;&#x4E00;&#x5B9A;&#x4FDD;&#x8BC1;100%&#x6B63;&#x786E;&#xFF09;</strong></p>
+<p>1&#x3001; &#x4E3A;&#x4EC0;&#x4E48;&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;&#x534F;&#x8BAE;&#x662F;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#xFF0C;&#x800C;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x5374;&#x662F;&#x56DB;&#x6B21;&#x63E1;&#x624B;&#x5462;&#xFF1F;</p>
+<p>&#x8FD9;&#x662F;&#x56E0;&#x4E3A;&#x670D;&#x52A1;&#x7AEF;&#x7684;LISTEN&#x72B6;&#x6001;&#x4E0B;&#x7684;SOCKET&#x5F53;&#x6536;&#x5230;SYN&#x62A5;&#x6587;&#x7684;&#x5EFA;&#x8FDE;&#x8BF7;&#x6C42;&#x540E;&#xFF0C;&#x5B83;&#x53EF;&#x4EE5;&#x628A;ACK&#x548C;SYN&#xFF08;ACK&#x8D77;&#x5E94;&#x7B54;&#x4F5C;&#x7528;&#xFF0C;&#x800C;SYN&#x8D77;&#x540C;&#x6B65;&#x4F5C;&#x7528;&#xFF09;&#x653E;&#x5728;&#x4E00;&#x4E2A;&#x62A5;&#x6587;&#x91CC;&#x6765;&#x53D1;&#x9001;&#x3002;&#x4F46;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x65F6;&#xFF0C;&#x5F53;&#x6536;&#x5230;&#x5BF9;&#x65B9;&#x7684;FIN&#x62A5;&#x6587;&#x901A;&#x77E5;&#x65F6;&#xFF0C;&#x5B83;&#x4EC5;&#x4EC5;&#x8868;&#x793A;&#x5BF9;&#x65B9;&#x6CA1;&#x6709;&#x6570;&#x636E;&#x53D1;&#x9001;&#x7ED9;&#x4F60;&#x4E86;&#xFF1B;&#x4F46;&#x672A;&#x5FC5;&#x4F60;&#x6240;&#x6709;&#x7684;&#x6570;&#x636E;&#x90FD;&#x5168;&#x90E8;&#x53D1;&#x9001;&#x7ED9;&#x5BF9;&#x65B9;&#x4E86;&#xFF0C;&#x6240;&#x4EE5;&#x4F60;&#x53EF;&#x4EE5;&#x672A;&#x5FC5;&#x4F1A;&#x9A6C;&#x4E0A;&#x4F1A;&#x5173;&#x95ED;SOCKET,&#x4E5F;&#x5373;&#x4F60;&#x53EF;&#x80FD;&#x8FD8;&#x9700;&#x8981;&#x53D1;&#x9001;&#x4E00;&#x4E9B;&#x6570;&#x636E;&#x7ED9;&#x5BF9;&#x65B9;&#x4E4B;&#x540E;&#xFF0C;&#x518D;&#x53D1;&#x9001;FIN&#x62A5;&#x6587;&#x7ED9;&#x5BF9;&#x65B9;&#x6765;&#x8868;&#x793A;&#x4F60;&#x540C;&#x610F;&#x73B0;&#x5728;&#x53EF;&#x4EE5;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x4E86;&#xFF0C;&#x6240;&#x4EE5;&#x5B83;&#x8FD9;&#x91CC;&#x7684;ACK&#x62A5;&#x6587;&#x548C;FIN&#x62A5;&#x6587;&#x591A;&#x6570;&#x60C5;&#x51B5;&#x4E0B;&#x90FD;&#x662F;&#x5206;&#x5F00;&#x53D1;&#x9001;&#x7684;&#x3002;</p>
+<p>2&#x3001; &#x4E3A;&#x4EC0;&#x4E48;TIME_WAIT&#x72B6;&#x6001;&#x8FD8;&#x9700;&#x8981;&#x7B49;2MSL&#x540E;&#x624D;&#x80FD;&#x8FD4;&#x56DE;&#x5230;CLOSED&#x72B6;&#x6001;&#xFF1F;</p>
+<p>&#x8FD9;&#x662F;&#x56E0;&#x4E3A;&#xFF1A;&#x867D;&#x7136;&#x53CC;&#x65B9;&#x90FD;&#x540C;&#x610F;&#x5173;&#x95ED;&#x8FDE;&#x63A5;&#x4E86;&#xFF0C;&#x800C;&#x4E14;&#x63E1;&#x624B;&#x7684;4&#x4E2A;&#x62A5;&#x6587;&#x4E5F;&#x90FD;&#x534F;&#x8C03;&#x548C;&#x53D1;&#x9001;&#x5B8C;&#x6BD5;&#xFF0C;&#x6309;&#x7406;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x56DE;&#x5230;CLOSED&#x72B6;&#x6001;&#xFF08;&#x5C31;&#x597D;&#x6BD4;&#x4ECE;SYN_SEND&#x72B6;&#x6001;&#x5230;ESTABLISH&#x72B6;&#x6001;&#x90A3;&#x6837;&#xFF09;&#xFF1B;&#x4F46;&#x662F;&#x56E0;&#x4E3A;&#x6211;&#x4EEC;&#x5FC5;&#x987B;&#x8981;&#x5047;&#x60F3;&#x7F51;&#x7EDC;&#x662F;&#x4E0D;&#x53EF;&#x9760;&#x7684;&#xFF0C;&#x4F60;&#x65E0;&#x6CD5;&#x4FDD;&#x8BC1;&#x4F60;&#x6700;&#x540E;&#x53D1;&#x9001;&#x7684;ACK&#x62A5;&#x6587;&#x4F1A;&#x4E00;&#x5B9A;&#x88AB;&#x5BF9;&#x65B9;&#x6536;&#x5230;&#xFF0C;&#x56E0;&#x6B64;&#x5BF9;&#x65B9;&#x5904;&#x4E8E;LAST_ACK&#x72B6;&#x6001;&#x4E0B;&#x7684;SOCKET&#x53EF;&#x80FD;&#x4F1A;&#x56E0;&#x4E3A;&#x8D85;&#x65F6;&#x672A;&#x6536;&#x5230;ACK&#x62A5;&#x6587;&#xFF0C;&#x800C;&#x91CD;&#x53D1;FIN&#x62A5;&#x6587;&#xFF0C;&#x6240;&#x4EE5;&#x8FD9;&#x4E2A;TIME_WAIT&#x72B6;&#x6001;&#x7684;&#x4F5C;&#x7528;&#x5C31;&#x662F;&#x7528;&#x6765;&#x91CD;&#x53D1;&#x53EF;&#x80FD;&#x4E22;&#x5931;&#x7684;ACK&#x62A5;&#x6587;&#xFF0C;&#x5E76;&#x4FDD;&#x8BC1;&#x4E8E;&#x6B64;&#x3002;</p>
+<p>&#x67E5;&#x770B;&#x5F53;&#x524D;&#x7CFB;&#x7EDF;&#x4E0B;&#x6240;&#x6709;&#x8FDE;&#x63A5;&#x72B6;&#x6001;&#x7684;&#x6570;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@vps ~]#netstat -n|awk &apos;/^tcp/{++S[$NF]}END{for (key in S) print key,S[key]}&apos;</span><br><span class="line">TIME_WAIT 286</span><br><span class="line">FIN_WAIT1 5</span><br><span class="line">FIN_WAIT2 6</span><br><span class="line">ESTABLISHED 269</span><br><span class="line">SYN_RECV 5</span><br><span class="line">CLOSING 1</span><br></pre></td></tr></table></figure>
+
+<p>&#x5982;&#x53D1;&#x73B0;&#x7CFB;&#x7EDF;&#x5B58;&#x5728;&#x5927;&#x91CF;TIME_WAIT&#x72B6;&#x6001;&#x7684;&#x8FDE;&#x63A5;&#xFF0C;&#x901A;&#x8FC7;&#x8C03;&#x6574;&#x5185;&#x6838;&#x53C2;&#x6570;&#x89E3;&#x51B3;&#xFF1A;<br>&#x7F16;&#x8F91;&#x6587;&#x4EF6;/etc/sysctl.conf&#xFF0C;&#x52A0;&#x5165;&#x4EE5;&#x4E0B;&#x5185;&#x5BB9;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.tcp_syncookies = 1</span><br><span class="line">net.ipv4.tcp_tw_reuse = 1</span><br><span class="line">net.ipv4.tcp_tw_recycle = 1</span><br><span class="line">net.ipv4.tcp_fin_timeout = 30</span><br></pre></td></tr></table></figure>
+
+<p>&#x7136;&#x540E;&#x6267;&#x884C; /sbin/sysctl -p &#x8BA9;&#x53C2;&#x6570;&#x751F;&#x6548;&#x3002;</p>
+<p>net.ipv4.tcp_syncookies = 1 &#x8868;&#x793A;&#x5F00;&#x542F;SYN Cookies&#x3002;&#x5F53;&#x51FA;&#x73B0;SYN&#x7B49;&#x5F85;&#x961F;&#x5217;&#x6EA2;&#x51FA;&#x65F6;&#xFF0C;&#x542F;&#x7528;cookies&#x6765;&#x5904;&#x7406;&#xFF0C;&#x53EF;&#x9632;&#x8303;&#x5C11;&#x91CF;SYN&#x653B;&#x51FB;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x8868;&#x793A;&#x5173;&#x95ED;&#xFF1B;<br>net.ipv4.tcp_tw_reuse = 1 &#x8868;&#x793A;&#x5F00;&#x542F;&#x91CD;&#x7528;&#x3002;&#x5141;&#x8BB8;&#x5C06;TIME-WAIT sockets&#x91CD;&#x65B0;&#x7528;&#x4E8E;&#x65B0;&#x7684;TCP&#x8FDE;&#x63A5;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x8868;&#x793A;&#x5173;&#x95ED;&#xFF1B;<br>net.ipv4.tcp_tw_recycle = 1 &#x8868;&#x793A;&#x5F00;&#x542F;TCP&#x8FDE;&#x63A5;&#x4E2D;TIME-WAIT sockets&#x7684;&#x5FEB;&#x901F;&#x56DE;&#x6536;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x8868;&#x793A;&#x5173;&#x95ED;&#x3002;<br>net.ipv4.tcp_fin_timeout &#x4FEE;&#x6539;&#x7CFB;&#x9ED8;&#x8BA4;&#x7684; TIMEOUT &#x65F6;&#x95F4;</p>
+<p><strong>&#x5176;&#x5B83;&#x53C2;&#x6570;&#x8BF4;&#x660E;&#xFF1A;</strong><br>net.ipv4.tcp_syncookies = 1 &#x8868;&#x793A;&#x5F00;&#x542F;SYN Cookies&#x3002;&#x5F53;&#x51FA;&#x73B0;SYN&#x7B49;&#x5F85;&#x961F;&#x5217;&#x6EA2;&#x51FA;&#x65F6;&#xFF0C;&#x542F;&#x7528;cookies&#x6765;&#x5904;&#x7406;&#xFF0C;&#x53EF;&#x9632;&#x8303;&#x5C11;&#x91CF;SYN&#x653B;&#x51FB;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x8868;&#x793A;&#x5173;&#x95ED;&#xFF1B;<br>net.ipv4.tcp_tw_reuse = 1 &#x8868;&#x793A;&#x5F00;&#x542F;&#x91CD;&#x7528;&#x3002;&#x5141;&#x8BB8;&#x5C06;TIME-WAIT sockets&#x91CD;&#x65B0;&#x7528;&#x4E8E;&#x65B0;&#x7684;TCP&#x8FDE;&#x63A5;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x8868;&#x793A;&#x5173;&#x95ED;&#xFF1B;<br>net.ipv4.tcp_tw_recycle = 1 &#x8868;&#x793A;&#x5F00;&#x542F;TCP&#x8FDE;&#x63A5;&#x4E2D;TIME-WAIT sockets&#x7684;&#x5FEB;&#x901F;&#x56DE;&#x6536;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x8868;&#x793A;&#x5173;&#x95ED;&#x3002;<br>net.ipv4.tcp_fin_timeout = 30 &#x8868;&#x793A;&#x5982;&#x679C;&#x5957;&#x63A5;&#x5B57;&#x7531;&#x672C;&#x7AEF;&#x8981;&#x6C42;&#x5173;&#x95ED;&#xFF0C;&#x8FD9;&#x4E2A;&#x53C2;&#x6570;&#x51B3;&#x5B9A;&#x4E86;&#x5B83;&#x4FDD;&#x6301;&#x5728;FIN-WAIT-2&#x72B6;&#x6001;&#x7684;&#x65F6;&#x95F4;&#x3002;<br>net.ipv4.tcp_keepalive_time = 1200 &#x8868;&#x793A;&#x5F53;keepalive&#x8D77;&#x7528;&#x7684;&#x65F6;&#x5019;&#xFF0C;TCP&#x53D1;&#x9001;keepalive&#x6D88;&#x606F;&#x7684;&#x9891;&#x5EA6;&#x3002;&#x7F3A;&#x7701;&#x662F;2&#x5C0F;&#x65F6;&#xFF0C;&#x6539;&#x4E3A;20&#x5206;&#x949F;&#x3002;<br>net.ipv4.ip_local_port_range = 1024 65000 &#x8868;&#x793A;&#x7528;&#x4E8E;&#x5411;&#x5916;&#x8FDE;&#x63A5;&#x7684;&#x7AEF;&#x53E3;&#x8303;&#x56F4;&#x3002;&#x7F3A;&#x7701;&#x60C5;&#x51B5;&#x4E0B;&#x5F88;&#x5C0F;&#xFF1A;32768&#x5230;61000&#xFF0C;&#x6539;&#x4E3A;1024&#x5230;65000&#x3002;<br>net.ipv4.tcp_max_syn_backlog = 8192 &#x8868;&#x793A;SYN&#x961F;&#x5217;&#x7684;&#x957F;&#x5EA6;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;1024&#xFF0C;&#x52A0;&#x5927;&#x961F;&#x5217;&#x957F;&#x5EA6;&#x4E3A;8192&#xFF0C;&#x53EF;&#x4EE5;&#x5BB9;&#x7EB3;&#x66F4;&#x591A;&#x7B49;&#x5F85;&#x8FDE;&#x63A5;&#x7684;&#x7F51;&#x7EDC;&#x8FDE;&#x63A5;&#x6570;&#x3002;<br>net.ipv4.tcp_max_tw_buckets = 5000 &#x8868;&#x793A;&#x7CFB;&#x7EDF;&#x540C;&#x65F6;&#x4FDD;&#x6301;TIME_WAIT&#x5957;&#x63A5;&#x5B57;&#x7684;&#x6700;&#x5927;&#x6570;&#x91CF;&#xFF0C;&#x5982;&#x679C;&#x8D85;&#x8FC7;&#x8FD9;&#x4E2A;&#x6570;&#x5B57;&#xFF0C;TIME_WAIT&#x5957;&#x63A5;&#x5B57;&#x5C06;&#x7ACB;&#x523B;&#x88AB;&#x6E05;&#x9664;&#x5E76;&#x6253;&#x5370;&#x8B66;&#x544A;&#x4FE1;&#x606F;&#x3002;<br>&#x9ED8; &#x8BA4;&#x4E3A;180000&#xFF0C;&#x6539;&#x4E3A;5000&#x3002;&#x5BF9;&#x4E8E;Apache&#x3001;Nginx&#x7B49;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x4E0A;&#x51E0;&#x884C;&#x7684;&#x53C2;&#x6570;&#x53EF;&#x4EE5;&#x5F88;&#x597D;&#x5730;&#x51CF;&#x5C11;TIME_WAIT&#x5957;&#x63A5;&#x5B57;&#x6570;&#x91CF;&#xFF0C;&#x4F46;&#x662F;&#x5BF9;&#x4E8E;Squid&#xFF0C;&#x6548;&#x679C;&#x5374;&#x4E0D;&#x5927;&#x3002;&#x6B64;&#x9879;&#x53C2;&#x6570;&#x53EF;&#x4EE5;&#x63A7;&#x5236;TIME_WAIT&#x5957;&#x63A5;&#x5B57;&#x7684;&#x6700;&#x5927;&#x6570;&#x91CF;&#xFF0C;&#x907F;&#x514D;Squid&#x670D;&#x52A1;&#x5668;&#x88AB;&#x5927;&#x91CF;&#x7684;TIME_WAIT&#x5957;&#x63A5;&#x5B57;&#x62D6;&#x6B7B;&#x3002;</p>
+<p><strong>&#x6CE8;:</strong><br>net.ipv4.tcp_tw_reuse = 1<br>net.ipv4.tcp_tw_recycle = 1</p>
+<p>&#x8BBE;&#x7F6E;&#x8FD9;&#x4E24;&#x4E2A;&#x53C2;&#x6570;&#xFF1A; reuse&#x662F;&#x8868;&#x793A;&#x662F;&#x5426;&#x5141;&#x8BB8;&#x91CD;&#x65B0;&#x5E94;&#x7528;&#x5904;&#x4E8E;TIME-WAIT&#x72B6;&#x6001;&#x7684;socket&#x7528;&#x4E8E;&#x65B0;&#x7684;TCP&#x8FDE;&#x63A5;&#xFF1B; recyse&#x662F;&#x52A0;&#x901F;TIME-WAIT sockets&#x56DE;&#x6536;</p>
+<p><strong>&#x6765;&#x6E90;&#x53CA;&#x53C2;&#x8003;</strong></p>
+<p><a href="http://bbs.linuxtone.org/thread-853-1-1.html" target="_blank" rel="noopener">http://bbs.linuxtone.org/thread-853-1-1.html</a><br><a href="http://hi.baidu.com/tim_bi/blog/item/35b005d784ca91d5a044df1d.html" target="_blank" rel="noopener">http://hi.baidu.com/tim_bi/blog/item/35b005d784ca91d5a044df1d.html</a><br><a href="http://apps.hi.baidu.com/share/detail/34009128" target="_blank" rel="noopener">http://apps.hi.baidu.com/share/detail/34009128</a></p>
+
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+            
+              <a href="/tags/ops/" rel="tag"><i class="fa fa-tag"></i> ops</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2012/04/22/简单的系统监控脚本/" rel="next" title="简单的系统监控脚本">
+                  <i class="fa fa-chevron-left"></i> 简单的系统监控脚本
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2012/05/03/nginx设置expires和access_log提升网站访问速度/" rel="prev" title="nginx设置expires和access_log提升网站访问速度">
+                  nginx设置expires和access_log提升网站访问速度 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

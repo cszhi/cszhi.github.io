@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x5B89;&amp;#x88C5;123456curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repocurl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repoyum install cob">
+<meta name="keywords" content="centos,cobbler,pxe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cobbler部署及使用">
+<meta property="og:url" content="http://blogs.cszhi.com/2019/08/02/Cobbler部署及使用/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x5B89;&amp;#x88C5;123456curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repocurl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repoyum install cob">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-01T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Cobbler部署及使用">
+<meta name="twitter:description" content="&amp;#x5B89;&amp;#x88C5;123456curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repocurl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repoyum install cob">
+  <link rel="canonical" href="http://blogs.cszhi.com/2019/08/02/Cobbler部署及使用/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Cobbler部署及使用 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2019/08/02/Cobbler部署及使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Cobbler部署及使用
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-02 00:00:00" itemprop="dateCreated datePublished" datetime="2019-08-02T00:00:00+08:00">2019-08-02</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="&#x5B89;&#x88C5;"><a href="#&#x5B89;&#x88C5;" class="headerlink" title="&#x5B89;&#x88C5;"></a>&#x5B89;&#x88C5;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span><br><span class="line">curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo</span><br><span class="line">yum install cobbler cobbler-web python-pip httpd pykickstart cman xinetd dhcp -y</span><br><span class="line">pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple requests</span><br><span class="line">pip install Django==1.8.9 -i https://pypi.tuna.tsinghua.edu.cn/simple requests</span><br><span class="line">yum clean all</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h3 id="&#x542F;&#x52A8;&#x670D;&#x52A1;"><a href="#&#x542F;&#x52A8;&#x670D;&#x52A1;" class="headerlink" title="&#x542F;&#x52A8;&#x670D;&#x52A1;"></a>&#x542F;&#x52A8;&#x670D;&#x52A1;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start httpd cobblerd</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x68C0;&#x67E5;&#x914D;&#x7F6E;"><a href="#&#x68C0;&#x67E5;&#x914D;&#x7F6E;" class="headerlink" title="&#x68C0;&#x67E5;&#x914D;&#x7F6E;"></a>&#x68C0;&#x67E5;&#x914D;&#x7F6E;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cobbler check</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x4FEE;&#x6539;&#x914D;&#x7F6E;"><a href="#&#x4FEE;&#x6539;&#x914D;&#x7F6E;" class="headerlink" title="&#x4FEE;&#x6539;&#x914D;&#x7F6E;"></a>&#x4FEE;&#x6539;&#x914D;&#x7F6E;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sed -i &apos;s/200/3000/g&apos; /etc/cobbler/pxe/pxedefault.template</span><br><span class="line">sed -i &apos;s/server: 127.0.0.1/server: 192.168.1.10/&apos; /etc/cobbler/settings</span><br><span class="line">sed -i &apos;s/next_server: 127.0.0.1/next_server: 192.168.1.10/&apos; /etc/cobbler/settings</span><br><span class="line">sed -i &apos;s/manage_dhcp: 0/manage_dhcp: 1/&apos; /etc/cobbler/settings</span><br><span class="line">sed -i &apos;s/pxe_just_once: 0/pxe_just_once: 1/&apos; /etc/cobbler/settings</span><br><span class="line">sed -ri &quot;/default_password_crypted/s#(.*: ).*#\1\&quot;`openssl passwd -1 -salt &apos;huayun&apos; &apos;huayunOPS1123&apos;`\&quot;#&quot; /etc/cobbler/settings</span><br><span class="line">sed -i &apos;s#yes#no#&apos; /etc/xinetd.d/tftp</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x65F6;&#x533A;"><a href="#&#x65F6;&#x533A;" class="headerlink" title="&#x65F6;&#x533A;"></a>&#x65F6;&#x533A;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timedatectl set-timezone Asia/Shanghai</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x83B7;&#x53D6;boot-loaders"><a href="#&#x83B7;&#x53D6;boot-loaders" class="headerlink" title="&#x83B7;&#x53D6;boot loaders"></a>&#x83B7;&#x53D6;boot loaders</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cobbler get-loaders</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x542F;&#x52A8;rsyncd"><a href="#&#x542F;&#x52A8;rsyncd" class="headerlink" title="&#x542F;&#x52A8;rsyncd"></a>&#x542F;&#x52A8;rsyncd</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start rsyncd</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x91CD;&#x542F;cobblerd"><a href="#&#x91CD;&#x542F;cobblerd" class="headerlink" title="&#x91CD;&#x542F;cobblerd"></a>&#x91CD;&#x542F;cobblerd</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart cobblerd</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x540C;&#x6B65;&#x914D;&#x7F6E;"><a href="#&#x540C;&#x6B65;&#x914D;&#x7F6E;" class="headerlink" title="&#x540C;&#x6B65;&#x914D;&#x7F6E;"></a>&#x540C;&#x6B65;&#x914D;&#x7F6E;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cobbler sync</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x518D;&#x6B21;&#x68C0;&#x67E5;"><a href="#&#x518D;&#x6B21;&#x68C0;&#x67E5;" class="headerlink" title="&#x518D;&#x6B21;&#x68C0;&#x67E5;"></a>&#x518D;&#x6B21;&#x68C0;&#x67E5;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cobbler check</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x542F;&#x52A8;&#x5176;&#x4ED6;&#x670D;&#x52A1;"><a href="#&#x542F;&#x52A8;&#x5176;&#x4ED6;&#x670D;&#x52A1;" class="headerlink" title="&#x542F;&#x52A8;&#x5176;&#x4ED6;&#x670D;&#x52A1;"></a>&#x542F;&#x52A8;&#x5176;&#x4ED6;&#x670D;&#x52A1;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start xinetd dhcpd rsyncd</span><br><span class="line">systemctl enable httpd cobblerd xinetd dhcpd rsyncd</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x5BFC;&#x5165;&#x7CFB;&#x7EDF;&#xFF1A;"><a href="#&#x5BFC;&#x5165;&#x7CFB;&#x7EDF;&#xFF1A;" class="headerlink" title="&#x5BFC;&#x5165;&#x7CFB;&#x7EDF;&#xFF1A;"></a>&#x5BFC;&#x5165;&#x7CFB;&#x7EDF;&#xFF1A;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mount -t iso9660 -o loop,ro /opt/CentOS-7-x86_64-DVD-1511.iso /mnt</span><br><span class="line">cobbler import --path=/mnt --name=CentOS-7.2 --arch=x86_64</span><br><span class="line">umount /mnt</span><br><span class="line">mount -t iso9660 -o loop,ro /opt/CentOS-7-x86_64-DVD-1804.iso /mnt</span><br><span class="line">cobbler import --path=/mnt --name=CentOS-7.5 --arch=x86_64</span><br><span class="line">umount /mnt</span><br><span class="line">mount -t iso9660 -o loop,ro /opt/CentOS-7-x86_64-DVD-1810.iso /mnt</span><br><span class="line">cobbler import --path=/mnt --name=CentOS-7.6 --arch=x86_64</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x67E5;&#x770B;&#x5217;&#x8868;"><a href="#&#x67E5;&#x770B;&#x5217;&#x8868;" class="headerlink" title="&#x67E5;&#x770B;&#x5217;&#x8868;"></a>&#x67E5;&#x770B;&#x5217;&#x8868;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cobbler list</span><br></pre></td></tr></table></figure>
+
+<h3 id="web&#x9875;&#x9762;"><a href="#web&#x9875;&#x9762;" class="headerlink" title="web&#x9875;&#x9762;"></a>web&#x9875;&#x9762;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cobbler_web(https)</span><br><span class="line">https://10.10.16.180/cobbler_web</span><br><span class="line">cobbler cobbler</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x81EA;&#x5B9A;&#x4E49;&#x7CFB;&#x7EDF;"><a href="#&#x81EA;&#x5B9A;&#x4E49;&#x7CFB;&#x7EDF;" class="headerlink" title="&#x81EA;&#x5B9A;&#x4E49;&#x7CFB;&#x7EDF;"></a>&#x81EA;&#x5B9A;&#x4E49;&#x7CFB;&#x7EDF;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cobbler system add --name=test2 --mac=22:da:49:2a:9e:52 --profile=CentOS-7.2-x86_64 \</span><br><span class="line">--hostname=test2 \</span><br><span class="line">--interface=eth0 \</span><br><span class="line">--ip-address=10.10.16.192 \</span><br><span class="line">--subnet=255.255.252.0 \</span><br><span class="line">--gateway=10.10.16.254 \</span><br><span class="line">--name-servers=&quot;114.114.114.114&quot; \</span><br><span class="line">--static=1</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;"><a href="#&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;" class="headerlink" title="&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;"></a>&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;</h3><h4 id="1&#x3001;&#x5B89;&#x88C5;koan&#x5DE5;&#x5177;"><a href="#1&#x3001;&#x5B89;&#x88C5;koan&#x5DE5;&#x5177;" class="headerlink" title="1&#x3001;&#x5B89;&#x88C5;koan&#x5DE5;&#x5177;"></a>1&#x3001;&#x5B89;&#x88C5;koan&#x5DE5;&#x5177;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span><br><span class="line">curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo</span><br><span class="line">yum install koan</span><br></pre></td></tr></table></figure>
+
+<h4 id="2&#x3001;&#x7ED9;&#x670D;&#x52A1;&#x5668;&#x914D;&#x7F6E;&#x4E00;&#x4E2A;192-168-1&#x6BB5;&#x7684;ip"><a href="#2&#x3001;&#x7ED9;&#x670D;&#x52A1;&#x5668;&#x914D;&#x7F6E;&#x4E00;&#x4E2A;192-168-1&#x6BB5;&#x7684;ip" class="headerlink" title="2&#x3001;&#x7ED9;&#x670D;&#x52A1;&#x5668;&#x914D;&#x7F6E;&#x4E00;&#x4E2A;192.168.1&#x6BB5;&#x7684;ip"></a>2&#x3001;&#x7ED9;&#x670D;&#x52A1;&#x5668;&#x914D;&#x7F6E;&#x4E00;&#x4E2A;192.168.1&#x6BB5;&#x7684;ip</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig eth0:0 192.168.1.21</span><br></pre></td></tr></table></figure>
+
+<h4 id="3&#x3001;&#x67E5;&#x770B;&#x6709;&#x54EA;&#x4E9B;&#x7CFB;&#x7EDF;"><a href="#3&#x3001;&#x67E5;&#x770B;&#x6709;&#x54EA;&#x4E9B;&#x7CFB;&#x7EDF;" class="headerlink" title="3&#x3001;&#x67E5;&#x770B;&#x6709;&#x54EA;&#x4E9B;&#x7CFB;&#x7EDF;"></a>3&#x3001;&#x67E5;&#x770B;&#x6709;&#x54EA;&#x4E9B;&#x7CFB;&#x7EDF;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x67E5;&#x770B;&#x6709;&#x54EA;&#x4E9B;&#x7CFB;&#x7EDF;</span></span><br><span class="line">[root@localhost ~]<span class="comment"># koan --server 192.168.1.10 --list=profiles</span></span><br><span class="line">- looking <span class="keyword">for</span> Cobbler at http://192.168.1.10:80/cobbler_api</span><br><span class="line">CentOS-7.2-x86_64</span><br><span class="line">CentOS-7.5-x86_64</span><br><span class="line">CentOS-7.6-x86_64</span><br><span class="line"></span><br><span class="line"><span class="comment">#&#x67E5;&#x770B;&#x6709;&#x54EA;&#x4E9B;&#x81EA;&#x5B9A;&#x4E49;&#x670D;&#x52A1;&#x5668;</span></span><br><span class="line">[root@localhost ~]<span class="comment">#  koan --server 192.168.1.10 --list=systems </span></span><br><span class="line">- looking <span class="keyword">for</span> Cobbler at http://192.168.1.10:80/cobbler_api</span><br><span class="line">huawei</span><br><span class="line">dell</span><br><span class="line">h3c</span><br></pre></td></tr></table></figure>
+
+<h4 id="4&#x3001;&#x4F7F;&#x7528;h3c-system&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;"><a href="#4&#x3001;&#x4F7F;&#x7528;h3c-system&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;" class="headerlink" title="4&#x3001;&#x4F7F;&#x7528;h3c system&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;"></a>4&#x3001;&#x4F7F;&#x7528;h3c system&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># koan --replace-self --server=192.168.1.10 --system=h3c</span></span><br><span class="line">- looking <span class="keyword">for</span> Cobbler at http://192.168.1.10:80/cobbler_api</span><br><span class="line">- reading URL: http://192.168.1.10/cblr/svc/op/ks/system/h3c</span><br><span class="line">install_tree: http://192.168.1.10/cblr/links/CentOS-7.5-x86_64</span><br><span class="line">downloading initrd initrd.img to /boot/initrd.img_koan</span><br><span class="line">url=http://192.168.1.10/cobbler/images/CentOS-7.5-x86_64/initrd.img</span><br><span class="line">- reading URL: http://192.168.1.10/cobbler/images/CentOS-7.5-x86_64/initrd.img</span><br><span class="line">downloading kernel vmlinuz to /boot/vmlinuz_koan</span><br><span class="line">url=http://192.168.1.10/cobbler/images/CentOS-7.5-x86_64/vmlinuz</span><br><span class="line">- reading URL: http://192.168.1.10/cobbler/images/CentOS-7.5-x86_64/vmlinuz</span><br><span class="line">- [<span class="string">&apos;/sbin/grubby&apos;</span>, <span class="string">&apos;--add-kernel&apos;</span>, <span class="string">&apos;/boot/vmlinuz_koan&apos;</span>, <span class="string">&apos;--initrd&apos;</span>, <span class="string">&apos;/boot/initrd.img_koan&apos;</span>, <span class="string">&apos;--args&apos;</span>, <span class="string">&apos;&quot;ksdevice=link lang= text net.ifnames=0 ks=http://192.168.1.10/cblr/svc/op/ks/system/h3c biosdevname=0 kssendmac &quot;&apos;</span>, <span class="string">&apos;--copy-default&apos;</span>, <span class="string">&apos;--make-default&apos;</span>, <span class="string">&apos;--title=kick1566199129&apos;</span>]</span><br><span class="line">- [<span class="string">&apos;/sbin/grubby&apos;</span>, <span class="string">&apos;--update-kernel&apos;</span>, <span class="string">&apos;/boot/vmlinuz_koan&apos;</span>, <span class="string">&apos;--remove-args=root&apos;</span>]</span><br><span class="line">- reboot to apply changes</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/centos/" rel="tag"><i class="fa fa-tag"></i> centos</a>
+            
+              <a href="/tags/cobbler/" rel="tag"><i class="fa fa-tag"></i> cobbler</a>
+            
+              <a href="/tags/pxe/" rel="tag"><i class="fa fa-tag"></i> pxe</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2018/11/23/Docker CE 部署/" rel="next" title="Docker CE 部署">
+                  <i class="fa fa-chevron-left"></i> Docker CE 部署
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/08/29/mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解/" rel="prev" title="mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解">
+                  mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动服务"><span class="nav-number">2.</span> <span class="nav-text">启动服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查配置"><span class="nav-number">3.</span> <span class="nav-text">检查配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改配置"><span class="nav-number">4.</span> <span class="nav-text">修改配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#时区"><span class="nav-number">5.</span> <span class="nav-text">时区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取boot-loaders"><span class="nav-number">6.</span> <span class="nav-text">获取boot loaders</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动rsyncd"><span class="nav-number">7.</span> <span class="nav-text">启动rsyncd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重启cobblerd"><span class="nav-number">8.</span> <span class="nav-text">重启cobblerd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步配置"><span class="nav-number">9.</span> <span class="nav-text">同步配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#再次检查"><span class="nav-number">10.</span> <span class="nav-text">再次检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动其他服务"><span class="nav-number">11.</span> <span class="nav-text">启动其他服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#导入系统："><span class="nav-number">12.</span> <span class="nav-text">导入系统：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看列表"><span class="nav-number">13.</span> <span class="nav-text">查看列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web页面"><span class="nav-number">14.</span> <span class="nav-text">web页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义系统"><span class="nav-number">15.</span> <span class="nav-text">自定义系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重装系统"><span class="nav-number">16.</span> <span class="nav-text">重装系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、安装koan工具"><span class="nav-number">16.1.</span> <span class="nav-text">1、安装koan工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、给服务器配置一个192-168-1段的ip"><span class="nav-number">16.2.</span> <span class="nav-text">2、给服务器配置一个192.168.1段的ip</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3、查看有哪些系统"><span class="nav-number">16.3.</span> <span class="nav-text">3、查看有哪些系统</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、使用h3c-system重装系统"><span class="nav-number">16.4.</span> <span class="nav-text">4、使用h3c system重装系统</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

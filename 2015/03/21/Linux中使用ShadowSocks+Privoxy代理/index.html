@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x5B89;&amp;#x88C5;shadowsocks&amp;#x5BA2;&amp;#x6237;&amp;#x7AEF;12yum install python-pippip install shadowsocks -i https://pypi.tuna.tsinghua.edu.cn/simple requests">
+<meta name="keywords" content="代理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux中使用ShadowSocks+Privoxy代理">
+<meta property="og:url" content="http://blogs.cszhi.com/2015/03/21/Linux中使用ShadowSocks+Privoxy代理/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x5B89;&amp;#x88C5;shadowsocks&amp;#x5BA2;&amp;#x6237;&amp;#x7AEF;12yum install python-pippip install shadowsocks -i https://pypi.tuna.tsinghua.edu.cn/simple requests">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2015-03-20T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux中使用ShadowSocks+Privoxy代理">
+<meta name="twitter:description" content="&amp;#x5B89;&amp;#x88C5;shadowsocks&amp;#x5BA2;&amp;#x6237;&amp;#x7AEF;12yum install python-pippip install shadowsocks -i https://pypi.tuna.tsinghua.edu.cn/simple requests">
+  <link rel="canonical" href="http://blogs.cszhi.com/2015/03/21/Linux中使用ShadowSocks+Privoxy代理/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Linux中使用ShadowSocks+Privoxy代理 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2015/03/21/Linux中使用ShadowSocks+Privoxy代理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Linux中使用ShadowSocks+Privoxy代理
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2015-03-21 00:00:00" itemprop="dateCreated datePublished" datetime="2015-03-21T00:00:00+08:00">2015-03-21</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技巧/" itemprop="url" rel="index"><span itemprop="name">技巧</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="&#x5B89;&#x88C5;shadowsocks&#x5BA2;&#x6237;&#x7AEF;"><a href="#&#x5B89;&#x88C5;shadowsocks&#x5BA2;&#x6237;&#x7AEF;" class="headerlink" title="&#x5B89;&#x88C5;shadowsocks&#x5BA2;&#x6237;&#x7AEF;"></a>&#x5B89;&#x88C5;shadowsocks&#x5BA2;&#x6237;&#x7AEF;</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum install python-pip</span><br><span class="line">pip install shadowsocks -i https://pypi.tuna.tsinghua.edu.cn/simple requests</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h4 id="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;"><a href="#&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;" class="headerlink" title="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;"></a>&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup sslocal -s 39.109.8.5 -p 8008 -l 1080 -k huayun2014 -t 600 -m aes-256-cfb &gt; /root/ss.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;"><a href="#&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;" class="headerlink" title="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;"></a>&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">nohup sslocal -c /etc/shadowsocks.json &gt;&gt;/root/ss.log 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">{</span><br><span class="line">    &quot;server&quot;:&quot;39.109.8.5&quot;,</span><br><span class="line">    &quot;server_port&quot;:8008,</span><br><span class="line">    &quot;local_address&quot;: &quot;127.0.0.1&quot;,</span><br><span class="line">    &quot;local_port&quot;:1080,</span><br><span class="line">    &quot;password&quot;:&quot;huayun2014&quot;,</span><br><span class="line">    &quot;timeout&quot;:300,</span><br><span class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">    &quot;fast_open&quot;: false,</span><br><span class="line">    &quot;workers&quot;: 1</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x5B89;&#x88C5;privoxy"><a href="#&#x5B89;&#x88C5;privoxy" class="headerlink" title="&#x5B89;&#x88C5;privoxy"></a>&#x5B89;&#x88C5;privoxy</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install privoxy -y</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x914D;&#x7F6E;"><a href="#&#x914D;&#x7F6E;" class="headerlink" title="&#x914D;&#x7F6E;"></a>&#x914D;&#x7F6E;</h4><p>grep -v &#x201C;#&#x201D; /etc/privoxy/config |grep -v &#x201C;^$&#x201D;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">confdir /etc/privoxy</span><br><span class="line">logdir /var/log/privoxy</span><br><span class="line">filterfile default.filter</span><br><span class="line">logfile logfile</span><br><span class="line">listen-address 127.0.0.1:8118</span><br><span class="line">toggle 1</span><br><span class="line">enable-remote-toggle 0</span><br><span class="line">enable-remote-http-toggle 0</span><br><span class="line">enable-edit-actions 0</span><br><span class="line">enforce-blocks 0</span><br><span class="line">buffer-limit 4096</span><br><span class="line">enable-proxy-authentication-forwarding 0</span><br><span class="line">forward-socks5t / 127.0.0.1:1080 .</span><br><span class="line">forwarded-connect-retries 0</span><br><span class="line">accept-intercepted-requests 0</span><br><span class="line">allow-cgi-request-crunching 0</span><br><span class="line">split-large-forms 0</span><br><span class="line">keep-alive-timeout 5</span><br><span class="line">tolerate-pipelining 1</span><br><span class="line">socket-timeout 300</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x542F;&#x52A8;"><a href="#&#x542F;&#x52A8;" class="headerlink" title="&#x542F;&#x52A8;"></a>&#x542F;&#x52A8;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart privoxy </span><br><span class="line">systemctl <span class="built_in">enable</span> privoxy</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x8F6C;&#x53D1;&#x914D;&#x7F6E;"><a href="#&#x8F6C;&#x53D1;&#x914D;&#x7F6E;" class="headerlink" title="&#x8F6C;&#x53D1;&#x914D;&#x7F6E;"></a>&#x8F6C;&#x53D1;&#x914D;&#x7F6E;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; vim /etc/profile</span><br><span class="line"><span class="built_in">export</span> http_proxy=http://127.0.0.1:8118</span><br><span class="line"><span class="built_in">export</span> https_proxy=http://127.0.0.1:8118</span><br><span class="line">\&gt; <span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x4EC5;&#x5728;&#x5F53;&#x524D;-session-&#x751F;&#x6548;"><a href="#&#x4EC5;&#x5728;&#x5F53;&#x524D;-session-&#x751F;&#x6548;" class="headerlink" title="&#x4EC5;&#x5728;&#x5F53;&#x524D; session &#x751F;&#x6548;"></a>&#x4EC5;&#x5728;&#x5F53;&#x524D; session &#x751F;&#x6548;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> http_proxy=http://127.0.0.1:8118</span><br><span class="line"><span class="built_in">export</span> https_proxy=http://127.0.0.1:8118</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://www.jianshu.com/p/48b3866b5e2a" target="_blank" rel="noopener">https://www.jianshu.com/p/48b3866b5e2a</a></p>
+
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/代理/" rel="tag"><i class="fa fa-tag"></i> 代理</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2014/11/19/xenserver虚拟机实时性能查看/" rel="next" title="xenserver虚拟机实时性能查看">
+                  <i class="fa fa-chevron-left"></i> xenserver虚拟机实时性能查看
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/11/13/Nginx部署/" rel="prev" title="Nginx部署">
+                  Nginx部署 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装shadowsocks客户端"><span class="nav-number">1.</span> <span class="nav-text">安装shadowsocks客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#运行shadowsocks（一条命令）"><span class="nav-number">1.1.</span> <span class="nav-text">运行shadowsocks（一条命令）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#运行shadowsocks（读取配置文件）"><span class="nav-number">1.2.</span> <span class="nav-text">运行shadowsocks（读取配置文件）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装privoxy"><span class="nav-number">2.</span> <span class="nav-text">安装privoxy</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置"><span class="nav-number">2.1.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动"><span class="nav-number">2.2.</span> <span class="nav-text">启动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#转发配置"><span class="nav-number">2.3.</span> <span class="nav-text">转发配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#仅在当前-session-生效"><span class="nav-number">2.4.</span> <span class="nav-text">仅在当前 session 生效</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

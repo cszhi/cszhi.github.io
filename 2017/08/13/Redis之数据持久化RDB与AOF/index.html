@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x5927;&amp;#x5BB6;&amp;#x90FD;&amp;#x77E5;&amp;#x9053;&amp;#xFF0C;Redis&amp;#x4E4B;&amp;#x6240;&amp;#x4EE5;&amp;#x6027;&amp;#x80FD;&amp;#x597D;&amp;#xFF0C;&amp;#x8BFB;&amp;#x5199;&amp;#x5FEB;&amp;#xFF0C;&amp;#x662F;&amp;#x56E0;&amp;#x4E3A;Redis&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x518">
+<meta name="keywords" content="redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis之数据持久化RDB与AOF">
+<meta property="og:url" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x5927;&amp;#x5BB6;&amp;#x90FD;&amp;#x77E5;&amp;#x9053;&amp;#xFF0C;Redis&amp;#x4E4B;&amp;#x6240;&amp;#x4EE5;&amp;#x6027;&amp;#x80FD;&amp;#x597D;&amp;#xFF0C;&amp;#x8BFB;&amp;#x5199;&amp;#x5FEB;&amp;#xFF0C;&amp;#x662F;&amp;#x56E0;&amp;#x4E3A;Redis&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x518">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567056869345.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567056565166.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567056598127.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567056621911.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567057744415.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567057496358.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567057414692.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567057445939.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567050271191.png">
+<meta property="og:updated_time" content="2017-08-12T16:00:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis之数据持久化RDB与AOF">
+<meta name="twitter:description" content="&amp;#x5927;&amp;#x5BB6;&amp;#x90FD;&amp;#x77E5;&amp;#x9053;&amp;#xFF0C;Redis&amp;#x4E4B;&amp;#x6240;&amp;#x4EE5;&amp;#x6027;&amp;#x80FD;&amp;#x597D;&amp;#xFF0C;&amp;#x8BFB;&amp;#x5199;&amp;#x5FEB;&amp;#xFF0C;&amp;#x662F;&amp;#x56E0;&amp;#x4E3A;Redis&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x518">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/1567056869345.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Redis之数据持久化RDB与AOF | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2017/08/13/Redis之数据持久化RDB与AOF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Redis之数据持久化RDB与AOF
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-08-13 00:00:00" itemprop="dateCreated datePublished" datetime="2017-08-13T00:00:00+08:00">2017-08-13</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>&#x5927;&#x5BB6;&#x90FD;&#x77E5;&#x9053;&#xFF0C;Redis&#x4E4B;&#x6240;&#x4EE5;&#x6027;&#x80FD;&#x597D;&#xFF0C;&#x8BFB;&#x5199;&#x5FEB;&#xFF0C;&#x662F;&#x56E0;&#x4E3A;Redis&#x662F;&#x4E00;&#x4E2A;&#x5185;&#x5B58;&#x6570;&#x636E;&#x5E93;&#xFF0C;&#x5B83;&#x7684;&#x64CD;&#x4F5C;&#x90FD;&#x51E0;&#x4E4E;&#x57FA;&#x4E8E;&#x5185;&#x5B58;&#x3002;&#x4F46;&#x662F;&#x5185;&#x5B58;&#x578B;&#x6570;&#x636E;&#x5E93;&#x6709;&#x4E00;&#x4E2A;&#x5F88;&#x5927;&#x7684;&#x5F0A;&#x7AEF;&#xFF0C;&#x5C31;&#x662F;&#x5F53;&#x6570;&#x636E;&#x5E93;&#x8FDB;&#x7A0B;&#x5D29;&#x6E83;&#x6216;&#x7CFB;&#x7EDF;&#x91CD;&#x542F;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x5982;&#x679C;&#x5185;&#x5B58;&#x6570;&#x636E;&#x4E0D;&#x4FDD;&#x5B58;&#x7684;&#x8BDD;&#xFF0C;&#x91CC;&#x9762;&#x7684;&#x6570;&#x636E;&#x5C31;&#x4F1A;&#x4E22;&#x5931;&#x4E0D;&#x89C1;&#x4E86;&#x3002;&#x8FD9;&#x6837;&#x7684;&#x6570;&#x636E;&#x5E93;&#x5E76;&#x4E0D;&#x662F;&#x4E00;&#x4E2A;&#x53EF;&#x9760;&#x7684;&#x6570;&#x636E;&#x5E93;&#x3002;</p>
+<p>&#x6240;&#x4EE5;&#x6570;&#x636E;&#x7684;&#x6301;&#x4E45;&#x5316;&#x662F;&#x5185;&#x5B58;&#x578B;&#x6570;&#x636E;&#x5E93;&#x7684;&#x91CD;&#x4E2D;&#x4E4B;&#x91CD;&#x3002;&#x5B83;&#x4E0D;&#x4EC5;&#x63D0;&#x4F9B;&#x6570;&#x636E;&#x4FDD;&#x5B58;&#x786C;&#x76D8;&#x7684;&#x529F;&#x80FD;&#xFF0C;&#x8FD8;&#x53EF;&#x4EE5;&#x501F;&#x6B64;&#x7528;&#x786C;&#x76D8;&#x5BB9;&#x91CF;&#x6269;&#x5C55;&#x6570;&#x636E;&#x5B58;&#x50A8;&#x7A7A;&#x95F4;&#xFF0C;&#x4F7F;&#x5F97;Redis&#x7684;&#x53EF;&#x4EE5;&#x5B58;&#x50A8;&#x8D85;&#x8FC7;&#x673A;&#x5668;&#x672C;&#x8EAB;&#x5185;&#x5B58;&#x5927;&#x5C0F;&#x7684;&#x6570;&#x636E;&#x3002;</p>
+<p>Redis&#x5BF9;&#x4E8E;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;&#x63D0;&#x4F9B;&#x4E86;&#x4E24;&#x79CD;&#x6301;&#x4E45;&#x5316;&#x7684;&#x65B9;&#x6848;&#xFF0C;RDB&#x4E0E;AOF&#x3002;&#x5B83;&#x4EEC;&#x7684;&#x539F;&#x7406;&#x548C;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x90FD;&#x5927;&#x4E0D;&#x76F8;&#x540C;&#xFF0C;&#x4E0B;&#x9762;&#x6211;&#x4EEC;&#x6765;&#x8BE6;&#x7EC6;&#x5730;&#x4E86;&#x89E3;&#x4E0B;&#x3002;</p>
+<a id="more"></a>
+
+<h2 id="RDB&#x2014;&#x2014;&#x6570;&#x636E;&#x5FEB;&#x7167;&#xFF08;Snapshot&#xFF09;"><a href="#RDB&#x2014;&#x2014;&#x6570;&#x636E;&#x5FEB;&#x7167;&#xFF08;Snapshot&#xFF09;" class="headerlink" title="RDB&#x2014;&#x2014;&#x6570;&#x636E;&#x5FEB;&#x7167;&#xFF08;Snapshot&#xFF09;"></a>RDB&#x2014;&#x2014;&#x6570;&#x636E;&#x5FEB;&#x7167;&#xFF08;Snapshot&#xFF09;</h2><p>RDB&#xFF0C;&#x63D0;&#x4F9B;&#x4E00;&#x4E2A;&#x67D0;&#x4E2A;&#x65F6;&#x95F4;&#x70B9;&#x7684;&#x6570;&#x636E;&#x7684;Snapshot&#xFF0C;&#x4FDD;&#x5B58;&#x5728;RDB&#x6587;&#x4EF6;&#x4E2D;&#x3002;&#x5B83;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;SAVE/BGSAVE&#x547D;&#x4EE4;&#x624B;&#x52A8;&#x6267;&#x884C;&#xFF0C;&#x628A;&#x6570;&#x636E;Snapshot&#x5199;&#x5230;RDB&#x6587;&#x4EF6;&#xFF0C;&#x4E5F;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x914D;&#x7F6E;&#xFF0C;&#x5B9A;&#x65F6;&#x6267;&#x884C;&#x3002;</p>
+<p>Redis&#x4E5F;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x52A0;&#x8F7D;RDB&#x6587;&#x4EF6;&#xFF0C;&#x628A;&#x6570;&#x636E;&#x4ECE;&#x78C1;&#x76D8;&#x52A0;&#x8F7D;&#x8BFB;&#x53D6;&#x5230;Redis&#x4E2D;&#x3002;</p>
+<h3 id="RDB&#x6587;&#x4EF6;&#x521B;&#x5EFA;"><a href="#RDB&#x6587;&#x4EF6;&#x521B;&#x5EFA;" class="headerlink" title="RDB&#x6587;&#x4EF6;&#x521B;&#x5EFA;"></a>RDB&#x6587;&#x4EF6;&#x521B;&#x5EFA;</h3><p>&#x8FDE;&#x4E0A;Redis&#xFF0C;&#x8BBE;&#x503C;&#x4E00;&#x4E9B;&#x503C;&#xFF0C;&#x7136;&#x540E;&#x6267;&#x884C;<code>SAVE</code>&#x547D;&#x4EE4;&#x3002;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567056869345.png" alt="1567056869345"></p>
+<p>&#x7136;&#x540E;&#x53EF;&#x4EE5;&#x67E5;&#x770B;&#x4E0B;redis.conf&#x7684;&#x6301;&#x4E45;&#x5316;&#x5DE5;&#x4F5C;&#x76EE;&#x5F55;&#x3002;&#x8FDB;&#x5165;&#x76EE;&#x5F55;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x4FDD;&#x5B58;&#x4E86;&#x4E00;&#x4E2A;<code>dump.rdb</code>&#x6587;&#x4EF6;&#x3002;&#x8BE5;&#x6587;&#x4EF6;&#x662F;&#x4E00;&#x4E2A;&#x4E8C;&#x8FDB;&#x5236;&#x6587;&#x4EF6;&#xFF0C;&#x65E0;&#x6CD5;&#x76F4;&#x63A5;&#x6B63;&#x5E38;&#x6253;&#x5F00;&#x3002;</p>
+<p>&#x81F3;&#x4E8E;<code>SAVE/BGSAVE</code>&#x7684;&#x533A;&#x522B;&#xFF0C;&#x5C31;&#x662F;&#x524D;&#x7F6E;&#x662F;&#x963B;&#x585E;&#x6267;&#x884C;&#xFF0C;&#x6B64;&#x65F6;&#x670D;&#x52A1;&#x4E0D;&#x4F1A;&#x63A5;&#x53D7;&#x8BF7;&#x6C42;&#xFF0C;&#x540E;&#x8005;&#x662F;<code>Fork</code>&#x4E00;&#x4E2A;&#x5B50;&#x8FDB;&#x7A0B;&#x51FA;&#x6765;&#xFF0C;&#x7531;&#x8BE5;&#x8FDB;&#x7A0B;&#x53BB;&#x6267;&#x884C;&#x4FDD;&#x5B58;<code>RDB</code>&#x6587;&#x4EF6;&#x7684;&#x64CD;&#x4F5C;&#xFF0C;&#x4E0D;&#x5F71;&#x54CD;&#x7528;&#x6237;&#x8BF7;&#x6C42;&#x3002;</p>
+<p>P.S. <code>Redis</code>&#x662F;&#x5355;&#x8FDB;&#x7A0B;&#x7684;&#xFF0C;&#x6240;&#x4EE5;<code>BGSAVE</code>&#x53EA;&#x80FD;Fork&#x4E00;&#x4E2A;&#x5B50;&#x8FDB;&#x7A0B;&#xFF0C;&#x800C;&#x4E0D;&#x662F;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x5904;&#x7406;&#x3002;</p>
+<p>&#x4EE5;&#x4E0A;&#x662F;&#x624B;&#x52A8;&#x6267;&#x884C;&#x7684;&#x8FC7;&#x7A0B;&#x3002;&#x4F46;&#x5728;&#x751F;&#x4EA7;&#x6211;&#x4EEC;&#x5F88;&#x5C11;&#x4F1A;&#x624B;&#x52A8;&#x767B;&#x4E0A;&#x670D;&#x52A1;&#x53BB;&#x6267;&#x884C;&#x64CD;&#x4F5C;&#xFF0C;&#x6240;&#x4EE5;&#x66F4;&#x591A;&#x7684;&#x65F6;&#x5019;&#x662F;&#x4F9D;&#x8D56;Redis&#x7684;&#x914D;&#x7F6E;&#xFF0C;&#x5B9A;&#x65F6;&#x4FDD;&#x5B58;RDB&#x6587;&#x4EF6;&#x3002;</p>
+<p>&#x6253;&#x5F00;<code>redis.conf</code>&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF0C;&#x627E;&#x5230;<strong><code>SNAPSHOTTING</code></strong>&#x7684;&#x914D;&#x7F6E;&#xFF0C;<code>Save Point</code>&#x7684;&#x8BBE;&#x7F6E;&#x3002;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567056565166.png" alt="1567056565166"></p>
+<ul>
+<li>save 900 1 &#xFF1A; &#x8868;&#x793A;15&#x5206;&#x949F;&#xFF08;900&#x79D2;&#x949F;&#xFF09;&#x5185;&#x81F3;&#x5C11;1&#x4E2A;&#x952E;&#x88AB;&#x66F4;&#x6539;&#x5219;&#x8FDB;&#x884C;&#x5FEB;&#x7167;&#x3002;</li>
+<li>save 300 10 &#xFF1A; &#x8868;&#x793A;5&#x5206;&#x949F;&#xFF08;300&#x79D2;&#xFF09;&#x5185;&#x81F3;&#x5C11;10&#x4E2A;&#x952E;&#x88AB;&#x66F4;&#x6539;&#x5219;&#x8FDB;&#x884C;&#x5FEB;&#x7167;&#x3002;</li>
+<li>save 60 10000 &#xFF1A;&#x8868;&#x793A;1&#x5206;&#x949F;&#x5185;&#x81F3;&#x5C11;10000&#x4E2A;&#x952E;&#x88AB;&#x66F4;&#x6539;&#x5219;&#x8FDB;&#x884C;&#x5FEB;&#x7167;&#x3002;</li>
+</ul>
+<p>&#x8FD9;&#x91CC;&#x5C31;&#x662F; Redis &#x9ED8;&#x8BA4;&#x914D;&#x7F6E;&#x4FE1;&#x606F;&#xFF0C;&#x53EF;&#x4EE5;&#x914D;&#x7F6E;&#x591A;&#x4E2A;&#x6761;&#x4EF6;&#xFF08;&#x6BCF;&#x884C;&#x914D;&#x7F6E;&#x4E00;&#x4E2A;&#x6761;&#x4EF6;&#xFF09;&#xFF0C;&#x6BCF;&#x4E2A;&#x6761;&#x4EF6;&#x4E4B;&#x95F4;&#x662F;&#x201C;&#x6216;&#x201D;&#x7684;&#x5173;&#x7CFB;&#x3002;</p>
+<p>&#x5728;Redis&#x4E2D;&#xFF0C;&#x8FD9;&#x4E2A;&#x81EA;&#x52A8;&#x4FDD;&#x5B58;RDB&#x7684;&#x529F;&#x80FD;&#x662F;&#x9ED8;&#x8BA4;&#x5F00;&#x542F;&#x7684;&#x3002;</p>
+<h3 id="RDB&#x539F;&#x7406;"><a href="#RDB&#x539F;&#x7406;" class="headerlink" title="RDB&#x539F;&#x7406;"></a>RDB&#x539F;&#x7406;</h3><ol>
+<li>Redis &#x4F7F;&#x7528; fork &#x51FD;&#x6570;&#x590D;&#x5236;&#x4E00;&#x4EFD;&#x5F53;&#x524D;&#x8FDB;&#x7A0B;&#x7684;&#x526F;&#x672C;(&#x5B50;&#x8FDB;&#x7A0B;)</li>
+<li>&#x7236;&#x8FDB;&#x7A0B;&#x7EE7;&#x7EED;&#x63A5;&#x6536;&#x5E76;&#x5904;&#x7406;&#x5BA2;&#x6237;&#x7AEF;&#x53D1;&#x6765;&#x7684;&#x547D;&#x4EE4;&#xFF0C;&#x800C;&#x5B50;&#x8FDB;&#x7A0B;&#x5F00;&#x59CB;&#x5C06;&#x5185;&#x5B58;&#x4E2D;&#x7684;&#x6570;&#x636E;&#x5199;&#x5165;&#x786C;&#x76D8;&#x4E2D;&#x7684;&#x4E34;&#x65F6;&#x6587;&#x4EF6;&#x3002;</li>
+<li>&#x5F53;&#x5B50;&#x8FDB;&#x7A0B;&#x5199;&#x5165;&#x5B8C;&#x6240;&#x6709;&#x6570;&#x636E;&#x540E;&#x4F1A;&#x7528;&#x8BE5;&#x4E34;&#x65F6;&#x6587;&#x4EF6;&#x66FF;&#x6362;&#x65E7;&#x7684;RDB&#x6587;&#x4EF6;&#xFF0C;&#x81F3;&#x6B64;&#xFF0C;&#x4E00;&#x6B21;&#x5FEB;&#x7167;&#x64CD;&#x4F5C;&#x5B8C;&#x6210;&#x3002;</li>
+</ol>
+<p>&#x6CE8;&#x610F;&#x4E8B;&#x9879;</p>
+<ul>
+<li>Redis &#x5728;&#x8FDB;&#x884C;&#x5FEB;&#x7167;&#x7684;&#x8FC7;&#x7A0B;&#x4E2D;<strong>&#x4E0D;&#x4F1A;&#x4FEE;&#x6539;</strong> RDB &#x6587;&#x4EF6;&#xFF0C;&#x53EA;&#x6709;&#x5FEB;&#x7167;&#x7ED3;&#x675F;&#x540E;&#x624D;&#x4F1A;&#x5C06;&#x65E7;&#x7684;&#x6587;&#x4EF6;<strong>&#x66FF;&#x6362;</strong>&#x6210;&#x65B0;&#x7684;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#x4EFB;&#x4F55;&#x65F6;&#x5019; RDB &#x6587;&#x4EF6;&#x90FD;&#x662F;&#x5B8C;&#x6574;&#x7684;&#x3002;</li>
+<li>&#x8FD9;&#x5C31;&#x4F7F;&#x5F97;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x5B9A;&#x65F6;&#x5907;&#x4EFD; RDB &#x6587;&#x4EF6;&#x6765;&#x5B9E;&#x73B0; Redis &#x6570;&#x636E;&#x5E93;&#x7684;&#x5907;&#x4EFD;&#xFF0C; RDB &#x6587;&#x4EF6;&#x662F;&#x7ECF;&#x8FC7;&#x538B;&#x7F29;&#x7684;&#x4E8C;&#x8FDB;&#x5236;&#x6587;&#x4EF6;&#xFF0C;&#x5360;&#x7528;&#x7684;&#x7A7A;&#x95F4;&#x4F1A;&#x5C0F;&#x4E8E;&#x5185;&#x5B58;&#x4E2D;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x66F4;&#x52A0;&#x5229;&#x4E8E;&#x4F20;&#x8F93;&#x3002;</li>
+</ul>
+<h3 id="RDB&#x4F18;&#x7F3A;&#x70B9;"><a href="#RDB&#x4F18;&#x7F3A;&#x70B9;" class="headerlink" title="RDB&#x4F18;&#x7F3A;&#x70B9;"></a>RDB&#x4F18;&#x7F3A;&#x70B9;</h3><p>&#x4F18;&#x70B9;&#xFF1A;</p>
+<ol>
+<li>RDB&#x662F;&#x67D0;&#x4E00;&#x65F6;&#x95F4;&#x70B9;&#x7684;&#x5FEB;&#x7167;&#xFF0C;&#x662F;&#x4E00;&#x4E2A;&#x7D27;&#x51D1;&#x7684;&#x5355;&#x6587;&#x4EF6;&#xFF0C;&#x66F4;&#x591A;&#x7528;&#x4E8E;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x3002;&#x53EF;&#x4EE5;&#x6309;&#x6BCF;&#x5C0F;&#x65F6;&#x6216;&#x6BCF;&#x65E5;&#x6765;&#x5907;&#x4EFD;&#xFF0C;&#x65B9;&#x4FBF;&#x4ECE;&#x4E0D;&#x540C;&#x7684;&#x7248;&#x672C;&#x6062;&#x590D;&#x6570;&#x636E;&#x3002;</li>
+<li>&#x5355;&#x6587;&#x4EF6;&#x5BB9;&#x6613;&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#x670D;&#x52A1;&#x505A;&#x6545;&#x969C;&#x6062;&#x590D;&#x3002;</li>
+<li>RDB&#x53EF;&#x4EE5;Fork&#x5B50;&#x8FDB;&#x7A0B;&#x8FDB;&#x884C;&#x6301;&#x4E45;&#x5316;&#xFF0C;&#x4F7F;Redis&#x53EF;&#x4EE5;&#x66F4;&#x597D;&#x5730;&#x5904;&#x7406;&#x7528;&#x6237;&#x8BF7;&#x6C42;</li>
+<li>&#x5728;&#x5927;&#x91CF;&#x6570;&#x636E;&#x7684;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;RDB&#x76F8;&#x6BD4;&#x8F83;&#x4E8E;AOF&#x4F1A;&#x66F4;&#x5FEB;&#x7684;&#x52A0;&#x8F7D;&#x3002;</li>
+</ol>
+<p>&#x7F3A;&#x70B9;&#xFF1A;</p>
+<ol>
+<li>&#x5982;&#x679C;Redis&#x4E0D;&#x53CA;&#x65F6;&#x4FDD;&#x5B58;RDB&#x6587;&#x4EF6;&#xFF0C;&#x4F1A;&#x9020;&#x6210;&#x6570;&#x636E;&#x7684;&#x4E22;&#x5931;&#x3002;&#x4F8B;&#x5982;&#x7CFB;&#x7EDF;&#x7A81;&#x7136;&#x65AD;&#x7535;&#xFF0C;&#x4F46;&#x672A;&#x6765;&#x5F97;&#x53CA;&#x4FDD;&#x5B58;&#x6570;&#x636E;&#x3002;&#x5373;&#x4F7F;&#x4F60;&#x8BBE;&#x7F6E;&#x66F4;&#x591A;&#x7684;Save point&#xFF0C;&#x4E5F;&#x65E0;&#x6CD5;&#x4FDD;&#x8BC1;100%&#x7684;&#x6570;&#x636E;&#x4E0D;&#x4E22;&#x5931;&#x3002;</li>
+<li>RDB&#x7ECF;&#x5E38;&#x9700;&#x8981;fork&#x5B50;&#x8FDB;&#x7A0B;&#x53BB;&#x6267;&#x884C;&#xFF0C;&#x4F46;&#x5982;&#x679C;&#x518D;&#x5927;&#x91CF;&#x6570;&#x636E;&#x7684;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x8FD9;&#x4E2A;fork&#x64CD;&#x4F5C;&#x4F1A;&#x975E;&#x5E38;&#x8017;CPU&#x8D44;&#x6E90;&#x7684;&#x3002;&#x5BF9;&#x6BD4;AOF&#x867D;&#x7136;&#x4E5F;&#x662F;fork&#xFF0C;&#x4F46;&#x662F;&#x5B83;&#x7684;&#x6570;&#x636E;&#x4FDD;&#x5B58;&#x5904;&#x7406;&#x662F;&#x53EF;&#x4EE5;&#x63A7;&#x5236;&#x7684;&#xFF0C;&#x4E0D;&#x9700;&#x8981;&#x5168;&#x91CF;&#x4FDD;&#x5B58;&#x3002;</li>
+</ol>
+<h2 id="AOF&#x2014;&#x2014;&#x65E5;&#x5FD7;&#x8FFD;&#x52A0;&#xFF08;Append-Only&#xFF09;"><a href="#AOF&#x2014;&#x2014;&#x65E5;&#x5FD7;&#x8FFD;&#x52A0;&#xFF08;Append-Only&#xFF09;" class="headerlink" title="AOF&#x2014;&#x2014;&#x65E5;&#x5FD7;&#x8FFD;&#x52A0;&#xFF08;Append-Only&#xFF09;"></a>AOF&#x2014;&#x2014;&#x65E5;&#x5FD7;&#x8FFD;&#x52A0;&#xFF08;Append-Only&#xFF09;</h2><p>Redis&#x7684;&#x53E6;&#x5916;&#x4E00;&#x79CD;&#x6301;&#x4E45;&#x5316;&#x65B9;&#x6848;&#x5C31;&#x662F;AOF&#xFF0C;Append Only File&#x3002;AOF&#x76F8;&#x5F53;&#x4E8E;&#x4E00;&#x4E2A;&#x64CD;&#x4F5C;&#x7684;&#x65E5;&#x5FD7;&#x8BB0;&#x5F55;&#xFF0C;&#x6BCF;&#x6B21;&#x5BF9;&#x4E8E;&#x6570;&#x636E;&#x7684;&#x53D8;&#x66F4;&#x90FD;&#x4F1A;&#x8BB0;&#x5F55;&#x8FFD;&#x52A0;&#x5230;AOF&#x65E5;&#x5FD7;&#x3002;&#x5F53;&#x670D;&#x52A1;&#x542F;&#x52A8;&#x7684;&#x65F6;&#x5019;&#x5C31;&#x4F1A;&#x8BFB;&#x8FD9;&#x4E9B;&#x64CD;&#x4F5C;&#x65E5;&#x5FD7;&#xFF0C;&#x91CD;&#x65B0;&#x6267;&#x884C;&#x4E00;&#x6B21;&#x64CD;&#x4F5C;&#xFF0C;&#x4ECE;&#x800C;&#x6062;&#x590D;&#x539F;&#x59CB;&#x6570;&#x636E;&#x3002;</p>
+<h3 id="AOF&#x542F;&#x7528;"><a href="#AOF&#x542F;&#x7528;" class="headerlink" title="AOF&#x542F;&#x7528;"></a>AOF&#x542F;&#x7528;</h3><p>AOF&#x9ED8;&#x8BA4;&#x662F;&#x5173;&#x95ED;&#x7684;&#x3002;&#x6253;&#x5F00;<code>redis.conf</code>&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF0C;&#x627E;&#x5230;<code>appendonly no</code>&#x6539;&#x6210;<code>appendonly yes</code>&#x3002;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567056598127.png" alt="1567056598127"></p>
+<p>AOF&#x548C;RDB&#x662F;&#x53EF;&#x4EE5;&#x5171;&#x5B58;&#x7684;&#xFF0C;&#x53EA;&#x8981;&#x4FDD;&#x5B58;&#x7684;&#x6587;&#x4EF6;&#x540D;&#x4E0D;&#x51B2;&#x7A81;&#x3002;</p>
+<h3 id="AOF-fsync&#x540C;&#x6B65;&#x89C4;&#x5219;"><a href="#AOF-fsync&#x540C;&#x6B65;&#x89C4;&#x5219;" class="headerlink" title="AOF fsync&#x540C;&#x6B65;&#x89C4;&#x5219;"></a>AOF fsync&#x540C;&#x6B65;&#x89C4;&#x5219;</h3><p>&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x5F80;&#x4E0B;&#x62C9;&#xFF0C;&#x770B;&#x5230;<code>fsync</code>&#x7684;&#x914D;&#x7F6E;&#x3002;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567056621911.png" alt="1567056621911"></p>
+<p>Redis &#x6BCF;&#x6B21;&#x66F4;&#x6539;&#x6570;&#x636E;&#x7684;&#x65F6;&#x5019;&#xFF0C; aof &#x673A;&#x5236;&#x90FD;&#x4F1A;&#x5C06;&#x547D;&#x4EE4;&#x8BB0;&#x5F55;&#x5230; aof &#x6587;&#x4EF6;&#xFF0C;&#x4F46;&#x662F;&#x5B9E;&#x9645;&#x4E0A;&#x7531;&#x4E8E;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x7684;&#x7F13;&#x5B58;&#x673A;&#x5236;&#xFF0C;&#x6570;&#x636E;&#x5E76;&#x6CA1;&#x6709;&#x5B9E;&#x65F6;&#x5199;&#x5165;&#x5230;&#x786C;&#x76D8;&#xFF0C;&#x800C;&#x662F;&#x8FDB;&#x5165;&#x786C;&#x76D8;&#x7F13;&#x5B58;&#x3002;&#x518D;&#x901A;&#x8FC7;&#x786C;&#x76D8;&#x7F13;&#x5B58;&#x673A;&#x5236;&#x53BB;&#x5237;&#x65B0;&#x5230;&#x4FDD;&#x5B58;&#x5230;&#x6587;&#x4EF6;&#x3002;</p>
+<p>fsync()&#x662F;&#x4E00;&#x4E2A;&#x7CFB;&#x7EDF;&#x8C03;&#x7528;&#x51FD;&#x6570;&#xFF0C;&#x544A;&#x8BC9;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x628A;&#x6570;&#x636E;&#x5199;&#x5230;&#x786C;&#x76D8;&#x4E0A;&#xFF0C;&#x800C;&#x4E0D;&#x662F;&#x7F13;&#x5B58;&#x66F4;&#x591A;&#x6570;&#x636E;&#x624D;&#x5199;&#x5230;&#x786C;&#x76D8;&#x3002;&#x8FD9;&#x6837;&#x7684;&#x8C03;&#x7528;&#x53EF;&#x4EE5;&#x53CA;&#x65F6;&#x4FDD;&#x5B58;&#x6570;&#x636E;&#x5230;&#x786C;&#x76D8;&#x4E0A;&#x3002;</p>
+<p>Redis&#x63D0;&#x4F9B;&#x4E86;&#x4E09;&#x79CD;fsync&#x7684;&#x8C03;&#x7528;&#x65B9;&#x5F0F;</p>
+<ul>
+<li>appendfsync always&#xFF0C;&#x6BCF;&#x6B21;&#x64CD;&#x4F5C;&#x8BB0;&#x5F55;&#x90FD;&#x540C;&#x6B65;&#x5230;&#x786C;&#x76D8;&#x4E0A;&#xFF0C;&#x6700;&#x4F4E;&#x6548;&#xFF0C;&#x6700;&#x5B89;&#x5168;&#x3002;</li>
+<li>appendfsync everysec&#xFF0C;&#x6BCF;&#x79D2;&#x6267;&#x884C;&#x4E00;&#x6B21;&#x628A;&#x64CD;&#x4F5C;&#x8BB0;&#x5F55;&#x540C;&#x6B65;&#x5230;&#x786C;&#x76D8;&#x4E0A;&#x3002;&#x9ED8;&#x8BA4;&#x9009;&#x9879;&#x3002;</li>
+<li>appendfsync no&#xFF0C;&#x4E0D;&#x6267;&#x884C;fysnc&#x8C03;&#x7528;&#xFF0C;&#x8BA9;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x81EA;&#x52A8;&#x64CD;&#x4F5C;&#x628A;&#x7F13;&#x5B58;&#x6570;&#x636E;&#x5199;&#x5230;&#x786C;&#x76D8;&#x4E0A;&#xFF0C;&#x4E0D;&#x53EF;&#x9760;&#xFF0C;&#x4F46;&#x6700;&#x5FEB;&#x3002;</li>
+</ul>
+<h3 id="AOF&#x6587;&#x4EF6;&#x683C;&#x5F0F;&#x89E3;&#x6790;"><a href="#AOF&#x6587;&#x4EF6;&#x683C;&#x5F0F;&#x89E3;&#x6790;" class="headerlink" title="AOF&#x6587;&#x4EF6;&#x683C;&#x5F0F;&#x89E3;&#x6790;"></a>AOF&#x6587;&#x4EF6;&#x683C;&#x5F0F;&#x89E3;&#x6790;</h3><p>&#x5F00;&#x542F;AOF&#x540E;&#xFF0C;&#x4F1A;&#x518D;&#x5DE5;&#x4F5C;&#x76EE;&#x5F55;&#x770B;&#x5230;<code>appendonly.aof</code>&#x6587;&#x4EF6;&#x3002;</p>
+<p>&#x5728;&#x5BA2;&#x6237;&#x7AEF;&#x4E0A;&#x6267;&#x884C;&#x4E00;&#x4E9B;&#x547D;&#x4EE4;&#x540E;&#xFF0C;&#x6253;&#x5F00;<code>AOF</code>&#x6587;&#x4EF6;&#xFF0C;&#x53EF;&#x4EE5;&#x89C2;&#x5BDF;&#x5230;&#x6709;&#x5BF9;&#x5E94;&#x7684;&#x64CD;&#x4F5C;&#x7684;&#x8BB0;&#x5F55;&#x65E5;&#x5FD7;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; <span class="built_in">set</span> x 1</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; <span class="built_in">set</span> y 2</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; <span class="built_in">set</span> z 3</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567057744415.png" alt="1567057744415"></p>
+<p>&#x6587;&#x4EF6;&#x89E3;&#x6790;&#x8BF4;&#x660E;&#xFF1A;</p>
+<ul>
+<li>*&#xFF0C;&#x8868;&#x793A;&#x547D;&#x4EE4;&#x7684;&#x53C2;&#x6570;&#x4E2A;&#x6570;&#xFF0C;&#x4F8B;&#x5982;<code>set a 1</code>&#x662F;&#x4E09;&#x4E2A;&#x53C2;&#x6570;&#xFF0C;&#x6240;&#x4EE5;&#x662F;*3</li>
+<li>$&#xFF0C;&#x8868;&#x793A;&#x53C2;&#x6570;&#x7684;&#x5B57;&#x8282;&#x6570;&#xFF0C;&#x4F8B;&#x5982;<code>set</code>&#x8FD9;&#x4E2A;&#x53C2;&#x6570;&#x662F;&#x4E09;&#x5B57;&#x8282;&#xFF0C;&#x6240;&#x4EE5;&#x662F;$3&#xFF0C;key&#x503C;a&#x662F;&#x4E00;&#x4E2A;&#x5B57;&#x8282;&#xFF0C;&#x6240;&#x4EE5;&#x662F;$1</li>
+<li>&#x65E0;&#x7B26;&#x53F7;&#xFF0C;&#x8868;&#x793A;&#x662F;&#x53C2;&#x6570;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x4F8B;&#x5982;<code>set</code>,<code>a</code>,<code>1</code>&#x5C31;&#x662F;&#x5177;&#x4F53;&#x7684;&#x6570;&#x636E;</li>
+</ul>
+<h3 id="AOF&#x91CD;&#x5199;"><a href="#AOF&#x91CD;&#x5199;" class="headerlink" title="AOF&#x91CD;&#x5199;"></a>AOF&#x91CD;&#x5199;</h3><p>AOF&#x867D;&#x7136;&#x6BD4;RDB&#x66F4;&#x53EF;&#x9760;&#xFF0C;&#x4F46;&#x7F3A;&#x70B9;&#x4E5F;&#x662F;&#x6BD4;&#x8F83;&#x660E;&#x663E;&#x7684;&#xFF0C;&#x5C31;&#x662F;&#x6BCF;&#x6B21;&#x5199;&#x64CD;&#x4F5C;&#x90FD;&#x8981;&#x628A;&#x64CD;&#x4F5C;&#x65E5;&#x5FD7;&#x5199;&#x5230;&#x6587;&#x4EF6;&#x4E0A;&#xFF0C;&#x8FD9;&#x6837;&#x4F1A;&#x5BFC;&#x81F4;&#x6587;&#x4EF6;&#x975E;&#x5E38;&#x5197;&#x4F59;&#x3002;</p>
+<p>&#x5047;&#x82E5;&#x4F60;&#x8981;&#x81EA;&#x589E;&#x4E00;&#x4E2A;&#x8BA1;&#x6570;&#x5668;100&#x6B21;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x91CD;&#x5199;&#xFF0C;AOF&#x6587;&#x4EF6;&#x5C31;&#x5C31;&#x4F1A;&#x6709;&#x8FD9;100&#x6B21;&#x7684;&#x81EA;&#x589E;&#x8BB0;&#x5F55;&#xFF0C;&#x5982;<code>INCR a</code>&#x3002;&#x5982;&#x679C;&#x6267;&#x884C;&#x4E86;&#x65E5;&#x5FD7;&#x91CD;&#x5199;&#xFF0C;&#x90A3;&#x4E48;&#x6587;&#x4EF6;&#x53EA;&#x4F1A;&#x4FDD;&#x7559;<code>set a 100</code>&#x800C;&#x4E0D;&#x662F;100&#x6761;<code>INCR a</code>&#x3002;&#x8FD9;&#x6837;&#x62E5;&#x6709;&#x76F8;&#x540C;&#x7684;&#x7ED3;&#x679C;&#xFF0C;&#x4F46;&#x53EF;&#x4EE5;&#x5927;&#x5927;&#x51CF;&#x5C11;AOF&#x7684;&#x6587;&#x4EF6;&#x5927;&#x5C0F;&#xFF0C;&#x5E76;&#x4E14;&#x53EF;&#x4EE5;&#x8BA9;AOF&#x8F7D;&#x5165;&#x7684;&#x65F6;&#x5019;&#x63D0;&#x5347;&#x8F7D;&#x5165;&#x7684;&#x6548;&#x7387;&#x3002;</p>
+<p>&#x770B;&#x56DE;<code>redis.conf</code>&#x914D;&#x7F6E;&#xFF0C;&#x6709;&#x4E24;&#x9879;&#x63A7;&#x5236;rewrite&#x7684;&#x9009;&#x9879;&#x3002;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567057496358.png" alt="1567057496358"></p>
+<ul>
+<li>auto-aof-rewrite-percentage 100&#xFF0C;&#x5F53;&#x6587;&#x4EF6;&#x589E;&#x957F;100%&#xFF08;&#x4E00;&#x500D;&#xFF09;&#x65F6;&#x5019;&#xFF0C;&#x81EA;&#x52A8;&#x91CD;&#x5199;&#x3002;</li>
+<li>auto-aof-rewrite-min-size 64mb&#xFF0C;&#x65E5;&#x5FD7;&#x91CD;&#x5199;&#x6700;&#x5C0F;&#x6587;&#x4EF6;&#x5927;&#x5C0F;&#xFF0C;&#x5982;&#x679C;&#x5C0F;&#x4E8E;&#x8BE5;&#x5927;&#x5C0F;&#xFF0C;&#x4E0D;&#x4F1A;&#x81EA;&#x52A8;&#x91CD;&#x5199;&#x3002;</li>
+</ul>
+<p>&#x6765;&#x5B9E;&#x9A8C;&#x4E00;&#x4E0B;&#x91CD;&#x5199;&#x7684;&#x7ED3;&#x679C;&#xFF0C;&#x6211;&#x4EEC;&#x5148;&#x8BBE;&#x5B9A;&#x4E00;&#x4E2A;x&#x503C;&#xFF0C;&#x7136;&#x540E;&#x81EA;&#x589E;&#x591A;&#x6B21;&#xFF0C;&#x67E5;&#x770B;AOF&#x6587;&#x4EF6;&#x5185;&#x5BB9;&#x3002;&#x91CC;&#x9762;&#x6709;&#x5F88;&#x591A;INCR&#x7684;&#x8BED;&#x53E5;&#x8BB0;&#x5F55;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567057414692.png" alt="1567057414692"></p>
+<p>&#x7136;&#x540E;&#x6211;&#x4EEC;&#x624B;&#x52A8;&#x6267;&#x884C;&#x4E0B;<code>BGREWRITEOF</code>&#xFF0C;&#x6267;&#x884C;&#x65E5;&#x5FD7;&#x91CD;&#x5199;&#x3002;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567057445939.png" alt="1567057445939"></p>
+<h3 id="AOF-&#x6587;&#x4EF6;&#x635F;&#x574F;&#x4EE5;&#x540E;&#x5982;&#x4F55;&#x4FEE;&#x590D;"><a href="#AOF-&#x6587;&#x4EF6;&#x635F;&#x574F;&#x4EE5;&#x540E;&#x5982;&#x4F55;&#x4FEE;&#x590D;" class="headerlink" title="AOF &#x6587;&#x4EF6;&#x635F;&#x574F;&#x4EE5;&#x540E;&#x5982;&#x4F55;&#x4FEE;&#x590D;"></a>AOF &#x6587;&#x4EF6;&#x635F;&#x574F;&#x4EE5;&#x540E;&#x5982;&#x4F55;&#x4FEE;&#x590D;</h3><p>&#x670D;&#x52A1;&#x5668;&#x53EF;&#x80FD;&#x5728;&#x7A0B;&#x5E8F;&#x6B63;&#x5728;&#x5BF9; AOF &#x6587;&#x4EF6;&#x8FDB;&#x884C;&#x5199;&#x5165;&#x65F6;&#x505C;&#x673A;&#xFF0C; &#x5982;&#x679C;&#x505C;&#x673A;&#x9020;&#x6210;&#x4E86; AOF &#x6587;&#x4EF6;&#x51FA;&#x9519;&#xFF08;corrupt&#xFF09;&#xFF0C; &#x90A3;&#x4E48; Redis &#x5728;&#x91CD;&#x542F;&#x65F6;&#x4F1A;&#x62D2;&#x7EDD;&#x8F7D;&#x5165;&#x8FD9;&#x4E2A; AOF &#x6587;&#x4EF6;&#xFF0C; &#x4ECE;&#x800C;&#x786E;&#x4FDD;&#x6570;&#x636E;&#x7684;&#x4E00;&#x81F4;&#x6027;&#x4E0D;&#x4F1A;&#x88AB;&#x7834;&#x574F;&#x3002;</p>
+<p>&#x5F53;&#x53D1;&#x751F;&#x8FD9;&#x79CD;&#x60C5;&#x51B5;&#x65F6;&#xFF0C; &#x53EF;&#x4EE5;&#x7528;&#x4EE5;&#x4E0B;&#x65B9;&#x6CD5;&#x6765;&#x4FEE;&#x590D;&#x51FA;&#x9519;&#x7684; AOF &#x6587;&#x4EF6;&#xFF1A;</p>
+<ol>
+<li><p>&#x4E3A;&#x73B0;&#x6709;&#x7684; AOF &#x6587;&#x4EF6;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x5907;&#x4EFD;&#x3002;</p>
+</li>
+<li><p>&#x4F7F;&#x7528; Redis &#x9644;&#x5E26;&#x7684; <strong>redis-check-aof</strong> &#x7A0B;&#x5E8F;&#xFF0C;&#x5BF9;&#x539F;&#x6765;&#x7684; AOF &#x6587;&#x4EF6;&#x8FDB;&#x884C;&#x4FEE;&#x590D;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-check-aof --fix</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>&#x91CD;&#x542F; Redis &#x670D;&#x52A1;&#x5668;&#xFF0C;&#x7B49;&#x5F85;&#x670D;&#x52A1;&#x5668;&#x8F7D;&#x5165;&#x4FEE;&#x590D;&#x540E;&#x7684; AOF &#x6587;&#x4EF6;&#xFF0C;&#x5E76;&#x8FDB;&#x884C;&#x6570;&#x636E;&#x6062;&#x590D;&#x3002;</p>
+</li>
+</ol>
+<h3 id="AOF&#x4F18;&#x7F3A;&#x70B9;"><a href="#AOF&#x4F18;&#x7F3A;&#x70B9;" class="headerlink" title="AOF&#x4F18;&#x7F3A;&#x70B9;"></a>AOF&#x4F18;&#x7F3A;&#x70B9;</h3><p>&#x4F18;&#x70B9;&#xFF1A;</p>
+<ol>
+<li>AOF&#x53EF;&#x4EE5;&#x8BBE;&#x7F6E; &#x5B8C;&#x5168;&#x4E0D;&#x540C;&#x6B65;&#x3001;&#x6BCF;&#x79D2;&#x540C;&#x6B65;&#x3001;&#x6BCF;&#x6B21;&#x64CD;&#x4F5C;&#x540C;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;&#x6BCF;&#x79D2;&#x540C;&#x6B65;&#x3002;&#x56E0;&#x4E3A;AOF&#x662F;&#x64CD;&#x4F5C;&#x6307;&#x4EE4;&#x7684;&#x8FFD;&#x52A0;&#xFF0C;&#x6240;&#x4EE5;&#x53EF;&#x4EE5;&#x9891;&#x7E41;&#x7684;&#x5927;&#x91CF;&#x7684;&#x540C;&#x6B65;&#x3002;</li>
+<li>AOF&#x6587;&#x4EF6;&#x662F;&#x4E00;&#x4E2A;&#x503C;&#x8FFD;&#x52A0;&#x65E5;&#x5FD7;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x5373;&#x4F7F;&#x670D;&#x52A1;&#x5B95;&#x673A;&#x4E3A;&#x5199;&#x5165;&#x5B8C;&#x6574;&#x7684;&#x547D;&#x4EE4;&#xFF0C;&#x4E5F;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;redis-check-aof&#x5DE5;&#x5177;&#x4FEE;&#x590D;&#x8FD9;&#x4E9B;&#x95EE;&#x9898;&#x3002;</li>
+<li>&#x5982;&#x679C;AOF&#x6587;&#x4EF6;&#x8FC7;&#x5927;&#xFF0C;Redis&#x4F1A;&#x5728;&#x540E;&#x53F0;&#x81EA;&#x52A8;&#x5730;&#x91CD;&#x5199;AOF&#x6587;&#x4EF6;&#x3002;&#x91CD;&#x5199;&#x540E;&#x4F1A;&#x4F7F;AOF&#x6587;&#x4EF6;&#x538B;&#x7F29;&#x5230;&#x6700;&#x5C0F;&#x6240;&#x9700;&#x7684;&#x6307;&#x4EE4;&#x96C6;&#x3002;</li>
+<li>AOF&#x6587;&#x4EF6;&#x662F;&#x6709;&#x5E8F;&#x4FDD;&#x5B58;&#x6570;&#x636E;&#x5E93;&#x7684;&#x6240;&#x6709;&#x5199;&#x5165;&#x64CD;&#x4F5C;&#xFF0C;&#x6613;&#x8BFB;&#xFF0C;&#x6613;&#x5206;&#x6790;&#x3002;&#x5373;&#x4F7F;&#x5982;&#x679C;&#x4E0D;&#x5C0F;&#x5FC3;&#x8BEF;&#x64CD;&#x4F5C;&#x6570;&#x636E;&#x5E93;&#xFF0C;&#x4E5F;&#x5F88;&#x5BB9;&#x6613;&#x627E;&#x51FA;&#x9519;&#x8BEF;&#x6307;&#x4EE4;&#xFF0C;&#x6062;&#x590D;&#x5230;&#x67D0;&#x4E2A;&#x6570;&#x636E;&#x8282;&#x70B9;&#x3002;&#x4F8B;&#x5982;&#x4E0D;&#x5C0F;&#x5FC3;FLUSHALL&#xFF0C;&#x53EF;&#x4EE5;&#x975E;&#x5E38;&#x5BB9;&#x6613;&#x6062;&#x590D;&#x5230;&#x6267;&#x884C;&#x547D;&#x4EE4;&#x4E4B;&#x524D;&#x3002;</li>
+</ol>
+<p>&#x7F3A;&#x70B9;</p>
+<ol>
+<li>&#x76F8;&#x540C;&#x6570;&#x636E;&#x91CF;&#x4E0B;&#xFF0C;AOF&#x7684;&#x6587;&#x4EF6;&#x901A;&#x5E38;&#x4F53;&#x79EF;&#x4F1A;&#x6BD4;RDB&#x5927;&#x3002;&#x56E0;&#x4E3A;AOF&#x662F;&#x5B58;&#x6307;&#x4EE4;&#x7684;&#xFF0C;&#x800C;RDB&#x662F;&#x6240;&#x6709;&#x6307;&#x4EE4;&#x7684;&#x7ED3;&#x679C;&#x5FEB;&#x7167;&#x3002;&#x4F46;AOF&#x5728;&#x65E5;&#x5FD7;&#x91CD;&#x5199;&#x540E;&#x4F1A;&#x538B;&#x7F29;&#x4E00;&#x4E9B;&#x7A7A;&#x95F4;&#x3002;</li>
+<li>&#x5728;&#x5927;&#x91CF;&#x5199;&#x5165;&#x548C;&#x8F7D;&#x5165;&#x7684;&#x65F6;&#x5019;&#xFF0C;AOF&#x7684;&#x6548;&#x7387;&#x4F1A;&#x6BD4;RDB&#x4F4E;&#x3002;&#x56E0;&#x4E3A;&#x5927;&#x91CF;&#x5199;&#x5165;&#xFF0C;AOF&#x4F1A;&#x6267;&#x884C;&#x66F4;&#x591A;&#x7684;&#x4FDD;&#x5B58;&#x547D;&#x4EE4;&#xFF0C;&#x8F7D;&#x5165;&#x7684;&#x65F6;&#x5019;&#x4E5F;&#x9700;&#x8981;&#x5927;&#x91CF;&#x7684;&#x91CD;&#x6267;&#x884C;&#x547D;&#x4EE4;&#x6765;&#x5F97;&#x5230;&#x6700;&#x540E;&#x7684;&#x7ED3;&#x679C;&#x3002;RDB&#x5BF9;&#x6B64;&#x66F4;&#x6709;&#x4F18;&#x52BF;&#x3002;</li>
+</ol>
+<h2 id="&#x5982;&#x4F55;&#x9009;&#x62E9;"><a href="#&#x5982;&#x4F55;&#x9009;&#x62E9;" class="headerlink" title="&#x5982;&#x4F55;&#x9009;&#x62E9;"></a>&#x5982;&#x4F55;&#x9009;&#x62E9;</h2><p>&#x4EE5;&#x4E0A;&#x5DF2;&#x7ECF;&#x57FA;&#x672C;&#x4E86;&#x89E3;&#x8FC7;RDB&#x548C;AOF&#x7684;&#x4F7F;&#x7528;&#x3001;&#x57FA;&#x672C;&#x539F;&#x7406;&#x4EE5;&#x53CA;&#x5BF9;&#x5E94;&#x7684;&#x4F18;&#x7F3A;&#x70B9;&#x3002;&#x90A3;&#x4E48;&#x5728;&#x5B9E;&#x9645;&#x5F53;&#x4E2D;&#xFF0C;&#x6211;&#x4EEC;&#x5230;&#x5E95;&#x600E;&#x4E48;&#x53BB;&#x9009;&#x62E9;&#x7528;&#x54EA;&#x79CD;&#x6301;&#x4E45;&#x5316;&#x65B9;&#x5F0F;&#x5462;&#xFF1F;</p>
+<p>&#x4E00;&#x822C;&#x6765;&#x8BF4;&#xFF0C;&#x4E0D;&#x8003;&#x8651;&#x786C;&#x76D8;&#x5927;&#x5C0F;&#xFF0C;&#x6700;&#x5B89;&#x5168;&#x7684;&#x505A;&#x6CD5;&#x662F;RDB&#x4E0E;AOF&#x540C;&#x65F6;&#x4F7F;&#x7528;&#xFF0C;&#x5373;&#x4F7F;AOF&#x635F;&#x574F;&#x65E0;&#x6CD5;&#x4FEE;&#x590D;&#xFF0C;&#x8FD8;&#x53EF;&#x4EE5;&#x7528;RDB&#x6765;&#x6062;&#x590D;&#x6570;&#x636E;&#x3002;</p>
+<p>&#x5982;&#x679C;Redis&#x7684;&#x6570;&#x636E;&#x5728;&#x4F60;&#x7684;&#x670D;&#x52A1;&#x4E2D;&#x5E76;&#x4E0D;&#x662F;&#x5FC5;&#x8981;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x4F8B;&#x5982;&#x53EA;&#x662F;&#x5F53;&#x7B80;&#x5355;&#x7684;&#x7F13;&#x5B58;&#xFF0C;&#x6CA1;&#x6709;&#x7F13;&#x5B58;&#x4E5F;&#x4E0D;&#x4F1A;&#x9020;&#x6210;&#x7F13;&#x5B58;&#x96EA;&#x5D29;&#x3002;&#x8BF4;&#x660E;&#x6570;&#x636E;&#x7684;&#x5B89;&#x5168;&#x53EF;&#x9760;&#x6027;&#x5E76;&#x4E0D;&#x662F;&#x9996;&#x8981;&#x8003;&#x8651;&#x8303;&#x56F4;&#x5185;&#xFF0C;&#x90A3;&#x4E48;&#x5355;&#x72EC;&#x53EA;&#x4F7F;&#x7528;RDB&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#x3002;</p>
+<p>&#x82E5;&#x540C;&#x65F6;&#x542F;&#x7528;RDB&#x548C;AFO&#x4E24;&#x79CD;&#x6301;&#x4E45;&#x5316;&#x65B9;&#x5F0F;&#xFF0C;&#x5219;Redis Server&#x542F;&#x52A8;&#x65F6;&#xFF0C;&#x4F1A;&#x52A0;&#x8F7D;AOF&#x6587;&#x4EF6;&#x4EE5;&#x91CD;&#x5EFA;&#x6570;&#x636E;&#x96C6;&#xFF0C;&#x56E0;&#x4E3A;AOF&#x53EF;&#x4EE5;&#x4FDD;&#x8BC1;&#x6570;&#x636E;&#x662F;&#x76F8;&#x5BF9;&#x6700;&#x5B8C;&#x6574;&#x7684;</p>
+<p>&#x4E0D;&#x63A8;&#x8350;&#x5355;&#x72EC;&#x4F7F;&#x7528;AOF&#xFF0C;&#x56E0;&#x4E3A;AOF&#x5BF9;&#x4E8E;&#x6570;&#x636E;&#x7684;&#x6062;&#x590D;&#x8F7D;&#x5165;&#x6765;&#x8BF4;&#xFF0C;&#x6BD4;RDB&#x6162;&#x3002;&#x5E76;&#x4E14;Redis&#x5B98;&#x65B9;&#x4E5F;&#x8BF4;&#x660E;&#x4E86;&#xFF0C;AOF&#x6709;&#x4E00;&#x4E2A;&#x7F55;&#x89C1;&#x7684;bug&#x3002;&#x51FA;&#x4E86;&#x95EE;&#x9898;&#x65E0;&#x6CD5;&#x5F88;&#x597D;&#x7684;&#x89E3;&#x51B3;&#x3002;&#x6240;&#x4EE5;&#x4F7F;&#x7528;AOF&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x6700;&#x597D;&#x8FD8;&#x662F;&#x6709;RDB&#x4F5C;&#x4E3A;&#x6570;&#x636E;&#x5907;&#x4EFD;&#x3002;</p>
+<p><img src="/2017/08/13/Redis&#x4E4B;&#x6570;&#x636E;&#x6301;&#x4E45;&#x5316;RDB&#x4E0E;AOF/1567050271191.png" alt="1567050271191"></p>
+<p><strong>&#x6839;&#x636E;&#x5B98;&#x65B9;&#x7684;&#x610F;&#x613F;&#x63CF;&#x8FF0;&#xFF0C;&#x5728;&#x672A;&#x6765;&#x53EF;&#x80FD;&#x4F1A;&#x6709;&#x4E00;&#x79CD;RDB&#x4E0E;AOF&#x76F8;&#x7ED3;&#x5408;&#x7684;&#x6301;&#x4E45;&#x5316;&#x6A21;&#x578B;&#x3002;&#x5230;&#x65F6;Redis&#x6301;&#x4E45;&#x5316;&#x5C31;&#x4E0D;&#x518D;&#x5982;&#x6B64;&#x9EBB;&#x70E6;&#x8D39;&#x52B2;&#x4E86;&#xFF0C;&#x6211;&#x4EEC;&#x62ED;&#x76EE;&#x4EE5;&#x5F85;&#x5427;&#x3002;</strong></p>
+<h2 id="&#x5728;&#x7EBF;&#x4FEE;&#x6539;Redis&#x914D;&#x7F6E;&#x53C2;&#x6570;"><a href="#&#x5728;&#x7EBF;&#x4FEE;&#x6539;Redis&#x914D;&#x7F6E;&#x53C2;&#x6570;" class="headerlink" title="&#x5728;&#x7EBF;&#x4FEE;&#x6539;Redis&#x914D;&#x7F6E;&#x53C2;&#x6570;"></a>&#x5728;&#x7EBF;&#x4FEE;&#x6539;<code>Redis</code>&#x914D;&#x7F6E;&#x53C2;&#x6570;</h2><h3 id="&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6240;&#x6709;&#x914D;&#x7F6E;"><a href="#&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6240;&#x6709;&#x914D;&#x7F6E;" class="headerlink" title="&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6240;&#x6709;&#x914D;&#x7F6E;"></a>&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6240;&#x6709;&#x914D;&#x7F6E;</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config get *</span><br><span class="line">  1) &quot;dbfilename&quot;</span><br><span class="line">  2) &quot;dump.rdb&quot;</span><br><span class="line">  3) &quot;requirepass&quot;</span><br><span class="line">  4) &quot;&quot;</span><br><span class="line">  5) &quot;masterauth&quot;</span><br><span class="line">  6) &quot;&quot;</span><br><span class="line">  7) &quot;unixsocket&quot;</span><br><span class="line">  8) &quot;&quot;</span><br><span class="line">  9) &quot;logfile&quot;</span><br><span class="line"> 10) &quot;/var/log/redis/redis-server.log&quot;</span><br><span class="line"> 11) &quot;pidfile&quot;</span><br><span class="line"> 12) &quot;/var/run/redis/redis-server.pid&quot;</span><br><span class="line"> 13) &quot;maxmemory&quot;</span><br><span class="line"> 14) &quot;0&quot;</span><br><span class="line"> 15) &quot;maxmemory-samples&quot;</span><br><span class="line"> 16) &quot;3&quot;</span><br><span class="line"> 17) &quot;timeout&quot;</span><br><span class="line"> 18) &quot;0&quot;</span><br><span class="line"> 19) &quot;tcp-keepalive&quot;</span><br><span class="line"> 20) &quot;0&quot;</span><br><span class="line"> 21) &quot;auto-aof-rewrite-percentage&quot;</span><br><span class="line"> 22) &quot;100&quot;</span><br><span class="line"> 23) &quot;auto-aof-rewrite-min-size&quot;</span><br><span class="line"> 24) &quot;67108864&quot;</span><br><span class="line"> 25) &quot;hash-max-ziplist-entries&quot;</span><br><span class="line"> 26) &quot;512&quot;</span><br><span class="line"> 27) &quot;hash-max-ziplist-value&quot;</span><br><span class="line"> 28) &quot;64&quot;</span><br><span class="line"> 29) &quot;list-max-ziplist-entries&quot;</span><br><span class="line"> 30) &quot;512&quot;</span><br><span class="line"> 31) &quot;list-max-ziplist-value&quot;</span><br><span class="line"> 32) &quot;64&quot;</span><br><span class="line"> 33) &quot;set-max-intset-entries&quot;</span><br><span class="line"> 34) &quot;512&quot;</span><br><span class="line"> 35) &quot;zset-max-ziplist-entries&quot;</span><br><span class="line"> 36) &quot;128&quot;</span><br><span class="line"> 37) &quot;zset-max-ziplist-value&quot;</span><br><span class="line"> 38) &quot;64&quot;</span><br><span class="line"> 39) &quot;lua-time-limit&quot;</span><br><span class="line"> 40) &quot;5000&quot;</span><br><span class="line"> 41) &quot;slowlog-log-slower-than&quot;</span><br><span class="line"> 42) &quot;10000&quot;</span><br><span class="line"> 43) &quot;slowlog-max-len&quot;</span><br><span class="line"> 44) &quot;128&quot;</span><br><span class="line"> 45) &quot;port&quot;</span><br><span class="line"> 46) &quot;6379&quot;</span><br><span class="line"> 47) &quot;databases&quot;</span><br><span class="line"> 48) &quot;16&quot;</span><br><span class="line"> 49) &quot;repl-ping-slave-period&quot;</span><br><span class="line"> 50) &quot;10&quot;</span><br><span class="line"> 51) &quot;repl-timeout&quot;</span><br><span class="line"> 52) &quot;60&quot;</span><br><span class="line"> 53) &quot;repl-backlog-size&quot;</span><br><span class="line"> 54) &quot;1048576&quot;</span><br><span class="line"> 55) &quot;repl-backlog-ttl&quot;</span><br><span class="line"> 56) &quot;3600&quot;</span><br><span class="line"> 57) &quot;maxclients&quot;</span><br><span class="line"> 58) &quot;3984&quot;</span><br><span class="line"> 59) &quot;watchdog-period&quot;</span><br><span class="line"> 60) &quot;0&quot;</span><br><span class="line"> 61) &quot;slave-priority&quot;</span><br><span class="line"> 62) &quot;100&quot;</span><br><span class="line"> 63) &quot;min-slaves-to-write&quot;</span><br><span class="line"> 64) &quot;0&quot;</span><br><span class="line"> 65) &quot;min-slaves-max-lag&quot;</span><br><span class="line"> 66) &quot;10&quot;</span><br><span class="line"> 67) &quot;hz&quot;</span><br><span class="line"> 68) &quot;10&quot;</span><br><span class="line"> 69) &quot;no-appendfsync-on-rewrite&quot;</span><br><span class="line"> 70) &quot;no&quot;</span><br><span class="line"> 71) &quot;slave-serve-stale-data&quot;</span><br><span class="line"> 72) &quot;yes&quot;</span><br><span class="line"> 73) &quot;slave-read-only&quot;</span><br><span class="line"> 74) &quot;yes&quot;</span><br><span class="line"> 75) &quot;stop-writes-on-bgsave-error&quot;</span><br><span class="line"> 76) &quot;yes&quot;</span><br><span class="line"> 77) &quot;daemonize&quot;</span><br><span class="line"> 78) &quot;yes&quot;</span><br><span class="line"> 79) &quot;rdbcompression&quot;</span><br><span class="line"> 80) &quot;yes&quot;</span><br><span class="line"> 81) &quot;rdbchecksum&quot;</span><br><span class="line"> 82) &quot;yes&quot;</span><br><span class="line"> 83) &quot;activerehashing&quot;</span><br><span class="line"> 84) &quot;yes&quot;</span><br><span class="line"> 85) &quot;repl-disable-tcp-nodelay&quot;</span><br><span class="line"> 86) &quot;no&quot;</span><br><span class="line"> 87) &quot;aof-rewrite-incremental-fsync&quot;</span><br><span class="line"> 88) &quot;yes&quot;</span><br><span class="line"> 89) &quot;appendonly&quot;</span><br><span class="line"> 90) &quot;no&quot;</span><br><span class="line"> 91) &quot;dir&quot;</span><br><span class="line"> 92) &quot;/var/lib/redis&quot;</span><br><span class="line"> 93) &quot;maxmemory-policy&quot;</span><br><span class="line"> 94) &quot;volatile-lru&quot;</span><br><span class="line"> 95) &quot;appendfsync&quot;</span><br><span class="line"> 96) &quot;everysec&quot;</span><br><span class="line"> 97) &quot;save&quot;</span><br><span class="line"> 98) &quot;900 1 300 10 60 10000&quot;</span><br><span class="line"> 99) &quot;loglevel&quot;</span><br><span class="line">100) &quot;notice&quot;</span><br><span class="line">101) &quot;client-output-buffer-limit&quot;</span><br><span class="line">102) &quot;normal 0 0 0 slave 268435456 67108864 60 pubsub 33554432 8388608 60&quot;</span><br><span class="line">103) &quot;unixsocketperm&quot;</span><br><span class="line">104) &quot;0&quot;</span><br><span class="line">105) &quot;slaveof&quot;</span><br><span class="line">106) &quot;&quot;</span><br><span class="line">107) &quot;notify-keyspace-events&quot;</span><br><span class="line">108) &quot;&quot;</span><br><span class="line">109) &quot;bind&quot;</span><br><span class="line">110) &quot;127.0.0.1&quot;</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x67E5;&#x770B;&#x5355;&#x9879;&#x914D;&#x7F6E;"><a href="#&#x67E5;&#x770B;&#x5355;&#x9879;&#x914D;&#x7F6E;" class="headerlink" title="&#x67E5;&#x770B;&#x5355;&#x9879;&#x914D;&#x7F6E;"></a>&#x67E5;&#x770B;&#x5355;&#x9879;&#x914D;&#x7F6E;</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config get appendonly</span><br><span class="line">1) <span class="string">&quot;appendonly&quot;</span></span><br><span class="line">2) <span class="string">&quot;no&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x914D;&#x7F6E;&#x8BF4;&#x660E;"><a href="#&#x914D;&#x7F6E;&#x8BF4;&#x660E;" class="headerlink" title="&#x914D;&#x7F6E;&#x8BF4;&#x660E;"></a>&#x914D;&#x7F6E;&#x8BF4;&#x660E;</h3><h4 id="&#x670D;&#x52A1;&#x5668;&#x76F8;&#x5173;&#x914D;&#x7F6E;"><a href="#&#x670D;&#x52A1;&#x5668;&#x76F8;&#x5173;&#x914D;&#x7F6E;" class="headerlink" title="&#x670D;&#x52A1;&#x5668;&#x76F8;&#x5173;&#x914D;&#x7F6E;"></a>&#x670D;&#x52A1;&#x5668;&#x76F8;&#x5173;&#x914D;&#x7F6E;</h4><ul>
+<li>port :&#x670D;&#x52A1;&#x7AEF;&#x7ED1;&#x5B9A;&#x7AEF;&#x53E3;&#xFF0C;&#x9ED8;&#x8BA4;6379</li>
+<li>bind:&#x670D;&#x52A1;&#x7AEF;&#x7ED1;&#x5B9A;&#x7684;IP&#x5730;&#x5740;</li>
+<li>timeout:&#x5F53;&#x5BA2;&#x6237;&#x7AEF;&#x95F2;&#x7F6E;&#x591A;&#x5C11;&#x79D2;&#x540E;&#x81EA;&#x52A8;&#x65AD;&#x5F00;&#x8FDE;&#x63A5;</li>
+<li>slaveof <masterip> <masterport>:&#x9ED8;&#x8BA4;&#x4E3A;&#x7A7A;&#xFF0C;&#x5C06;&#x672C;&#x673A;&#x4E3A;slave&#xFF0C;&#x5982;&#x679C;&#x8BBE;&#x7F6E;master&#x670D;&#x52A1;&#x7684;IP&#x5730;&#x5740;&#x53CA;&#x7AEF;&#x53E3;&#xFF0C;&#x5728;Redis&#x542F;&#x52A8;&#x65F6;&#xFF0C;&#x5B83;&#x4F1A;&#x81EA;&#x52A8;&#x4ECE;master&#x8FDB;&#x884C;&#x6570;&#x636E;&#x540C;&#x6B65;</masterport></masterip></li>
+<li>masterauth &lt;master&#xAD;password&gt;&#xFF1A;&#x5F53;master&#x670D;&#x52A1;&#x8BBE;&#x7F6E;&#x4E86;&#x5BC6;&#x7801;&#x4FDD;&#x62A4;&#x65F6;&#xFF0C;slav&#x670D;&#x52A1;&#x8FDE;&#x63A5;master&#x7684;&#x5BC6;&#x7801;</li>
+<li>maxclients&#xFF1A;&#x8BBE;&#x7F6E;&#x540C;&#x4E00;&#x65F6;&#x95F4;&#x6700;&#x5927;&#x5BA2;&#x6237;&#x7AEF;&#x8FDE;&#x63A5;&#x6570;&#xFF0C;&#x4E3A;0&#x4EE3;&#x8868;&#x65E0;&#x9650;&#x5236;</li>
+<li>requirepass:&#x8BBE;&#x7F6E;&#x5BC6;&#x7801;&#xFF0C;&#x9ED8;&#x8BA4;&#x6CA1;&#x6709;&#x5BC6;&#x7801;&#x3010;&#x64CD;&#x4F5C;&#x4E0D;&#x9A6C;&#x4E0A;&#x751F;&#x6548;&#x3011;</li>
+<li>databases:&#x8BBE;&#x7F6E;&#x6570;&#x636E;&#x5E93;&#x6570;&#x91CF;&#xFF0C;&#x9ED8;&#x8BA4;16&#x4E2A;&#x3010;&#x8FD9;&#x4E2A;&#x53EA;&#x80FD;&#x4FEE;&#x6539;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x6765;&#x751F;&#x6548;&#x3011;</li>
+<li>dbfilename:&#x6307;&#x5B9A;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;&#x540D;&#xFF0C;&#x9ED8;&#x8BA4;&#x503C;&#x4E3A;dump.rdb</li>
+<li>dir:&#x6307;&#x5B9A;&#x670D;&#x52A1;&#x7AEF;&#x5B58;&#x50A8;&#x6570;&#x636E;&#x5E93;&#x7684;&#x76EE;&#x5F55;</li>
+</ul>
+<h4 id="&#x65E5;&#x5FD7;&#x76F8;&#x5173;&#x914D;&#x7F6E;"><a href="#&#x65E5;&#x5FD7;&#x76F8;&#x5173;&#x914D;&#x7F6E;" class="headerlink" title="&#x65E5;&#x5FD7;&#x76F8;&#x5173;&#x914D;&#x7F6E;"></a>&#x65E5;&#x5FD7;&#x76F8;&#x5173;&#x914D;&#x7F6E;</h4><ul>
+<li><p>logfile:&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x540D;&#x79F0;</p>
+</li>
+<li><p>loglevel:&#x6307;&#x5B9A;&#x65E5;&#x5FD7;&#x8BB0;&#x5F55;&#x7EA7;&#x522B;</p>
+</li>
+<li><ul>
+<li>debug &#x8BB0;&#x5F55;&#x5F88;&#x591A;&#x4FE1;&#x606F;&#xFF0C;&#x7528;&#x4E8E;&#x5F00;&#x53D1;&#x548C;&#x6D4B;&#x8BD5;</li>
+<li>varbose &#x6709;&#x7528;&#x7684;&#x4FE1;&#x606F;&#xFF0C;&#x4E0D;&#x50CF; debug &#x4F1A;&#x8BB0;&#x5F55;&#x90A3;&#x4E48;&#x591A;</li>
+<li>notice &#x666E;&#x901A;&#x7684; verbose &#xFF0C;&#x5E38;&#x7528;&#x4E8E;&#x751F;&#x4EA7;&#x73AF;&#x5883;</li>
+<li>warning &#x53EA;&#x6709;&#x975E;&#x5E38;&#x91CD;&#x8981;&#x6216;&#x8005;&#x4E25;&#x91CD;&#x7684;&#x4FE1;&#x606F;&#x4F1A;&#x8BB0;&#x5F55;&#x5230;&#x65E5;&#x5FD7;</li>
+</ul>
+</li>
+</ul>
+<h4 id="&#x670D;&#x52A1;&#x7AEF;&#x4FDD;&#x5B58;&#x914D;&#x7F6E;"><a href="#&#x670D;&#x52A1;&#x7AEF;&#x4FDD;&#x5B58;&#x914D;&#x7F6E;" class="headerlink" title="&#x670D;&#x52A1;&#x7AEF;&#x4FDD;&#x5B58;&#x914D;&#x7F6E;"></a>&#x670D;&#x52A1;&#x7AEF;&#x4FDD;&#x5B58;&#x914D;&#x7F6E;</h4><ul>
+<li><p>save:&#x6307;&#x5B9A;&#x5728;&#x591A;&#x957F;&#x65F6;&#x95F4;&#x5185;&#xFF0C;&#x6709;&#x591A;&#x5C11;&#x6B21;&#x66F4;&#x65B0;&#x64CD;&#x4F5C;&#xFF0C;&#x5C31;&#x5C06;&#x6570;&#x636E;&#x540C;&#x6B65;&#x5230;&#x6570;&#x636E;&#x6587;&#x4EF6;&#x7B2C;&#x4E00;&#x4E2A;jd&#x4EE3;&#x8868;1&#xFF0C;&#x7B2C;&#x4E8C;&#x4E2A;&#x4EE3;&#x8868;10&#xFF0C;&#x7B2C;&#x4E09;&#x4E2A;&#x4EE3;&#x8868;10000&#x3002;</p>
+</li>
+<li><p>AOF&#x529F;&#x80FD;&#x5F00;&#x542F;&#xFF1A;</p>
+</li>
+<li><ul>
+<li><p>appendonly no&#xFF1A;&#x662F;&#x5426;&#x5F00;&#x542F;aof&#x8BB0;&#x5F55;&#x529F;&#x80FD;&#xFF0C;&#x6307;&#x5B9A;&#x662F;&#x5426;&#x5728;&#x6BCF;&#x6B21;&#x66F4;&#x65B0;&#x64CD;&#x4F5C;&#x540E;&#x8FDB;&#x884C;&#x65E5;&#x5FD7;&#x8BB0;&#x5F55;&#xFF0C;Redis&#x5728;&#x9ED8;&#x8BA4;&#x60C5;&#x51B5;&#x4E0B;&#x662F;&#x5F02;&#x6B65;&#x7684;&#x628A;&#x6570;&#x636E;&#x5199;&#x5165;&#x78C1;&#x76D8;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x5F00;&#x542F;&#xFF0C;&#x53EF;&#x80FD;&#x4F1A;&#x5728;&#x65AD;&#x7535;&#x65F6;&#x5BFC;&#x81F4;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x5185;&#x7684;&#x6570;&#x636E;&#x4E22;&#x5931;&#x3002;&#x56E0;&#x4E3A; redis&#x672C;&#x8EAB;&#x540C;&#x6B65;&#x6570;&#x636E;&#x6587;&#x4EF6;&#x662F;&#x6309;&#x4E0A;&#x9762;save&#x6761;&#x4EF6;&#x6765;&#x540C;&#x6B65;&#x7684;&#xFF0C;&#x6240;&#x4EE5;&#x6709;&#x7684;&#x6570;&#x636E;&#x4F1A;&#x5728;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x5185;&#x53EA;&#x5B58;&#x5728;&#x4E8E;&#x5185;&#x5B58;&#x4E2D;&#x3002;&#x9ED8;&#x8BA4;&#x4E3A;no</p>
+</li>
+<li><p>appendfilename&#xFF1A;&#x6307;&#x5B9A;aof&#x65E5;&#x5FD7;&#x7684;&#x6587;&#x4EF6;&#x540D;&#x79F0;</p>
+</li>
+<li><p>appendfsync&#xFF1A;&#x6307;&#x5B9A;aof&#x65E5;&#x5FD7;&#x66F4;&#x65B0;&#x6761;&#x4EF6;</p>
+</li>
+<li><ul>
+<li>no&#xFF1A;&#x8868;&#x793A;&#x7B49;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x8FDB;&#x884C;&#x6570;&#x636E;&#x7F13;&#x5B58;&#x540C;&#x6B65;&#x5230;&#x78C1;&#x76D8;&#xFF08;&#x5FEB;&#xFF09;</li>
+<li>always&#xFF1A;&#x8868;&#x793A;&#x6BCF;&#x6B21;&#x66F4;&#x65B0;&#x64CD;&#x4F5C;&#x540E;&#x624B;&#x52A8;&#x8C03;&#x7528;fsync()&#x5C06;&#x6570;&#x636E;&#x5199;&#x5230;&#x78C1;&#x76D8;&#xFF08;&#x6162;&#xFF0C;&#x5B89;&#x5168;&#xFF09;</li>
+<li>everysec&#xFF1A;&#x8868;&#x793A;&#x6BCF;&#x79D2;&#x540C;&#x6B65;&#x4E00;&#x6B21;&#xFF08;&#x6298;&#x8877;&#xFF0C;&#x9ED8;&#x8BA4;&#x503C;&#xFF09;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="&#x5728;&#x7EBF;&#x5F00;&#x542F;aof&#x529F;&#x80FD;"><a href="#&#x5728;&#x7EBF;&#x5F00;&#x542F;aof&#x529F;&#x80FD;" class="headerlink" title="&#x5728;&#x7EBF;&#x5F00;&#x542F;aof&#x529F;&#x80FD;"></a>&#x5728;&#x7EBF;&#x5F00;&#x542F;aof&#x529F;&#x80FD;</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config get appendonly</span><br><span class="line">1) <span class="string">&quot;appendonly&quot;</span></span><br><span class="line">2) <span class="string">&quot;no&quot;</span></span><br><span class="line">127.0.0.1:6379&gt; config <span class="built_in">set</span> appendonly yes</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; config get appendonly</span><br><span class="line">1) <span class="string">&quot;appendonly&quot;</span></span><br><span class="line">2) <span class="string">&quot;yes&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x5F00;&#x542F;&#x540E;&#x9ED8;&#x8BA4;&#x5728;/var/lib/redis&#x76EE;&#x5F55;&#x5C31;&#x4F1A;&#x751F;&#x6210;appendonly.aof&#x6587;&#x4EF6;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root@ops:/var/lib/redis<span class="comment"># pwd</span></span><br><span class="line">/var/lib/redis</span><br><span class="line">root@ops:/var/lib/redis<span class="comment"># ls</span></span><br><span class="line">appendonly.aof  dump.rdb</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/redis/" rel="tag"><i class="fa fa-tag"></i> redis</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/11/13/Nginx部署/" rel="next" title="Nginx部署">
+                  <i class="fa fa-chevron-left"></i> Nginx部署
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2018/02/21/TinyProxy http代理/" rel="prev" title="TinyProxy http代理">
+                  TinyProxy http代理 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB——数据快照（Snapshot）"><span class="nav-number">1.</span> <span class="nav-text">RDB——数据快照（Snapshot）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB文件创建"><span class="nav-number">1.1.</span> <span class="nav-text">RDB文件创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB原理"><span class="nav-number">1.2.</span> <span class="nav-text">RDB原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB优缺点"><span class="nav-number">1.3.</span> <span class="nav-text">RDB优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AOF——日志追加（Append-Only）"><span class="nav-number">2.</span> <span class="nav-text">AOF——日志追加（Append-Only）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF启用"><span class="nav-number">2.1.</span> <span class="nav-text">AOF启用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF-fsync同步规则"><span class="nav-number">2.2.</span> <span class="nav-text">AOF fsync同步规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF文件格式解析"><span class="nav-number">2.3.</span> <span class="nav-text">AOF文件格式解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF重写"><span class="nav-number">2.4.</span> <span class="nav-text">AOF重写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF-文件损坏以后如何修复"><span class="nav-number">2.5.</span> <span class="nav-text">AOF 文件损坏以后如何修复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF优缺点"><span class="nav-number">2.6.</span> <span class="nav-text">AOF优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何选择"><span class="nav-number">3.</span> <span class="nav-text">如何选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在线修改Redis配置参数"><span class="nav-number">4.</span> <span class="nav-text">在线修改Redis配置参数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看当前所有配置"><span class="nav-number">4.1.</span> <span class="nav-text">查看当前所有配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看单项配置"><span class="nav-number">4.2.</span> <span class="nav-text">查看单项配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置说明"><span class="nav-number">4.3.</span> <span class="nav-text">配置说明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#服务器相关配置"><span class="nav-number">4.3.1.</span> <span class="nav-text">服务器相关配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#日志相关配置"><span class="nav-number">4.3.2.</span> <span class="nav-text">日志相关配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#服务端保存配置"><span class="nav-number">4.3.3.</span> <span class="nav-text">服务端保存配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在线开启aof功能"><span class="nav-number">4.4.</span> <span class="nav-text">在线开启aof功能</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

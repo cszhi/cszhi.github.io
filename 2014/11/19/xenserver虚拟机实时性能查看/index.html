@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x767B;&amp;#x9646;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#xFF0C;&amp;#x6267;&amp;#x884C;&amp;#x811A;&amp;#x672C;/opt/tools/real_time_status.sh&amp;#xFF1A;&amp;#xFF08;&amp;#x8BE5;&amp;#x811A;&amp;#x672C;&amp;#x7684;&amp;#x76F8;&amp;#x5173;&amp;#x6570;&amp;#x636E;&amp;#x90FD;&amp;#">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xenserver虚拟机实时性能查看">
+<meta property="og:url" content="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x767B;&amp;#x9646;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#xFF0C;&amp;#x6267;&amp;#x884C;&amp;#x811A;&amp;#x672C;/opt/tools/real_time_status.sh&amp;#xFF1A;&amp;#xFF08;&amp;#x8BE5;&amp;#x811A;&amp;#x672C;&amp;#x7684;&amp;#x76F8;&amp;#x5173;&amp;#x6570;&amp;#x636E;&amp;#x90FD;&amp;#">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/1567495840535.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/1567495856926.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/1567495871775.png">
+<meta property="og:updated_time" content="2019-09-03T07:31:21.175Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="xenserver虚拟机实时性能查看">
+<meta name="twitter:description" content="&amp;#x767B;&amp;#x9646;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#xFF0C;&amp;#x6267;&amp;#x884C;&amp;#x811A;&amp;#x672C;/opt/tools/real_time_status.sh&amp;#xFF1A;&amp;#xFF08;&amp;#x8BE5;&amp;#x811A;&amp;#x672C;&amp;#x7684;&amp;#x76F8;&amp;#x5173;&amp;#x6570;&amp;#x636E;&amp;#x90FD;&amp;#">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/1567495840535.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>xenserver虚拟机实时性能查看 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">xenserver虚拟机实时性能查看
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2014-11-19 00:00:00" itemprop="dateCreated datePublished" datetime="2014-11-19T00:00:00+08:00">2014-11-19</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>&#x767B;&#x9646;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x6267;&#x884C;&#x811A;&#x672C;/opt/tools/real_time_status.sh&#xFF1A;&#xFF08;&#x8BE5;&#x811A;&#x672C;&#x7684;&#x76F8;&#x5173;&#x6570;&#x636E;&#x90FD;&#x662F;&#x4ECE;xentop&#x547D;&#x4EE4;&#x4E2D;&#x63D0;&#x53D6;&#x7684;&#xFF09;</p>
+<a id="more"></a>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Program:</span></span><br><span class="line"><span class="meta">#</span><span class="bash">       Real-time Performance</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> History:</span></span><br><span class="line"><span class="meta">#</span><span class="bash">	2014/09/29	caishunzhi First release</span></span><br><span class="line"> </span><br><span class="line">DIR=&quot;/opt/tools&quot;</span><br><span class="line">HOSTNAME=`/bin/hostname`</span><br><span class="line">SORT=${1:-4}</span><br><span class="line">NUM=${2:-6}</span><br><span class="line"> </span><br><span class="line">function get_performance()</span><br><span class="line">{</span><br><span class="line"><span class="meta">	#</span><span class="bash">cpu</span></span><br><span class="line"><span class="meta">	&gt;</span><span class="bash">/tmp/xentopcpu_</span></span><br><span class="line"><span class="meta">	#</span><span class="bash">/usr/sbin/xentop -i2 -d1 -b -f &gt;/tmp/xentopcpu_</span></span><br><span class="line"><span class="meta">	#</span><span class="bash">CPU=`awk -F<span class="string">&apos;[-r]&apos;</span> <span class="string">&apos;{print $NF}&apos;</span> /tmp/xentopcpu_ |grep -v VBD_WR |awk <span class="string">&apos;BEGIN{sum=0}{sum+=$2}END{print sum}&apos;</span>`</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">	#</span><span class="bash">traffic and io</span></span><br><span class="line">	/usr/sbin/xentop -i1 -d1 -b -f |grep -v VBD_WR &gt;/tmp/xentop_1</span><br><span class="line">	TX1=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_1 |awk &apos;BEGIN{sum=0}{sum+=$9}END{print sum}&apos;`</span><br><span class="line">	RX1=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_1 |awk &apos;BEGIN{sum=0}{sum+=$10}END{print sum}&apos;`</span><br><span class="line">	VDB_RD1=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_1 |awk &apos;BEGIN{sum=0}{sum+=$13}END{print sum}&apos;`</span><br><span class="line">	VDB_WR1=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_1 |awk &apos;BEGIN{sum=0}{sum+=$14}END{print sum}&apos;`</span><br><span class="line">	sleep 1</span><br><span class="line">	/usr/sbin/xentop -i1 -d1 -b -f |grep -v VBD_WR &gt;/tmp/xentop_2</span><br><span class="line">	TX2=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_2 |awk &apos;BEGIN{sum=0}{sum+=$9}END{print sum}&apos;`</span><br><span class="line">	RX2=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_2 |awk &apos;BEGIN{sum=0}{sum+=$10}END{print sum}&apos;`</span><br><span class="line">	VDB_RD2=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_2 |awk &apos;BEGIN{sum=0}{sum+=$13}END{print sum}&apos;`</span><br><span class="line">	VDB_WR2=`awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_2 |awk &apos;BEGIN{sum=0}{sum+=$14}END{print sum}&apos;`</span><br><span class="line"> </span><br><span class="line">	date1=`stat /tmp/xentop_1 |grep Modify |awk &apos;{print $2,$3}&apos;`</span><br><span class="line">	date2=`stat /tmp/xentop_2 |grep Modify |awk &apos;{print $2,$3}&apos;`</span><br><span class="line">	start=`date +%s -d &quot;$date1&quot;`</span><br><span class="line">	end=`date +%s -d &quot;$date2&quot;`</span><br><span class="line"> </span><br><span class="line">	let sleep=end-start</span><br><span class="line"> </span><br><span class="line"><span class="meta">	#</span><span class="bash">VM Performance Output</span></span><br><span class="line">	awk &apos;{print $1}&apos; /tmp/xentop_1 &gt;/tmp/vmname_</span><br><span class="line">	awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_1 &gt;/tmp/xentop_11</span><br><span class="line">	awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentop_2 &gt;/tmp/xentop_22</span><br><span class="line">	awk -F&apos;[-r]&apos; &apos;{print $NF}&apos; /tmp/xentopcpu_ |sed &apos;1,/NAME/d&apos; |awk &apos;{print $2}&apos; &gt;/tmp/xentop_33</span><br><span class="line">	printf &quot;\n%50s %6s %12s %12s %6s %6s\n&quot; NAME CPU &apos;NETin(KB)&apos; &apos;NETout(KB)&apos; IOr IOw </span><br><span class="line">	paste /tmp/vmname_ /tmp/xentop_11 /tmp/xentop_22 /tmp/xentop_33 |awk -v n=$sleep &apos;{printf &quot;%50s %6s %12d %12d %6d %6d\n&quot;,$1,$NF,($27-$10)/n,($28-$11)/n,($31-$14)/n,($32-$15)/n}&apos; |sort -k&quot;$SORT&quot; -rn |head -&quot;$NUM&quot;</span><br><span class="line">}</span><br><span class="line"> </span><br><span class="line">while true;</span><br><span class="line">do </span><br><span class="line">	get_performance</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<p>[root@xen-host01 ~]# sh /opt/tools/real_time_status.sh</p>
+<p><img src="/2014/11/19/xenserver&#x865A;&#x62DF;&#x673A;&#x5B9E;&#x65F6;&#x6027;&#x80FD;&#x67E5;&#x770B;/1567495840535.png" alt="1567495840535"></p>
+<p>&#x9ED8;&#x8BA4;&#x4EE5;&#x6D41;&#x51FA;&#x6D41;&#x91CF;&#xFF08;&#x7B2C;&#x56DB;&#x5217;&#xFF09;&#x6392;&#x5E8F;&#xFF0C;&#x663E;&#x793A;&#x524D;6&#x540D;&#x3002;</p>
+<p>&#x5982;&#x679C;&#x8981;&#x4EE5;&#x5176;&#x5B83;&#x5217;&#x6392;&#x5E8F;&#xFF0C;&#x76F4;&#x63A5;&#x5728;&#x811A;&#x672C;&#x540E;&#x63A5;&#x5217;&#x53F7;&#xFF1B;&#x5982;&#x679C;&#x8981;&#x663E;&#x793A;&#x66F4;&#x591A;&#x7684;&#x865A;&#x62DF;&#x673A;&#xFF0C;&#x5728;&#x5217;&#x53F7;&#x540E;&#x63A5;&#x8981;&#x663E;&#x793A;&#x7684;&#x6570;&#x91CF;&#x3002;<br> &#x5982;&#x4E0B;&#x547D;&#x4EE4;&#x4EE5;IO&#x8BFB;&#x8BF7;&#x6C42;&#x6570;&#x6392;&#x5E8F;&#xFF08;&#x7B2C;&#x4E94;&#x5217;&#xFF09;&#xFF0C;&#x663E;&#x793A;&#x524D;10&#x540D;&#xFF1A;<br> [root@xen-host01 ~]# sh /opt/tools/real_time_status.sh 5 10</p>
+<p><img src="/2014/11/19/xenserver&#x865A;&#x62DF;&#x673A;&#x5B9E;&#x65F6;&#x6027;&#x80FD;&#x67E5;&#x770B;/1567495856926.png" alt="1567495856926"></p>
+<p>&#x6CE8;&#xFF1A;<br>&#x9ED8;&#x8BA4;&#x6CA1;&#x6709;&#x663E;&#x793A;&#x865A;&#x62DF;&#x673A;&#x7684;cpu&#x4F7F;&#x7528;&#x7387;&#xFF0C;&#x5982;&#x679C;&#x8981;&#x663E;&#x793A;&#xFF0C;&#x8BF7;&#x7F16;&#x8F91;&#x811A;&#x672C;&#xFF0C;&#x5C06;&#x5982;&#x4E0B;&#x4E24;&#x884C;&#x7684;&#x6CE8;&#x91CA;&#xFF08;#&#xFF09;&#x53BB;&#x6389;&#xFF0C;&#x4FDD;&#x5B58;&#x9000;&#x51FA;&#xFF0C;&#x518D;&#x6267;&#x884C;&#x811A;&#x672C;&#x5373;&#x53EF;&#x3002;</p>
+<p><img src="/2014/11/19/xenserver&#x865A;&#x62DF;&#x673A;&#x5B9E;&#x65F6;&#x6027;&#x80FD;&#x67E5;&#x770B;/1567495871775.png" alt="1567495871775"></p>
+<p>xentop&#x5B98;&#x65B9;&#x4F7F;&#x7528;&#x8BF4;&#x660E;&#xFF1A;<br><a href="http://support.citrix.com/article/CTX127896" target="_blank" rel="noopener">How to Use the XenServer Xentop Utility</a></p>
+
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2014/03/21/Nginx报错处理/" rel="next" title="Nginx报错处理">
+                  <i class="fa fa-chevron-left"></i> Nginx报错处理
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/03/21/Linux中使用ShadowSocks+Privoxy代理/" rel="prev" title="Linux中使用ShadowSocks+Privoxy代理">
+                  Linux中使用ShadowSocks+Privoxy代理 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

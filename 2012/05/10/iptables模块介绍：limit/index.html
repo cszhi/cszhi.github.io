@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="limit&amp;#x6A21;&amp;#x5757;&amp;#x7528;&amp;#x4E8E;&amp;#x9650;&amp;#x5236;&amp;#x5339;&amp;#x914D;&amp;#x6570;&amp;#x636E;&amp;#x5305;&amp;#x7684;&amp;#x9891;&amp;#x7387;&amp;#x6216;&amp;#x901F;&amp;#x7387; limit&amp;#x7684;&amp;#x5DE5;&amp;#x4F5C;&amp;#x65B9;&amp;#x5F0F;&amp;#x5C31;&amp;#x50">
+<meta name="keywords" content="linux,iptables">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iptables模块介绍：limit">
+<meta property="og:url" content="http://blogs.cszhi.com/2012/05/10/iptables模块介绍：limit/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="limit&amp;#x6A21;&amp;#x5757;&amp;#x7528;&amp;#x4E8E;&amp;#x9650;&amp;#x5236;&amp;#x5339;&amp;#x914D;&amp;#x6570;&amp;#x636E;&amp;#x5305;&amp;#x7684;&amp;#x9891;&amp;#x7387;&amp;#x6216;&amp;#x901F;&amp;#x7387; limit&amp;#x7684;&amp;#x5DE5;&amp;#x4F5C;&amp;#x65B9;&amp;#x5F0F;&amp;#x5C31;&amp;#x50">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-03T07:57:29.975Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iptables模块介绍：limit">
+<meta name="twitter:description" content="limit&amp;#x6A21;&amp;#x5757;&amp;#x7528;&amp;#x4E8E;&amp;#x9650;&amp;#x5236;&amp;#x5339;&amp;#x914D;&amp;#x6570;&amp;#x636E;&amp;#x5305;&amp;#x7684;&amp;#x9891;&amp;#x7387;&amp;#x6216;&amp;#x901F;&amp;#x7387; limit&amp;#x7684;&amp;#x5DE5;&amp;#x4F5C;&amp;#x65B9;&amp;#x5F0F;&amp;#x5C31;&amp;#x50">
+  <link rel="canonical" href="http://blogs.cszhi.com/2012/05/10/iptables模块介绍：limit/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>iptables模块介绍：limit | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/10/iptables模块介绍：limit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">iptables模块介绍：limit
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-05-10 00:00:00" itemprop="dateCreated datePublished" datetime="2012-05-10T00:00:00+08:00">2012-05-10</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>limit&#x6A21;&#x5757;&#x7528;&#x4E8E;&#x9650;&#x5236;&#x5339;&#x914D;&#x6570;&#x636E;&#x5305;&#x7684;&#x9891;&#x7387;&#x6216;&#x901F;&#x7387;</strong></p>
+<p>limit&#x7684;&#x5DE5;&#x4F5C;&#x65B9;&#x5F0F;&#x5C31;&#x50CF;&#x4E00;&#x4E2A;&#x5355;&#x4F4D;&#x5927;&#x95E8;&#x53E3;&#x7684;&#x4FDD;&#x5B89;&#xFF0C;&#x5F53;&#x6709;&#x4EBA;&#x8981;&#x8FDB;&#x5165;&#x65F6;&#xFF0C;&#x9700;&#x8981;&#x627E;&#x4ED6;&#x529E;&#x7406;&#x901A;&#x884C;&#x8BC1;&#x3002;&#x65E9;&#x4E0A;&#x4E0A;&#x73ED;&#x65F6;&#xFF0C;&#x4FDD;&#x5B89;&#x624B;&#x91CC;&#x6709;&#x4E00;&#x5B9A;&#x6570;&#x91CF;&#x7684;&#x901A;&#x884C;&#x8BC1;&#xFF0C;&#x6765;&#x4E00;&#x4E2A;&#x4EBA;&#xFF0C;&#x5C31;&#x7B7E;&#x53D1;&#x4E00;&#x4E2A;&#xFF0C;&#x5F53;&#x901A;&#x884C;&#x8BC1;&#x7528;&#x5B8C;&#x540E;&#xFF0C;&#x518D;&#x6765;&#x4EBA;&#x5C31;&#x8FDB;&#x4E0D;&#x53BB;&#x4E86;&#xFF0C;&#x4F46;&#x4ED6;&#x4EEC;&#x4E0D;&#x4F1A;&#x7B49;&#xFF0C;&#x800C;&#x662F;&#x5230;&#x522B;&#x7684;&#x5730;&#x65B9;&#x53BB;&#xFF08;&#x5728;iptables&#x91CC;&#xFF0C;&#x8FD9;&#x76F8;&#x5F53;&#x4E8E;&#x4E00;&#x4E2A;&#x5305;&#x4E0D;&#x7B26;&#x5408;&#x67D0;&#x6761;&#x89C4;&#x5219;&#xFF0C;&#x5C31;&#x4F1A;&#x7531;&#x540E;&#x9762;&#x7684;&#x89C4;&#x5219;&#x6765;&#x5904;&#x7406;&#xFF0C;&#x5982;&#x679C;&#x90FD;&#x4E0D;&#x7B26;&#x5408;&#xFF0C;&#x5C31;&#x7531;&#x7F3A;&#x7701;&#x7684;&#x7B56;&#x7565;&#x5904;&#x7406;&#xFF09;&#x3002;&#x4F46;&#x6709;&#x4E2A;&#x89C4;&#x5B9A;&#xFF0C;&#x6BCF;&#x9694;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x4FDD;&#x5B89;&#x5C31;&#x8981;&#x7B7E;&#x53D1;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x901A;&#x884C;&#x8BC1;&#x3002;&#x8FD9;&#x6837;&#xFF0C;&#x540E;&#x9762;&#x6765;&#x7684;&#x4EBA;&#x5982;&#x679C;&#x6070;&#x5DE7;&#x8D76;&#x4E0A;&#xFF0C;&#x4E5F;&#x5C31;&#x53EF;&#x4EE5;&#x8FDB;&#x53BB;&#x4E86;&#x3002;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x4EBA;&#x6765;&#xFF0C;&#x90A3;&#x901A;&#x884C;&#x8BC1;&#x5C31;&#x4FDD;&#x7559;&#x4E0B;&#x6765;&#xFF0C;&#x4EE5;&#x5907;&#x6765;&#x7684;&#x4EBA;&#x7528;&#x3002;&#x5982;&#x679C;&#x4E00;&#x76F4;&#x6CA1;&#x4EBA;&#x6765;&#xFF0C;&#x53EF;&#x7528;&#x7684;&#x901A;&#x884C;&#x8BC1;&#x7684;&#x6570;&#x91CF;&#x5C31;&#x589E;&#x52A0;&#x4E86;&#xFF0C;&#x4F46;&#x4E0D;&#x662F;&#x65E0;&#x9650;&#x589E;&#x5927;&#x7684;&#xFF0C;&#x6700;&#x591A;&#x4E5F;&#x5C31;&#x662F;&#x521A;&#x5F00;&#x59CB;&#x65F6;&#x4FDD;&#x5B89;&#x624B;&#x91CC;&#x6709;&#x7684;&#x90A3;&#x4E2A;&#x6570;&#x91CF;&#x3002;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#xFF0C;&#x521A;&#x5F00;&#x59CB;&#x65F6;&#xFF0C;&#x901A;&#x884C;&#x8BC1;&#x7684;&#x6570;&#x91CF;&#x662F;&#x6709;&#x9650;&#x7684;&#xFF0C;&#x4F46;&#x6BCF;&#x9694;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x5C31;&#x6709;&#x65B0;&#x7684;&#x901A;&#x884C;&#x8BC1;&#x53EF;&#x7528;&#x3002;limit match&#x6709;&#x4E24;&#x4E2A;&#x53C2;&#x6570;&#x5C31;&#x5BF9;&#x5E94;&#x8FD9;&#x79CD;&#x60C5;&#x51B5;&#xFF0C;&#x2013;limit-burst&#x6307;&#x5B9A;&#x521A;&#x5F00;&#x59CB;&#x65F6;&#x6709;&#x591A;&#x5C11;&#x901A;&#x884C;&#x8BC1;&#x53EF;&#x7528;&#xFF0C;&#x2013;limit&#x6307;&#x5B9A;&#x8981;&#x9694;&#x591A;&#x957F;&#x65F6;&#x95F4;&#x624D;&#x80FD;&#x7B7E;&#x53D1;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x901A;&#x884C;&#x8BC1;&#x3002;&#x8981;&#x6CE8;&#x610F;&#x7684;&#x662F;&#xFF0C;&#x6211;&#x8FD9;&#x91CC;&#x5F3A;&#x8C03;&#x7684;&#x662F;&#x201C;&#x7B7E;&#x53D1;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x901A;&#x884C;&#x8BC1;&#x201D;&#xFF0C;&#x8FD9;&#x662F;&#x4EE5;iptables&#x7684;&#x89D2;&#x5EA6;&#x8003;&#x8651;&#x7684;&#x3002;&#x5728;&#x4F60;&#x81EA;&#x5DF1;&#x5199;&#x89C4;&#x5219;&#x65F6;&#xFF0C;&#x5C31;&#x8981;&#x4ECE;&#x8FD9;&#x4E2A;&#x89D2;&#x5EA6;&#x8003;&#x8651;&#x3002;&#x6BD4;&#x5982;&#xFF0C;&#x4F60;&#x6307;&#x5B9A;&#x4E86;&#x2013;limit 3/minute &#x2013;limit-burst 5 &#xFF0C;&#x610F;&#x601D;&#x662F;&#x5F00;&#x59CB;&#x65F6;&#x6709;5&#x4E2A;&#x901A;&#x884C;&#x8BC1;&#xFF0C;&#x7528;&#x5B8C;&#x4E4B;&#x540E;&#x6BCF;20&#x79D2;&#x589E;&#x52A0;&#x4E00;&#x4E2A;&#xFF08;&#x8FD9;&#x5C31;&#x662F;&#x4ECE;iptables&#x7684;&#x89D2;&#x5EA6;&#x770B;&#x7684;&#xFF0C;&#x8981;&#x662F;&#x4EE5;&#x7528;&#x6237;&#x7684;&#x89D2;&#x5EA6;&#x770B;&#xFF0C;&#x8BF4;&#x6CD5;&#x5C31;&#x662F;&#x6BCF;&#x4E00;&#x5206;&#x949F;&#x589E;&#x52A0;&#x4E09;&#x4E2A;&#x6216;&#x8005;&#x6BCF;&#x5206;&#x949F;&#x53EA;&#x80FD;&#x8FC7;&#x4E09;&#x4E2A;&#xFF09;&#x3002;&#x4F60;&#x8981;&#x662F;&#x60F3;&#x6BCF;20&#x5206;&#x949F;&#x8FC7;&#x4E00;&#x4E2A;&#xFF0C;&#x53EA;&#x80FD;&#x5199;&#x6210;&#x2013;limit 3/hour &#x2013;limit-burst 5&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#x4F60;&#x8981;&#x628A;&#x65F6;&#x95F4;&#x5355;&#x4F4D;&#x51D1;&#x6210;&#x6574;&#x7684;&#x3002;</p>
+<p>&#x4F8B;&#x5982;&#x8BBE;&#x7F6E;&#x4EE5;&#x4E0B;&#x89C4;&#x5219;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iptables -A INPUT -p icmp -m <span class="built_in">limit</span> --<span class="built_in">limit</span> 6/m --<span class="built_in">limit</span>-burst 5 -j ACCEPT</span><br><span class="line">iptables -A INPUT -p icmp -j DROP</span><br></pre></td></tr></table></figure>
+
+<p>&#x7136;&#x540E;&#x4ECE;&#x53E6;&#x4E00;&#x90E8;&#x4E3B;&#x673A;&#x4E0A;ping&#x8FD9;&#x90E8;&#x4E3B;&#x673A;&#xFF0C;&#x5C31;&#x4F1A;&#x53D1;&#x751F;&#x5982;&#x4E0B;&#x7684;&#x73B0;&#x8C61;&#xFF1A;<br>&#x9996;&#x5148;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x524D;&#x56DB;&#x4E2A;&#x5305;&#x7684;&#x56DE;&#x5E94;&#x90FD;&#x5F88;&#x6B63;&#x5E38;&#xFF0C;&#x7136;&#x540E;&#x4ECE;&#x7B2C;&#x4E94;&#x4E2A;&#x5305;&#x5F00;&#x59CB;&#xFF0C;&#x6211;&#x4EEC;&#x6BCF;10&#x79D2;&#x53EF;&#x4EE5;&#x6536;&#x5230;&#x4E00;&#x4E2A;&#x6B63;&#x5E38;&#x7684;&#x56DE;&#x5E94;&#x3002;&#x8FD9;&#x662F;&#x56E0;&#x4E3A;&#x6211;&#x4EEC;&#x8BBE;&#x5B9A;&#x4E86;&#x5355;&#x4F4D;&#x65F6;&#x95F4;(&#x5728;&#x8FD9;&#x91CC;&#x662F;&#x6BCF;&#x5206;&#x949F;)&#x5185;&#x5141;&#x8BB8;&#x901A;&#x8FC7;&#x7684;&#x6570;&#x636E;&#x5305;&#x7684;&#x4E2A;&#x6570;&#x662F;&#x6BCF;&#x5206;&#x949F;6&#x4E2A;&#xFF0C;&#x4E5F;&#x5373;&#x6BCF;10&#x79D2;&#x949F;&#x4E00;&#x4E2A;&#xFF1B;&#x5176;&#x6B21;&#x6211;&#x4EEC;&#x53C8;&#x8BBE;&#x5B9A;&#x4E86;&#x4E8B;&#x4EF6;&#x89E6;&#x53D1;&#x9600;&#x503C;&#x4E3A;5&#xFF0C;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x7684;&#x524D;&#x56DB;&#x4E2A;&#x5305;&#x90FD;&#x662F;&#x6B63;&#x5E38;&#x7684;&#xFF0C;&#x53EA;&#x662F;&#x4ECE;&#x7B2C;&#x4E94;&#x4E2A;&#x5305;&#x5F00;&#x59CB;&#xFF0C;&#x9650;&#x5236;&#x89C4;&#x5219;&#x5F00;&#x59CB;&#x751F;&#x6548;&#xFF0C;&#x6545;&#x53EA;&#x80FD;&#x6BCF;10&#x79D2;&#x6536;&#x5230;&#x4E00;&#x4E2A;&#x6B63;&#x5E38;&#x56DE;&#x5E94;&#x3002;<br>&#x5047;&#x8BBE;&#x6211;&#x4EEC;&#x505C;&#x6B62;ping&#xFF0C;30&#x79D2;&#x540E;&#x53C8;&#x5F00;&#x59CB;ping&#xFF0C;&#x8FD9;&#x65F6;&#x7684;&#x73B0;&#x8C61;&#x662F;&#xFF1A;<br>&#x524D;&#x4E24;&#x4E2A;&#x5305;&#x662F;&#x6B63;&#x5E38;&#x7684;&#xFF0C;&#x4ECE;&#x7B2C;&#x4E09;&#x4E2A;&#x5305;&#x5F00;&#x59CB;&#x4E22;&#x5305;&#xFF0C;&#x8FD9;&#x662F;&#x56E0;&#x4E3A;&#x5728;&#x8FD9;&#x91CC;&#x6211;&#x7684;&#x5141;&#x8BB8;&#x4E00;&#x4E2A;&#x5305;&#x901A;&#x8FC7;&#x7684;&#x5468;&#x671F;&#x662F;10&#x79D2;&#xFF0C;&#x5982;&#x679C;&#x5728;&#x4E00;&#x4E2A;&#x5468;&#x671F;&#x5185;&#x7CFB;&#x7EDF;&#x6CA1;&#x6709;&#x6536;&#x5230;&#x7B26;&#x5408;&#x6761;&#x4EF6;&#x7684;&#x5305;&#xFF0C;&#x7CFB;&#x7EDF;&#x7684;&#x89E6;&#x53D1;&#x503C;&#x5C31;&#x4F1A;&#x6062;&#x590D;1&#xFF0C;&#x6240;&#x4EE5;&#x5047;&#x5982;&#x6211;&#x4EEC;30&#x79D2;&#x5185;&#x6CA1;&#x6709;&#x7B26;&#x5408;&#x6761;&#x4EF6;&#x7684;&#x5305;&#x901A;&#x8FC7;&#xFF0C;&#x7CFB;&#x7EDF;&#x7684;&#x89E6;&#x53D1;&#x503C;&#x5C31;&#x4F1A;&#x6062;&#x590D;&#x5230;3&#xFF0C;&#x5047;&#x5982;5&#x4E2A;&#x5468;&#x671F;&#x5185;&#x90FD;&#x6CA1;&#x6709;&#x7B26;&#x5408;&#x6761;&#x4EF6;&#x7684;&#x5305;&#x901A;&#x8FC7;&#xFF0C;&#x7CFB;&#x7EDF;&#x90FD;&#x89E6;&#x53D1;&#x503C;&#x5C31;&#x4F1A;&#x5B8C;&#x5168;&#x6062;&#x590D;&#x3002;</p>
+<p>&#x4F8B;&#xFF1A;<br>&#x9632;&#x6B62;SYN-Flood &#x788E;&#x7247;&#x653B;&#x51FB;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">iptables -N syn-flood</span><br><span class="line">iptables -A syn-flood -m <span class="built_in">limit</span> &#x2013;<span class="built_in">limit</span> 100/s &#x2013;<span class="built_in">limit</span>-burst 150 -j RETURN</span><br><span class="line">iptables -A syn-flood -j DROP</span><br><span class="line">iptables -I INPUT -j syn-flood</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+            
+              <a href="/tags/iptables/" rel="tag"><i class="fa fa-tag"></i> iptables</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2012/05/10/MySQL备份方法总结/" rel="next" title="MySQL备份方法总结">
+                  <i class="fa fa-chevron-left"></i> MySQL备份方法总结
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2012/05/10/iptables模块介绍：connlimit/" rel="prev" title="iptables模块介绍：connlimit">
+                  iptables模块介绍：connlimit <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

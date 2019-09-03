@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"save":"auto"},
+    fancybox: false,
+    mediumzoom: true,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x8FD9;&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x72EC;&amp;#x7ACB;&amp;#x90AE;&amp;#x4EF6;&amp;#x7CFB;&amp;#x7EDF;&amp;#x5BA2;&amp;#x6237;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x7684;&amp;#x95EE;&amp;#x9898;&amp;#xFF0C;&amp;#x62BD;&amp;#x70B9;&amp;#x65F6;&amp;#x95F4;&amp;#x8BB0;&amp;#x5F55;">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分区变为只读的处理">
+<meta property="og:url" content="http://blogs.cszhi.com/2012/01/09/分区变为只读的处理/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x8FD9;&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x72EC;&amp;#x7ACB;&amp;#x90AE;&amp;#x4EF6;&amp;#x7CFB;&amp;#x7EDF;&amp;#x5BA2;&amp;#x6237;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x7684;&amp;#x95EE;&amp;#x9898;&amp;#xFF0C;&amp;#x62BD;&amp;#x70B9;&amp;#x65F6;&amp;#x95F4;&amp;#x8BB0;&amp;#x5F55;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blogs.cszhi.com/2012/01/09/分区变为只读的处理/1567496235290.png">
+<meta property="og:updated_time" content="2019-09-03T07:37:49.800Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分区变为只读的处理">
+<meta name="twitter:description" content="&amp;#x8FD9;&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x72EC;&amp;#x7ACB;&amp;#x90AE;&amp;#x4EF6;&amp;#x7CFB;&amp;#x7EDF;&amp;#x5BA2;&amp;#x6237;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x7684;&amp;#x95EE;&amp;#x9898;&amp;#xFF0C;&amp;#x62BD;&amp;#x70B9;&amp;#x65F6;&amp;#x95F4;&amp;#x8BB0;&amp;#x5F55;">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2012/01/09/分区变为只读的处理/1567496235290.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/2012/01/09/分区变为只读的处理/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>分区变为只读的处理 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">21</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">3</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">52</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/01/09/分区变为只读的处理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">分区变为只读的处理
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-01-09 00:00:00" itemprop="dateCreated datePublished" datetime="2012-01-09T00:00:00+08:00">2012-01-09</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>&#x8FD9;&#x662F;&#x4E00;&#x4E2A;&#x72EC;&#x7ACB;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;&#x5BA2;&#x6237;&#x670D;&#x52A1;&#x5668;&#x7684;&#x95EE;&#x9898;&#xFF0C;&#x62BD;&#x70B9;&#x65F6;&#x95F4;&#x8BB0;&#x5F55;&#x4E00;&#x4E0B;&#x5904;&#x7406;&#x8FC7;&#x7A0B;&#xFF0C;&#x8981;&#x4E0D;&#x65F6;&#x95F4;&#x4E45;&#x4E86;&#x53C8;&#x8981;&#x5FD8;&#x4E86;&#x3002;&#x8BDD;&#x8BF4;&#x65F6;&#x95F4;&#x6324;&#x6324;&#x603B;&#x4F1A;&#x6709;&#x7684;^_^</p>
+<a id="more"></a>
+
+<p><strong>&#x95EE;&#x9898;&#xFF1A;</strong><br>&#x767B;&#x9646;web&#x63D0;&#x793A;&#x7CFB;&#x7EDF;&#x9519;&#x8BEF;&#x3002;&#x65E0;&#x6CD5;&#x53D1;&#x9001;&#x90AE;&#x4EF6;&#xFF0C;&#x63D0;&#x793A;&#x90AE;&#x4EF6;&#x53D1;&#x9001;&#x5931;&#x8D25;</p>
+<p><strong>&#x5206;&#x6790;&#xFF1A;</strong><br>&#x5411;&#x5BA2;&#x6237;&#x8981;&#x6765;&#x670D;&#x52A1;&#x5668;ip&#x53CA;root&#x5BC6;&#x7801;&#xFF0C;&#x767B;&#x9646;&#x67E5;&#x770B;&#x3002;</p>
+<p>1&#x3001;&#x67E5;&#x770B;webmail&#x65E5;&#x5FD7;&#xFF0C;&#x9519;&#x8BEF;&#x5173;&#x952E;&#x5B57;&#xFF1A;&#x5B58;&#x50A8;&#x90AE;&#x4EF6;&#x5F02;&#x5E38;&#xFF0C;&#x53EA;&#x8BFB;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#x3002;&#x5982;&#x4E0B;&#xFF1A;<br><img src="/2012/01/09/&#x5206;&#x533A;&#x53D8;&#x4E3A;&#x53EA;&#x8BFB;&#x7684;&#x5904;&#x7406;/1567496235290.png" alt="1567496235290"></p>
+<p>2&#x3001;&#x6D4B;&#x8BD5;&#x5728;&#x5728;mail&#x5206;&#x533A;&#x4E0B;&#x521B;&#x5EFA;&#x6587;&#x4EF6;&#xFF0C;&#x65E0;&#x6CD5;&#x6210;&#x529F;&#x521B;&#x5EFA;&#xFF0C;&#x63D0;&#x793A;&#x53EA;&#x8BFB;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost mail]<span class="comment"># touch abc</span></span><br><span class="line">touch: &#x65E0;&#x6CD5;&#x89E6;&#x78B0; &#x201C;abc&#x201D;: &#x53EA;&#x8BFB;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;</span><br></pre></td></tr></table></figure>
+
+<p>3&#x3001;&#x67E5;&#x770B;&#x7CFB;&#x7EDF;&#x65E5;&#x5FD7;&#x4FE1;&#x606F;/var/log/messages&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># tail -100 /var/log/messages | grep kernel</span></span><br><span class="line">Jan  6 11:15:35 localhost kernel: EXT3-fs error (device sda2): htree_dirblock_to_tree: bad entry <span class="keyword">in</span> directory <span class="comment">#40534515: rec_len is smaller than minimal - offset=0, inode=0, rec_len=0, name_len=0</span></span><br><span class="line">Jan  6 11:29:17 localhost kernel: ext3_abort called.</span><br><span class="line">Jan  6 11:29:17 localhost kernel: EXT3-fs error (device sda2): ext3_put_super: Couldn<span class="string">&apos;t clean up the journal</span></span><br><span class="line"><span class="string">Jan  6 11:30:20 localhost kernel: kjournald starting.  Commit interval 5 seconds</span></span><br><span class="line"><span class="string">Jan  6 11:30:20 localhost kernel: EXT3 FS on sda2, internal journalJan  6 11:30:20 localhost kernel: EXT3-fs: mounted filesystem with ordered data mode.</span></span><br><span class="line"><span class="string">Jan  6 11:31:02 localhost kernel: clamd[27699]: segfault at 0000000000000060 rip 00002ae03828c71b rsp 00007fff8f5ca6f0 error 4</span></span><br><span class="line"><span class="string">Jan  6 13:29:45 localhost kernel: EXT3-fs error (device sda2): htree_dirblock_to_tree: bad entry in directory #40534515: rec_len is smaller than minimal - offset=0, inode=0, rec_len=0, name_len=0</span></span><br><span class="line"><span class="string">Jan  6 13:29:45 localhost kernel: Aborting journal on device sda2.</span></span><br><span class="line"><span class="string">Jan  6 13:29:46 localhost kernel: ext3_abort called.Jan  6 13:29:46 localhost kernel: EXT3-fs error (device sda2): ext3_journal_start_sb: Detected aborted journal</span></span><br><span class="line"><span class="string">Jan  6 13:29:46 localhost kernel: Remounting filesystem read-only</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x53EF;&#x4EE5;&#x770B;&#x51FA;&#x8FD9;&#x662F;&#x7531;&#x4E8E;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#x9519;&#x8BEF;&#xFF0C;&#x5185;&#x6838;&#x5C06;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#x91CD;&#x65B0;&#x6302;&#x8F7D;&#x4E3A;&#x53EA;&#x8BFB;&#x6A21;&#x5F0F;</p>
+<p><strong>&#x5904;&#x7406;&#xFF1A;&#x4FEE;&#x590D;mail&#x5206;&#x533A;</strong><br>1&#x3001;&#x5148;&#x5378;&#x4E0B;mail&#x5206;&#x533A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost tmp]<span class="comment"># umount /mail/</span></span><br><span class="line">umount: /mail: device is busy</span><br><span class="line">umount: /mail: device is busy</span><br></pre></td></tr></table></figure>
+
+<p>&#x65E0;&#x6CD5;&#x5378;&#x4E0B;&#xFF0C;&#x6709;&#x7A0B;&#x5E8F;&#x5728;&#x8BBF;&#x95EE;mail&#x5206;&#x533A;</p>
+<p>2&#x3001;&#x67E5;&#x770B;&#x662F;&#x4EC0;&#x4E48;&#x7A0B;&#x5E8F;&#x5728;&#x8BBF;&#x95EE;mail&#x5206;&#x533A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost tmp]<span class="comment"># fuser -m -v /dev/sda2</span></span><br><span class="line">                     USER        PID ACCESS COMMAND</span><br><span class="line">/dev/sda2:             root      26947 ..c.. bash</span><br><span class="line">                     root      27215 ..c.. tail</span><br><span class="line">                     root      27216 ..c.. grep</span><br></pre></td></tr></table></figure>
+
+<p>3&#x3001;&#x5C06;&#x8BBF;&#x95EE;mail&#x5206;&#x533A;&#x7684;&#x7A0B;&#x5E8F;kill&#x6389;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost tmp]<span class="comment"># fuser -m -k /dev/sda2</span></span><br><span class="line">/dev/sda2:           26947c</span><br></pre></td></tr></table></figure>
+
+<p>4&#x3001;&#x91CD;&#x65B0;&#x5378;&#x4E0B;mail&#x5206;&#x533A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost tmp]<span class="comment"># umount /mail/</span></span><br><span class="line">[root@localhost ~]<span class="comment"># df</span></span><br><span class="line">&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;               1K-&#x5757;        &#x5DF2;&#x7528;     &#x53EF;&#x7528; &#x5DF2;&#x7528;% &#x6302;&#x8F7D;&#x70B9;</span><br><span class="line">/dev/sda3             29753588   8215320  20002456  30% /</span><br><span class="line">/dev/sda1              7936256    155460   7371144   3% /boot</span><br><span class="line">tmpfs                  2017004         0   2017004   0% /dev/shm</span><br></pre></td></tr></table></figure>
+
+<p>&#x8FD9;&#x6B21;&#x6CA1;&#x6709;&#x63D0;&#x793A;&#x9519;&#x8BEF;&#x4E86;&#xFF0C;&#x4F7F;&#x7528;df&#x67E5;&#x770B;mail&#x5206;&#x533A;&#x5DF2;&#x88AB;&#x5378;&#x4E0B;</p>
+<p>5&#x3001;&#x4FEE;&#x590D;&#x5206;&#x533A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># screen -S fsck           &#x5728;sceen&#x4E0B;&#x4FEE;&#x590D;</span></span><br><span class="line">[root@localhost ~]<span class="comment"># fsck -Cy /dev/sad2   		&#x4FEE;&#x590D;&#x5206;&#x533A;</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x4FEE;&#x590D;&#x5B8C;&#x6210;&#x540E;&#x518D;&#x6D4B;&#x8BD5;&#x5728;mail&#x5206;&#x533A;&#x4E0B;&#x521B;&#x5EFA;&#x6587;&#x4EF6;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost mail]<span class="comment"># mkdir test</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x6CA1;&#x6709;&#x63D0;&#x793A;&#x9519;&#x8BEF;&#xFF0C;&#x6210;&#x529F;&#x521B;&#x5EFA;<br>&#x5C06;&#x4E4B;&#x524D;&#x521B;&#x5EFA;&#x7684;&#x6587;&#x4EF6;&#x5939;&#x5220;&#x9664;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost mail]<span class="comment"># rmdir test/</span></span><br></pre></td></tr></table></figure>
+
+<p>6&#x3001;&#x91CD;&#x542F;&#x90AE;&#x4EF6;&#x7CFB;&#x7EDF;&#x548C;webmail&#x670D;&#x52A1;</p>
+<p>&#x6700;&#x540E;&#x4E00;&#x6B65;&#x67E5;&#x770B;webmail&#x65E5;&#x5FD7;&#xFF0C;&#x65E5;&#x5FD7;&#x663E;&#x793A;&#x6B63;&#x5E38;&#x3002;&#x767B;&#x9646;web&#x7AEF;&#x6D4B;&#x8BD5;&#x53D1;&#x9001;&#x90AE;&#x4EF6;&#xFF0C;&#x63D0;&#x793A;&#x53D1;&#x9001;&#x90AE;&#x4EF6;&#x6210;&#x529F;&#xFF0C;&#x95EE;&#x9898;&#x89E3;&#x51B3;&#x3002;</p>
+<p>&#x6574;&#x4E2A;&#x8FC7;&#x7A0B;&#x6D89;&#x53CA;&#x5230;&#x51E0;&#x4E2A;&#x547D;&#x4EE4;&#xFF1A;mount&#xFF0C;fuser&#xFF0C;screen&#xFF0C;fsck&#x3002;&#x6709;&#x65F6;&#x95F4;&#x518D;&#x6574;&#x4E0B;&#x8FD9;&#x51E0;&#x4E2A;&#x547D;&#x4EE4;&#x7684;&#x7528;&#x6CD5;&#x3002;</p>
+<p>=========================================================</p>
+<p>2013-05-29<br>&#x4ECA;&#x5929;&#x53C8;&#x78B0;&#x5230;&#x4E00;&#x4F8B;&#x53EA;&#x8BFB;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#x3002;&#x6309;&#x7167;&#x4E0A;&#x9762;&#x7684;&#x6D41;&#x7A0B;&#x64CD;&#x4F5C;&#x4FEE;&#x590D;&#xFF0C;&#x4F46;&#x6267;&#x884C;&#x4FEE;&#x590D;&#x547D;&#x4EE4;&#xFF08;fsck -Cy /dev/sad2&#xFF09;&#x540E;&#xFF0C;&#x4E00;&#x77AC;&#x95F4;&#x5C31;&#x597D;&#x4E86;&#xFF0C;&#x63D0;&#x793A;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#x662F;clean&#x72B6;&#x6001;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># fsck -y /dev/sda1</span></span><br><span class="line">e2fsck 1.39 (29-May-2006)</span><br><span class="line">/: recovering journal</span><br><span class="line">/: clean, 2226424/229310464 files, 155758033/229291720 blocks</span><br></pre></td></tr></table></figure>
+
+<p>&#x91CD;&#x65B0;&#x6302;&#x8F7D;&#xFF0C;&#x6062;&#x590D;&#x8BFB;&#x5199;&#x3002;&#x4F46;&#x4E00;&#x4F1A;&#x540E;&#x53C8;&#x53EA;&#x8BFB;&#x3002;<br>&#x5C1D;&#x8BD5;&#x4F7F;&#x7528;-f&#x53C2;&#x6570;&#x5F3A;&#x5236;&#x68C0;&#x67E5;&#x4FEE;&#x590D;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#xFF0C;&#x68C0;&#x67E5;&#x51FA;&#x4E0D;&#x5C11;&#x9519;&#x8BEF;&#xFF0C;&#x5B8C;&#x540E;&#x6302;&#x8F7D;&#xFF0C;&#x6D4B;&#x8BD5;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#xFF0C;&#x6CA1;&#x6709;&#x518D;&#x51FA;&#x73B0;&#x95EE;&#x9898;&#x3002;<br>&#x53E6;&#x5916;&#xFF0C;&#x4F7F;&#x7528;-f&#x53C2;&#x6570;&#x5F3A;&#x5236;&#x68C0;&#x67E5;&#x524D;&#xFF0C;&#x6700;&#x597D;&#x5148;&#x5907;&#x4EFD;&#x4E0B;&#x6570;&#x636E;&#xFF0C;&#x9632;&#x6B62;&#x6570;&#x636E;&#x4E22;&#x5931;&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-f      Force checking of file systems, even when they are marked clean</span><br><span class="line">            (<span class="keyword">for</span> file systems that support this).</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2011/10/10/使用iptables缓解DDOS及CC攻击/" rel="next" title="使用iptables缓解DDOS及CC攻击">
+                  <i class="fa fa-chevron-left"></i> 使用iptables缓解DDOS及CC攻击
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2012/01/20/使用Telnet测试邮箱/" rel="prev" title="使用Telnet测试邮箱">
+                  使用Telnet测试邮箱 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@live.com" title="E-Mail &rarr; mailto:cszhi@live.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2009 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数"></span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长"></span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
