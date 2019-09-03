@@ -58,20 +58,21 @@
 </script>
 
   <meta name="description" content="&amp;#x4F7F;&amp;#x7528;mod_limitipconn&amp;#x6A21;&amp;#x5757;&amp;#x9650;&amp;#x5236;IP&amp;#x5E76;&amp;#x53D1;&amp;#x8FDE;&amp;#x63A5;&amp;#x6570;&amp;#x5B89;&amp;#x88C5;&amp;#xFF1A; 1234wget http://dominia.org/djao/limit/mod_limitipconn-0.24.tar.bz2tar">
+<meta name="keywords" content="apache">
 <meta property="og:type" content="article">
-<meta property="og:title" content="csz&#39;s blog">
-<meta property="og:url" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/index.html">
+<meta property="og:title" content="使用mod_limitipconn模块限制IP并发连接数">
+<meta property="og:url" content="http://blogs.cszhi.com/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/index.html">
 <meta property="og:site_name" content="csz&#39;s blog">
 <meta property="og:description" content="&amp;#x4F7F;&amp;#x7528;mod_limitipconn&amp;#x6A21;&amp;#x5757;&amp;#x9650;&amp;#x5236;IP&amp;#x5E76;&amp;#x53D1;&amp;#x8FDE;&amp;#x63A5;&amp;#x6570;&amp;#x5B89;&amp;#x88C5;&amp;#xFF1A; 1234wget http://dominia.org/djao/limit/mod_limitipconn-0.24.tar.bz2tar">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/1567498214907.png">
-<meta property="og:image" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/1567498221747.png">
-<meta property="og:updated_time" content="2019-09-03T08:10:37.916Z">
+<meta property="og:image" content="http://blogs.cszhi.com/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/1567498214907.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/1567498221747.png">
+<meta property="og:updated_time" content="2019-09-03T08:53:29.256Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="csz&#39;s blog">
+<meta name="twitter:title" content="使用mod_limitipconn模块限制IP并发连接数">
 <meta name="twitter:description" content="&amp;#x4F7F;&amp;#x7528;mod_limitipconn&amp;#x6A21;&amp;#x5757;&amp;#x9650;&amp;#x5236;IP&amp;#x5E76;&amp;#x53D1;&amp;#x8FDE;&amp;#x63A5;&amp;#x6570;&amp;#x5B89;&amp;#x88C5;&amp;#xFF1A; 1234wget http://dominia.org/djao/limit/mod_limitipconn-0.24.tar.bz2tar">
-<meta name="twitter:image" content="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/1567498214907.png">
-  <link rel="canonical" href="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/1567498214907.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/">
 
 
 <script id="page-configurations">
@@ -85,7 +86,7 @@
   };
 </script>
 
-  <title> | csz's blog</title>
+  <title>使用mod_limitipconn模块限制IP并发连接数 | csz's blog</title>
   
 
 
@@ -253,7 +254,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/0201/01/01/apache/Apache限制IP并发数和流量控制/">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="csz">
@@ -265,7 +266,7 @@
       <meta itemprop="name" content="csz's blog">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
+        <h1 class="post-title" itemprop="name headline">使用mod_limitipconn模块限制IP并发连接数
 
           
         </h1>
@@ -281,7 +282,7 @@
                 
               
 
-              <time title="创建时间：0200-12-31 23:59:17" itemprop="dateCreated datePublished" datetime="0200-12-31T23:59:17+08:00">0200-12-31</time>
+              <time title="创建时间：2012-03-04 00:00:00" itemprop="dateCreated datePublished" datetime="2012-03-04T00:00:00+08:00">2012-03-04</time>
             </span>
           
             <span class="post-meta-item">
@@ -346,7 +347,7 @@
 <p>&#x5176;&#x5B83;&#x53C2;&#x6570;&#x4E8B;&#x4F8B;&#x8BF4;&#x660E;&#xFF0C;&#x8BE6;&#x7EC6;&#x7684;&#x89C1;&#x6E90;&#x7801;&#x5305;&#x91CC;&#x7684;mod_bw.txt&#xFF1A;</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">BandWidth localhost 0                                      #&#x5BF9;localhost&#x4E0D;&#x9650;&#x901F;</span><br><span class="line">BandWidth 192.168.1.5 102400                       #&#x5BF9;192.168.1.5&#x9650;&#x901F;&#x4E3A;100KB</span><br><span class="line">BandWidth &#x201C;u:^Mozilla(.*)&#x201D; 10240              #&#x7528;mozilla&#x65F6;&#x9650;&#x901F;10KB</span><br><span class="line">BandWidth &#x201C;u:wget&#x201D; 102400                      &#xFF03;&#x5982;&#x679C;&#x7528;wget&#x4E0B;&#x8F7D;&#x65F6;&#x9650;&#x901F;10KB</span><br><span class="line">MinBandWidth all -1                                      &#xFF03;&#x4FDD;&#x8BC1;&#x6BCF;&#x4E2A;&#x5BA2;&#x6237;&#x7AEF;&#x6700;&#x9AD8;&#x901F;&#x5EA6;&#x53EF;&#x8FBE;10KB</span><br><span class="line">LargeFileLimit .jpg 100 10240                      &#xFF03;jpg&#x6587;&#x4EF6;&#x8D85;&#x8FC7;100KB&#xFF0C;&#x9650;&#x901F;10KB</span><br><span class="line">&#xFF03;&#x4E0B;&#x9762;&#x7684;510&#x633A;&#x597D;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x8BBE;&#x7F6E;&#xFF0C;apache&#x81EA;&#x5DF1;&#x4F1A;&#x62A5;&#x9519;&#xFF0C;&#x5C31;&#x6839;&#x62A5;404&#x5DEE;&#x4E0D;&#x591A;&#xFF0C;&#x9875;&#x9762;&#x975E;&#x5E38;&#x7684;&#x4E11;</span><br><span class="line">ErrorDocument 510 /exceed_speed.html</span><br><span class="line">BandWidthError 510</span><br><span class="line">MaxConnection all 10                                       #&#x6240;&#x6709;ip&#x6700;&#x5927;&#x8FDE;&#x63A5;&#x6570;&#x4E3A;10</span><br><span class="line">MaxConnection 192.168.1.5 5                         &#xFF03;192.168.1.5&#x6700;&#x5927;&#x8FDE;&#x63A5;&#x6570;&#x4E3A;5</span><br></pre></td></tr></table></figure>
 
-<p><strong>&#x6D4B;&#x8BD5;&#xFF1A;</strong><br>&#x4F7F;&#x7528;mod_bw.so&#x6A21;&#x5757;&#x524D;&#xFF1A;<br><img src="/0201/01/01/apache/Apache&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x6570;&#x548C;&#x6D41;&#x91CF;&#x63A7;&#x5236;/1567498214907.png" alt="1567498214907"><br>&#x4F7F;&#x7528;mod_bw.so&#x6A21;&#x5757;&#x540E;&#xFF1A;<br><img src="/0201/01/01/apache/Apache&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x6570;&#x548C;&#x6D41;&#x91CF;&#x63A7;&#x5236;/1567498221747.png" alt="1567498221747"></p>
+<p><strong>&#x6D4B;&#x8BD5;&#xFF1A;</strong><br>&#x4F7F;&#x7528;mod_bw.so&#x6A21;&#x5757;&#x524D;&#xFF1A;<br><img src="/2012/03/04/&#x4F7F;&#x7528;mod_limitipconn&#x6A21;&#x5757;&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;/1567498214907.png" alt="1567498214907"><br>&#x4F7F;&#x7528;mod_bw.so&#x6A21;&#x5757;&#x540E;&#xFF1A;<br><img src="/2012/03/04/&#x4F7F;&#x7528;mod_limitipconn&#x6A21;&#x5757;&#x9650;&#x5236;IP&#x5E76;&#x53D1;&#x8FDE;&#x63A5;&#x6570;/1567498221747.png" alt="1567498221747"></p>
 <p><strong>&#x5B89;&#x88C5;&#x8FC7;&#x7A0B;&#x4E2D;&#x53EF;&#x80FD;&#x51FA;&#x73B0;&#x7684;&#x95EE;&#x9898;&#xFF1A;</strong></p>
 <p>1&#x3001;&#x6DFB;&#x52A0;&#x5B8C;mod_bw.so&#x6A21;&#x5757;&#xFF0C;&#x91CD;&#x542F;apache&#x65F6;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF1A;</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@vps httpd]<span class="comment"># /etc/init.d/httpd restart</span></span><br><span class="line">Stopping httpd:                                            [FAILED]</span><br><span class="line">Starting httpd: httpd: Syntax error on line 203 of /etc/httpd/conf/httpd.conf: Cannot load /etc/httpd/modules/mod_bw.so into server: /etc/httpd/modules/mod_bw.so: undefined symbol: apr_atomic_cas</span><br><span class="line">                                                           [FAILED]</span><br></pre></td></tr></table></figure>
@@ -371,11 +372,24 @@
       
 
       <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/apache/" rel="tag"><i class="fa fa-tag"></i> apache</a>
+            
+          </div>
+        
 
         
 
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
+              
+                <a href="/2012/01/30/awk列求和/" rel="next" title="awk列求和">
+                  <i class="fa fa-chevron-left"></i> awk列求和
+                </a>
               
             </div>
 
@@ -383,8 +397,8 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2009/03/11/DDoS攻击原理及防护方法论/" rel="prev" title="DDoS攻击原理及防护方法论">
-                  DDoS攻击原理及防护方法论 <i class="fa fa-chevron-right"></i>
+                <a href="/2012/03/11/LINUX踢人/" rel="prev" title="LINUX踢人">
+                  LINUX踢人 <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
