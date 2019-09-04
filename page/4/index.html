@@ -21,6 +21,7 @@
 
 
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
   <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
 
@@ -29,17 +30,17 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Pisces',
+    scheme: 'Gemini',
     version: '7.4.0',
     exturl: false,
     sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
     copycode: {"enable":false,"show_result":false,"style":"mac"},
     back2top: {"enable":true,"sidebar":true,"scrollpercent":false},
     bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: true,
+    fancybox: true,
+    mediumzoom: false,
     lazyload: false,
-    pangu: false,
+    pangu: true,
     algolia: {
       appID: '',
       apiKey: '',
@@ -239,7 +240,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/13/Nginx限制ip连接数和流量控制/">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/13/Nginx的日常维护/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="csz">
@@ -253,7 +254,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2012/05/13/Nginx限制ip连接数和流量控制/" class="post-title-link" itemprop="url">Nginx限制ip连接数和流量控制</a>
+            <a href="/2012/05/13/Nginx的日常维护/" class="post-title-link" itemprop="url">Nginx的日常维护</a>
           
         </h1>
 
@@ -293,7 +294,7 @@
               
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               
-              <span>1 分钟</span>
+              <span>7 分钟</span>
             </span>
           
 
@@ -306,12 +307,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>&#x5728;&#x914D;&#x7F6E;&#x6587;&#x4EF6;nginx.conf&#x7684;http{}&#x6DFB;&#x52A0;&#xFF1A;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">limit_zone   one  $binary_remote_addr  10m;</span><br></pre></td></tr></table></figure>
+          <p><strong>&#x68C0;&#x9A8C;&#x914D;&#x7F6E;&#x6587;&#x4EF6;</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/nginx/sbin/nginx -t</span><br></pre></td></tr></table></figure>
+
+<p>&#x6216;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/nginx/sbin/nginx -t -c /opt/nginx/conf/nginx.conf</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
             <div class="post-button text-center">
-              <a class="btn" href="/2012/05/13/Nginx限制ip连接数和流量控制/#more" rel="contents">
+              <a class="btn" href="/2012/05/13/Nginx的日常维护/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -330,7 +334,7 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\13\Nginx的日常维护\" rel="bookmark">Nginx的日常维护</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\13\Nginx限制ip连接数和流量控制\" rel="bookmark">Nginx限制ip连接数和流量控制</a></div>
       
     </li>
   
@@ -344,7 +348,7 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\03\nginx设置expires和access_log提升网站访问速度\" rel="bookmark">nginx设置expires和access_log提升网站访问速度</a></div>
+      <div class="popular-posts-title"><a href="\2014\03\21\Nginx报错处理\" rel="bookmark">Nginx报错处理</a></div>
       
     </li>
   
@@ -358,7 +362,7 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2014\03\21\Nginx报错处理\" rel="bookmark">Nginx报错处理</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\03\nginx设置expires和access_log提升网站访问速度\" rel="bookmark">nginx设置expires和access_log提升网站访问速度</a></div>
       
     </li>
   
@@ -1044,14 +1048,14 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\10\MySQL备份方法总结\" rel="bookmark">MySQL备份方法总结</a></div>
+      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\10\MySQL备份方法总结\" rel="bookmark">MySQL备份方法总结</a></div>
       
     </li>
   
@@ -1320,14 +1324,14 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\13\Nginx限制ip连接数和流量控制\" rel="bookmark">Nginx限制ip连接数和流量控制</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\13\Nginx的日常维护\" rel="bookmark">Nginx的日常维护</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\13\Nginx的日常维护\" rel="bookmark">Nginx的日常维护</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\13\Nginx限制ip连接数和流量控制\" rel="bookmark">Nginx限制ip连接数和流量控制</a></div>
       
     </li>
   
@@ -1341,14 +1345,14 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2015\11\13\Nginx部署\" rel="bookmark">Nginx部署</a></div>
+      <div class="popular-posts-title"><a href="\2014\03\21\Nginx报错处理\" rel="bookmark">Nginx报错处理</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2014\03\21\Nginx报错处理\" rel="bookmark">Nginx报错处理</a></div>
+      <div class="popular-posts-title"><a href="\2015\11\13\Nginx部署\" rel="bookmark">Nginx部署</a></div>
       
     </li>
   
@@ -1848,9 +1852,12 @@
 
 
   <script src="/lib/anime.min.js?v=3.1.0"></script>
-  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
 <script src="/js/utils.js?v=7.4.0"></script>
 <script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
 <script src="/js/next-boot.js?v=7.4.0"></script>
 
 

@@ -21,6 +21,7 @@
 
 
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
   <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
 
@@ -29,17 +30,17 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Pisces',
+    scheme: 'Gemini',
     version: '7.4.0',
     exturl: false,
     sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
     copycode: {"enable":false,"show_result":false,"style":"mac"},
     back2top: {"enable":true,"sidebar":true,"scrollpercent":false},
     bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: true,
+    fancybox: true,
+    mediumzoom: false,
     lazyload: false,
-    pangu: false,
+    pangu: true,
     algolia: {
       appID: '',
       apiKey: '',
@@ -406,8 +407,8 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2012/03/11/Linux下大文件跨网传输的方法/" rel="next" title="Linux下大文件跨网传输的方法">
-                  <i class="fa fa-chevron-left"></i> Linux下大文件跨网传输的方法
+                <a href="/2012/03/04/使用mod_limitipconn模块限制IP并发连接数/" rel="next" title="使用mod_limitipconn模块限制IP并发连接数">
+                  <i class="fa fa-chevron-left"></i> 使用mod_limitipconn模块限制IP并发连接数
                 </a>
               
             </div>
@@ -416,8 +417,8 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2012/03/12/rsync简明教程/" rel="prev" title="rsync简明教程">
-                  rsync简明教程 <i class="fa fa-chevron-right"></i>
+                <a href="/2012/03/11/Linux下大文件跨网传输的方法/" rel="prev" title="Linux下大文件跨网传输的方法">
+                  Linux下大文件跨网传输的方法 <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -620,9 +621,12 @@
 
 
   <script src="/lib/anime.min.js?v=3.1.0"></script>
-  <script src="//cdn.jsdelivr.net/npm/medium-zoom@1/dist/medium-zoom.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
 <script src="/js/utils.js?v=7.4.0"></script>
 <script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
 <script src="/js/next-boot.js?v=7.4.0"></script>
 
 
