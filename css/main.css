@@ -978,9 +978,6 @@ pre .javascript .function {
   text-align: center;
   visibility: hidden;
 }
-.back-to-top span {
-  display: none;
-}
 .back-to-top:hover {
   opacity: 0.8;
 }
@@ -1676,7 +1673,7 @@ article:last-child .post-eof {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #3b2aaf;
+  background: #58ffff;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
