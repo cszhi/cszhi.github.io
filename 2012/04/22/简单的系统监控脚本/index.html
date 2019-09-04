@@ -47,7 +47,7 @@
       hits: {"per_page":10},
       labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
     },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
     path: 'search.xml',
     motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     translation: {
@@ -60,7 +60,7 @@
 </script>
 
   <meta name="description" content="&amp;#x5468;&amp;#x672B;&amp;#x62BD;&amp;#x7A7A;&amp;#x5199;&amp;#x4E86;&amp;#x4E2A;&amp;#x7CFB;&amp;#x7EDF;&amp;#x76D1;&amp;#x63A7;&amp;#x811A;&amp;#x672C;&amp;#xFF0C;&amp;#x6CA1;&amp;#x4EC0;&amp;#x4E48;&amp;#x6280;&amp;#x672F;&amp;#x542B;&amp;#x91CF;&amp;#xFF0C;&amp;#x5C31;&amp;#x5F53;&amp;#x7EC3;">
-<meta name="keywords" content="linux,shell,ops">
+<meta name="keywords" content="shell,linux,ops">
 <meta property="og:type" content="article">
 <meta property="og:title" content="简单的系统监控脚本">
 <meta property="og:url" content="http://blogs.cszhi.com/2012/04/22/简单的系统监控脚本/index.html">
@@ -354,20 +354,6 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\03\11\LINUX踢人\" rel="bookmark">LINUX踢人</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
       <div class="popular-posts-title"><a href="\2012\01\20\使用Telnet测试邮箱\" rel="bookmark">使用Telnet测试邮箱</a></div>
       
     </li>
@@ -376,6 +362,20 @@
       
       
       <div class="popular-posts-title"><a href="\2012\04\13\使用脚本防止ssh暴力破解\" rel="bookmark">使用脚本防止ssh暴力破解</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\04\25\TCP连接状态详解及TIME_WAIT过多的解决方法\" rel="bookmark">TCP连接状态详解及TIME_WAIT过多的解决方法</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
       
     </li>
   
@@ -397,9 +397,9 @@
           
           <div class="post-tags">
             
-              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
-            
               <a href="/tags/shell/" rel="tag"><i class="fa fa-tag"></i> shell</a>
+            
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
             
               <a href="/tags/ops/" rel="tag"><i class="fa fa-tag"></i> ops</a>
             
