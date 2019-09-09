@@ -58,18 +58,18 @@
   };
 </script>
 
-  <meta name="description" content="&amp;#x524D;&amp;#x8A00;&amp;#x5728; Web &amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E2D;&amp;#xFF0C;&amp;#x9AD8;&amp;#x53EF;&amp;#x7528; &amp;#x662F;&amp;#x6307;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x53EF;&amp;#x4EE5; &amp;#x6B63;&amp;#x5E38;&amp;#x8BBF;&amp;#x95EE; &amp;#x7684;&amp;#x65F">
+  <meta name="description" content="&amp;#x524D;&amp;#x8A00;&amp;#x5728; Web &amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E2D;&amp;#xFF0C;&amp;#x9AD8;&amp;#x53EF;&amp;#x7528; &amp;#x662F;&amp;#x6307;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x53EF;&amp;#x4EE5; &amp;#x6B63;&amp;#x5E38;&amp;#x8BBF;&amp;#x95EE; &amp;#x7684;&amp;#x65F6;">
 <meta name="keywords" content="redis,高可用">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis高可用之复制">
 <meta property="og:url" content="http://blogs.cszhi.com/2019/08/26/Redis高可用之复制/index.html">
 <meta property="og:site_name" content="csz&#39;s blog">
-<meta property="og:description" content="&amp;#x524D;&amp;#x8A00;&amp;#x5728; Web &amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E2D;&amp;#xFF0C;&amp;#x9AD8;&amp;#x53EF;&amp;#x7528; &amp;#x662F;&amp;#x6307;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x53EF;&amp;#x4EE5; &amp;#x6B63;&amp;#x5E38;&amp;#x8BBF;&amp;#x95EE; &amp;#x7684;&amp;#x65F">
+<meta property="og:description" content="&amp;#x524D;&amp;#x8A00;&amp;#x5728; Web &amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E2D;&amp;#xFF0C;&amp;#x9AD8;&amp;#x53EF;&amp;#x7528; &amp;#x662F;&amp;#x6307;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x53EF;&amp;#x4EE5; &amp;#x6B63;&amp;#x5E38;&amp;#x8BBF;&amp;#x95EE; &amp;#x7684;&amp;#x65F6;">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-09T02:09:21.108Z">
+<meta property="og:updated_time" content="2019-09-09T03:01:46.744Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis高可用之复制">
-<meta name="twitter:description" content="&amp;#x524D;&amp;#x8A00;&amp;#x5728; Web &amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E2D;&amp;#xFF0C;&amp;#x9AD8;&amp;#x53EF;&amp;#x7528; &amp;#x662F;&amp;#x6307;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x53EF;&amp;#x4EE5; &amp;#x6B63;&amp;#x5E38;&amp;#x8BBF;&amp;#x95EE; &amp;#x7684;&amp;#x65F">
+<meta name="twitter:description" content="&amp;#x524D;&amp;#x8A00;&amp;#x5728; Web &amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E2D;&amp;#xFF0C;&amp;#x9AD8;&amp;#x53EF;&amp;#x7528; &amp;#x662F;&amp;#x6307;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x53EF;&amp;#x4EE5; &amp;#x6B63;&amp;#x5E38;&amp;#x8BBF;&amp;#x95EE; &amp;#x7684;&amp;#x65F6;">
   <link rel="canonical" href="http://blogs.cszhi.com/2019/08/26/Redis高可用之复制/">
 
 
@@ -319,9 +319,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <a id="more"></a>
-
-<h2 id="&#x524D;&#x8A00;"><a href="#&#x524D;&#x8A00;" class="headerlink" title="&#x524D;&#x8A00;"></a>&#x524D;&#x8A00;</h2><p>&#x5728; <code>Web</code> &#x670D;&#x52A1;&#x5668;&#x4E2D;&#xFF0C;<strong>&#x9AD8;&#x53EF;&#x7528;</strong> &#x662F;&#x6307;&#x670D;&#x52A1;&#x5668;&#x53EF;&#x4EE5; <strong>&#x6B63;&#x5E38;&#x8BBF;&#x95EE;</strong> &#x7684;&#x65F6;&#x95F4;&#xFF0C;&#x8861;&#x91CF;&#x7684;&#x6807;&#x51C6;&#x662F;&#x5728; <strong>&#x591A;&#x957F;&#x65F6;&#x95F4;</strong> &#x5185;&#x53EF;&#x4EE5;&#x63D0;&#x4F9B;&#x6B63;&#x5E38;&#x670D;&#x52A1;&#xFF08;<code>99.9%</code>&#x3001;<code>99.99%</code>&#x3001;<code>99.999%</code> &#x7B49;&#x7B49;&#xFF09;&#x3002;&#x5728; <code>Redis</code> &#x5C42;&#x9762;&#xFF0C;<strong>&#x9AD8;&#x53EF;&#x7528;</strong> &#x7684;&#x542B;&#x4E49;&#x8981;&#x5BBD;&#x6CDB;&#x4E00;&#x4E9B;&#xFF0C;&#x9664;&#x4E86;&#x4FDD;&#x8BC1;&#x63D0;&#x4F9B; <strong>&#x6B63;&#x5E38;&#x670D;&#x52A1;</strong>&#xFF08;&#x5982; <strong>&#x4E3B;&#x4ECE;&#x5206;&#x79BB;</strong>&#x3001;<strong>&#x5FEB;&#x901F;&#x5BB9;&#x707E;&#x6280;&#x672F;</strong> &#x7B49;&#xFF09;&#xFF0C;&#x8FD8;&#x9700;&#x8981;&#x8003;&#x8651; <strong>&#x6570;&#x636E;&#x5BB9;&#x91CF;&#x6269;&#x5C55;</strong>&#x3001;<strong>&#x6570;&#x636E;&#x5B89;&#x5168;</strong> &#x7B49;&#x7B49;&#x3002;</p>
+        <h2 id="&#x524D;&#x8A00;"><a href="#&#x524D;&#x8A00;" class="headerlink" title="&#x524D;&#x8A00;"></a>&#x524D;&#x8A00;</h2><p>&#x5728; <code>Web</code> &#x670D;&#x52A1;&#x5668;&#x4E2D;&#xFF0C;<strong>&#x9AD8;&#x53EF;&#x7528;</strong> &#x662F;&#x6307;&#x670D;&#x52A1;&#x5668;&#x53EF;&#x4EE5; <strong>&#x6B63;&#x5E38;&#x8BBF;&#x95EE;</strong> &#x7684;&#x65F6;&#x95F4;&#xFF0C;&#x8861;&#x91CF;&#x7684;&#x6807;&#x51C6;&#x662F;&#x5728; <strong>&#x591A;&#x957F;&#x65F6;&#x95F4;</strong> &#x5185;&#x53EF;&#x4EE5;&#x63D0;&#x4F9B;&#x6B63;&#x5E38;&#x670D;&#x52A1;&#xFF08;<code>99.9%</code>&#x3001;<code>99.99%</code>&#x3001;<code>99.999%</code> &#x7B49;&#x7B49;&#xFF09;&#x3002;&#x5728; <code>Redis</code> &#x5C42;&#x9762;&#xFF0C;<strong>&#x9AD8;&#x53EF;&#x7528;</strong> &#x7684;&#x542B;&#x4E49;&#x8981;&#x5BBD;&#x6CDB;&#x4E00;&#x4E9B;&#xFF0C;&#x9664;&#x4E86;&#x4FDD;&#x8BC1;&#x63D0;&#x4F9B; <strong>&#x6B63;&#x5E38;&#x670D;&#x52A1;</strong>&#xFF08;&#x5982; <strong>&#x4E3B;&#x4ECE;&#x5206;&#x79BB;</strong>&#x3001;<strong>&#x5FEB;&#x901F;&#x5BB9;&#x707E;&#x6280;&#x672F;</strong> &#x7B49;&#xFF09;&#xFF0C;&#x8FD8;&#x9700;&#x8981;&#x8003;&#x8651; <strong>&#x6570;&#x636E;&#x5BB9;&#x91CF;&#x6269;&#x5C55;</strong>&#x3001;<strong>&#x6570;&#x636E;&#x5B89;&#x5168;</strong> &#x7B49;&#x7B49;&#x3002;</p>
 <p>&#x5728; <code>Redis</code> &#x4E2D;&#xFF0C;&#x5B9E;&#x73B0; <strong>&#x9AD8;&#x53EF;&#x7528;</strong> &#x7684;&#x6280;&#x672F;&#x4E3B;&#x8981;&#x5305;&#x62EC; <strong>&#x6301;&#x4E45;&#x5316;</strong>&#x3001;<strong>&#x590D;&#x5236;</strong>&#x3001;<strong>&#x54E8;&#x5175;</strong> &#x548C; <strong>&#x96C6;&#x7FA4;</strong>&#xFF0C;&#x4E0B;&#x9762;&#x7B80;&#x5355;&#x8BF4;&#x660E;&#x5B83;&#x4EEC;&#x7684;&#x4F5C;&#x7528;&#xFF0C;&#x4EE5;&#x53CA;&#x89E3;&#x51B3;&#x4E86;&#x4EC0;&#x4E48;&#x6837;&#x7684;&#x95EE;&#x9898;&#xFF1A;</p>
 <ul>
 <li><strong>&#x6301;&#x4E45;&#x5316;</strong>&#xFF1A;&#x6301;&#x4E45;&#x5316;&#x662F; <strong>&#x6700;&#x7B80;&#x5355;&#x7684;</strong> &#x9AD8;&#x53EF;&#x7528;&#x65B9;&#x6CD5;&#x3002;&#x5B83;&#x7684;&#x4E3B;&#x8981;&#x4F5C;&#x7528;&#x662F; <strong>&#x6570;&#x636E;&#x5907;&#x4EFD;</strong>&#xFF0C;&#x5373;&#x5C06;&#x6570;&#x636E;&#x5B58;&#x50A8;&#x5728; <strong>&#x786C;&#x76D8;</strong>&#xFF0C;&#x4FDD;&#x8BC1;&#x6570;&#x636E;&#x4E0D;&#x4F1A;&#x56E0;&#x8FDB;&#x7A0B;&#x9000;&#x51FA;&#x800C;&#x4E22;&#x5931;&#x3002;</li>
@@ -329,7 +327,9 @@
 <li><strong>&#x54E8;&#x5175;</strong>&#xFF1A;&#x5728;&#x590D;&#x5236;&#x7684;&#x57FA;&#x7840;&#x4E0A;&#xFF0C;&#x54E8;&#x5175;&#x5B9E;&#x73B0;&#x4E86; <strong>&#x81EA;&#x52A8;&#x5316;</strong> &#x7684; <strong>&#x6545;&#x969C;&#x6062;&#x590D;</strong>&#x3002;&#x7F3A;&#x9677;&#x662F; <strong>&#x5199;&#x64CD;&#x4F5C;</strong> &#x65E0;&#x6CD5; <strong>&#x8D1F;&#x8F7D;&#x5747;&#x8861;</strong>&#xFF0C;<strong>&#x5B58;&#x50A8;&#x80FD;&#x529B;</strong> &#x53D7;&#x5230; <strong>&#x5355;&#x673A;</strong> &#x7684;&#x9650;&#x5236;&#x3002;</li>
 <li><strong>&#x96C6;&#x7FA4;</strong>&#xFF1A;&#x901A;&#x8FC7;&#x96C6;&#x7FA4;&#xFF0C;<code>Redis</code> &#x89E3;&#x51B3;&#x4E86; <strong>&#x5199;&#x64CD;&#x4F5C;</strong> &#x65E0;&#x6CD5; <strong>&#x8D1F;&#x8F7D;&#x5747;&#x8861;</strong> &#x4EE5;&#x53CA; <strong>&#x5B58;&#x50A8;&#x80FD;&#x529B;</strong> &#x53D7;&#x5230; <strong>&#x5355;&#x673A;&#x9650;&#x5236;</strong> &#x7684;&#x95EE;&#x9898;&#xFF0C;&#x5B9E;&#x73B0;&#x4E86;&#x8F83;&#x4E3A; <strong>&#x5B8C;&#x5584;</strong> &#x7684; <strong>&#x9AD8;&#x53EF;&#x7528;&#x65B9;&#x6848;</strong>&#x3002;</li>
 </ul>
-<h2 id="&#x4E3B;&#x4ECE;&#x590D;&#x5236;"><a href="#&#x4E3B;&#x4ECE;&#x590D;&#x5236;" class="headerlink" title="&#x4E3B;&#x4ECE;&#x590D;&#x5236;"></a>&#x4E3B;&#x4ECE;&#x590D;&#x5236;</h2><p>&#x5728;&#x4E3B;&#x4ECE;&#x590D;&#x5236;&#x4E2D;&#xFF0C;&#x6570;&#x636E;&#x5E93;&#x5206;&#x4E3A;&#x4E24;&#x7C7B;&#xFF0C;&#x4E00;&#x7C7B;&#x662F;&#x4E3B;&#x5E93;(master)&#xFF0C;&#x53E6;&#x4E00;&#x7C7B;&#x662F;&#x540C;&#x6B65;&#x4E3B;&#x5E93;&#x6570;&#x636E;&#x7684;&#x4ECE;&#x5E93;(slave)&#x3002;&#x4E3B;&#x5E93;&#x53EF;&#x4EE5;&#x8FDB;&#x884C;&#x8BFB;&#x5199;&#x64CD;&#x4F5C;&#xFF0C;&#x5F53;&#x5199;&#x64CD;&#x4F5C;&#x5BFC;&#x81F4;&#x6570;&#x636E;&#x53D8;&#x5316;&#x65F6;&#x4F1A;&#x81EA;&#x52A8;&#x540C;&#x6B65;&#x5230;&#x4ECE;&#x5E93;&#x3002;&#x800C;&#x4ECE;&#x5E93;&#x4E00;&#x822C;&#x662F;&#x53EA;&#x8BFB;&#x7684;(&#x7279;&#x5B9A;&#x60C5;&#x51B5;&#x4E5F;&#x53EF;&#x4EE5;&#x5199;,&#x901A;&#x8FC7;&#x53C2;&#x6570;slave-read-only&#x6307;&#x5B9A;)&#xFF0C;&#x5E76;&#x63A5;&#x53D7;&#x6765;&#x81EA;&#x4E3B;&#x5E93;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x4E00;&#x4E2A;&#x4E3B;&#x5E93;&#x53EF;&#x62E5;&#x6709;&#x591A;&#x4E2A;&#x4ECE;&#x5E93;&#xFF0C;&#x800C;&#x4E00;&#x4E2A;&#x4ECE;&#x5E93;&#x53EA;&#x80FD;&#x6709;&#x4E00;&#x4E2A;&#x4E3B;&#x5E93;&#x3002;</p>
+<a id="more"></a>
+
+<h2 id="&#x4E3B;&#x4ECE;&#x590D;&#x5236;"><a href="#&#x4E3B;&#x4ECE;&#x590D;&#x5236;" class="headerlink" title="&#x4E3B;&#x4ECE;&#x590D;&#x5236;"></a>&#x4E3B;&#x4ECE;&#x590D;&#x5236;</h2><p>Redis&#x4E3B;&#x4ECE;&#x670D;&#x52A1;&#x5206;&#x4E3A;&#x4E24;&#x7C7B;&#xFF0C;&#x4E00;&#x7C7B;&#x662F;&#x4E3B;&#x5E93;(master)&#xFF0C;&#x53E6;&#x4E00;&#x7C7B;&#x662F;&#x540C;&#x6B65;&#x4E3B;&#x5E93;&#x6570;&#x636E;&#x7684;&#x4ECE;&#x5E93;(slave)&#x3002;&#x4E3B;&#x5E93;&#x53EF;&#x4EE5;&#x8FDB;&#x884C;&#x8BFB;&#x5199;&#x64CD;&#x4F5C;&#xFF0C;&#x5F53;&#x5199;&#x64CD;&#x4F5C;&#x5BFC;&#x81F4;&#x6570;&#x636E;&#x53D8;&#x5316;&#x65F6;&#x4F1A;&#x81EA;&#x52A8;&#x540C;&#x6B65;&#x5230;&#x4ECE;&#x5E93;&#x3002;&#x800C;&#x4ECE;&#x5E93;&#x4E00;&#x822C;&#x662F;&#x53EA;&#x8BFB;&#x7684;(&#x7279;&#x5B9A;&#x60C5;&#x51B5;&#x4E5F;&#x53EF;&#x4EE5;&#x5199;,&#x901A;&#x8FC7;&#x53C2;&#x6570;slave-read-only&#x6307;&#x5B9A;)&#xFF0C;&#x5E76;&#x63A5;&#x53D7;&#x6765;&#x81EA;&#x4E3B;&#x5E93;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x4E00;&#x4E2A;&#x4E3B;&#x5E93;&#x53EF;&#x62E5;&#x6709;&#x591A;&#x4E2A;&#x4ECE;&#x5E93;&#xFF0C;&#x800C;&#x4E00;&#x4E2A;&#x4ECE;&#x5E93;&#x53EA;&#x80FD;&#x6709;&#x4E00;&#x4E2A;&#x4E3B;&#x5E93;&#x3002;</p>
 <h2 id="&#x90E8;&#x7F72;"><a href="#&#x90E8;&#x7F72;" class="headerlink" title="&#x90E8;&#x7F72;"></a>&#x90E8;&#x7F72;</h2><h3 id="&#x73AF;&#x5883;"><a href="#&#x73AF;&#x5883;" class="headerlink" title="&#x73AF;&#x5883;"></a>&#x73AF;&#x5883;</h3><table>
 <thead>
 <tr>
@@ -404,6 +404,13 @@
       
   <div class="popular-posts-header">相关文章</div>
   <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2019\08\29\Redis高可用之哨兵\" rel="bookmark">Redis高可用之哨兵</a></div>
+      
+    </li>
+  
     <li class="popular-posts-item">
       
       
@@ -516,7 +523,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-count">55</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -601,12 +608,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">271k</span>
+    <span title="站点总字数">286k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">11:17</span>
+    <span title="站点阅读时长">11:55</span>
 </div>
 
         
