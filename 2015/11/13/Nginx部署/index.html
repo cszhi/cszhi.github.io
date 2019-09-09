@@ -306,7 +306,7 @@
               
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               
-              <span>5 分钟</span>
+              <span>24 分钟</span>
             </span>
           
 
@@ -328,9 +328,14 @@
 <blockquote>
 <p><a href="http://nginx.org/en/download.html" target="_blank" rel="noopener">http://nginx.org/en/download.html</a></p>
 </blockquote>
+<h3 id="&#x4E0B;&#x8F7D;nginx-module-vts"><a href="#&#x4E0B;&#x8F7D;nginx-module-vts" class="headerlink" title="&#x4E0B;&#x8F7D;nginx-module-vts"></a>&#x4E0B;&#x8F7D;nginx-module-vts</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /tmp</span><br><span class="line">git clone git://github.com/vozlt/nginx-module-vts.git</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>nginx&#x7684;&#x76D1;&#x63A7;&#x6A21;&#x5757;&#xFF0C;&#x80FD;&#x591F;&#x8F93;&#x51FA;json&#x683C;&#x5F0F;&#x7684;&#x76D1;&#x63A7;&#x6570;&#x636E;</p>
+</blockquote>
 <h3 id="&#x89E3;&#x538B;"><a href="#&#x89E3;&#x538B;" class="headerlink" title="&#x89E3;&#x538B;"></a>&#x89E3;&#x538B;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar zxvf nginx-1.14.2.tar.gz</span><br></pre></td></tr></table></figure>
 
-<h3 id="&#x7F16;&#x8BD1;&#x5B89;&#x88C5;"><a href="#&#x7F16;&#x8BD1;&#x5B89;&#x88C5;" class="headerlink" title="&#x7F16;&#x8BD1;&#x5B89;&#x88C5;"></a>&#x7F16;&#x8BD1;&#x5B89;&#x88C5;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd nginx-1.14.2</span><br><span class="line">./configure --prefix=/opt/nginx --with-http_stub_status_module --with-http_ssl_module</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h3 id="&#x7F16;&#x8BD1;&#x5B89;&#x88C5;"><a href="#&#x7F16;&#x8BD1;&#x5B89;&#x88C5;" class="headerlink" title="&#x7F16;&#x8BD1;&#x5B89;&#x88C5;"></a>&#x7F16;&#x8BD1;&#x5B89;&#x88C5;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd nginx-1.14.2</span><br><span class="line">./configure --prefix=/opt/nginx --with-http_stub_status_module --with-http_ssl_module --add-module=/tmp/nginx-module-vts</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
 
 <h3 id="&#x505A;&#x8F6F;&#x94FE;&#xFF0C;&#x65B9;&#x4FBF;&#x540E;&#x7EED;&#x6267;&#x884C;"><a href="#&#x505A;&#x8F6F;&#x94FE;&#xFF0C;&#x65B9;&#x4FBF;&#x540E;&#x7EED;&#x6267;&#x884C;" class="headerlink" title="&#x505A;&#x8F6F;&#x94FE;&#xFF0C;&#x65B9;&#x4FBF;&#x540E;&#x7EED;&#x6267;&#x884C;"></a>&#x505A;&#x8F6F;&#x94FE;&#xFF0C;&#x65B9;&#x4FBF;&#x540E;&#x7EED;&#x6267;&#x884C;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s /opt/nginx/sbin/nginx /sbin/nginx</span><br></pre></td></tr></table></figure>
 
@@ -361,7 +366,157 @@
 <h4 id="&#x91CD;&#x542F;keepalived"><a href="#&#x91CD;&#x542F;keepalived" class="headerlink" title="&#x91CD;&#x542F;keepalived"></a>&#x91CD;&#x542F;keepalived</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart keepalived</span><br></pre></td></tr></table></figure>
 
 <p>&#x6700;&#x540E;&#x6D4B;&#x8BD5;&#x5C06;&#x8282;&#x70B9;1&#x7684;keepalived&#x505C;&#x6B62;&#x6216;&#x76F4;&#x63A5;&#x5173;&#x6389;&#x8282;&#x70B9;1&#xFF0C;&#x770B;&#x8282;&#x70B9;2&#x662F;&#x5426;&#x4F1A;&#x63A5;&#x7BA1;&#x865A;ip&#x3002;</p>
+<h2 id="&#x4E3B;&#x914D;&#x7F6E;"><a href="#&#x4E3B;&#x914D;&#x7F6E;" class="headerlink" title="&#x4E3B;&#x914D;&#x7F6E;"></a>&#x4E3B;&#x914D;&#x7F6E;</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user  nobody;</span></span><br><span class="line"><span class="attribute">worker_processes</span>  <span class="number">20</span>;</span><br><span class="line"><span class="section">events</span> {</span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">10240</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> {</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line"></span><br><span class="line">	<span class="attribute">log_format</span>  main_old  <span class="string">&apos;<span class="variable">$remote_addr</span> - <span class="variable">$remote_user</span> [<span class="variable">$time_local</span>] &quot;<span class="variable">$request</span>&quot; &apos;</span></span><br><span class="line">                     <span class="string">&apos;<span class="variable">$status</span> <span class="variable">$body_bytes_sent</span> &quot;<span class="variable">$http_referer</span>&quot; &apos;</span></span><br><span class="line">                      <span class="string">&apos;&quot;<span class="variable">$http_user_agent</span>&quot; &quot;<span class="variable">$http_x_forwarded_for</span>&quot;&apos;</span></span><br><span class="line">                      <span class="string">&apos;&quot;<span class="variable">$request_body</span>&quot;&apos;</span></span><br><span class="line">                      <span class="string">&apos;<span class="variable">$upstream_addr</span>&apos;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#	log_format main escape=json &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;</span></span><br><span class="line"><span class="comment">#                      &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;</span></span><br><span class="line"><span class="comment">#                      &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot; &quot;$request_time&quot; &quot;$upstream_response_time&quot; &quot;$request_body&quot; &quot;$upstream_addr&quot;&apos;;</span></span><br><span class="line"></span><br><span class="line">	<span class="attribute">log_format</span> main <span class="string">&apos;{ &quot;<span class="variable">@timestamp</span>&quot;: &quot;<span class="variable">$time_iso8601</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;remote_addr&quot;: &quot;<span class="variable">$remote_addr</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;remote_user&quot;: &quot;<span class="variable">$remote_user</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;body_bytes_sent&quot;: &quot;<span class="variable">$body_bytes_sent</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;request_time&quot;: &quot;<span class="variable">$request_time</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;status&quot;: &quot;<span class="variable">$status</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;request_uri&quot;: &quot;<span class="variable">$request_uri</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;request_method&quot;: &quot;<span class="variable">$request_method</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;http_referrer&quot;: &quot;<span class="variable">$http_referrer</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;body_bytes_sent&quot;: &quot;<span class="variable">$body_bytes_sent</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;upstream_addr&quot;: &quot;<span class="variable">$upstream_addr</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;upstream_response_time&quot;: &quot;<span class="variable">$upstream_response_time</span>&quot;, &apos;</span></span><br><span class="line">		<span class="string">&apos;&quot;http_user_agent&quot;: &quot;<span class="variable">$http_user_agent</span>&quot;}&apos;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#keepalive_timeout  0;</span></span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line">	<span class="attribute">server_tokens</span>  <span class="literal">off</span>;</span><br><span class="line">    <span class="attribute">server_names_hash_bucket_size</span> <span class="number">512</span>;</span><br><span class="line">    <span class="attribute">client_max_body_size</span> <span class="number">510m</span>;</span><br><span class="line">    <span class="attribute">client_header_buffer_size</span> <span class="number">128k</span>;</span><br><span class="line">    <span class="attribute">large_client_header_buffers</span> <span class="number">4</span> <span class="number">128k</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#gzip  on;</span></span><br><span class="line">	<span class="attribute">vhost_traffic_status_zone</span> shared:vhost_traffic_status:<span class="number">128m</span>;</span><br><span class="line">    <span class="attribute">vhost_traffic_status_filter_by_host</span> <span class="literal">on</span>;</span><br><span class="line">    <span class="section">server</span> {</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">8008</span>;</span><br><span class="line">        <span class="attribute">location</span> /status {</span><br><span class="line">			vhost_traffic_status_display;</span><br><span class="line">            <span class="attribute">vhost_traffic_status_display_format</span> html;</span><br><span class="line">            <span class="attribute">access_log</span> <span class="literal">off</span>;</span><br><span class="line">            <span class="attribute">allow</span> <span class="number">127.0.0.1</span>;</span><br><span class="line">			<span class="attribute">allow</span> <span class="number">218.6.71.54</span>;</span><br><span class="line">            <span class="attribute">deny</span> all;</span><br><span class="line">        }</span><br><span class="line">	}</span><br><span class="line"></span><br><span class="line">    <span class="section">server</span> {</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  _;</span><br><span class="line">        <span class="attribute">location</span> / {</span><br><span class="line">			<span class="attribute">return</span> <span class="number">444</span>;</span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">    }</span><br><span class="line">	<span class="attribute">include</span> vhost/<span class="regexp">*.conf</span>;</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
 
+<h2 id="&#x53CD;&#x5411;&#x4EE3;&#x7406;&#x914D;&#x7F6E;"><a href="#&#x53CD;&#x5411;&#x4EE3;&#x7406;&#x914D;&#x7F6E;" class="headerlink" title="&#x53CD;&#x5411;&#x4EE3;&#x7406;&#x914D;&#x7F6E;"></a>&#x53CD;&#x5411;&#x4EE3;&#x7406;&#x914D;&#x7F6E;</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">upstream</span>  kibana  {</span><br><span class="line">	<span class="attribute">server</span> <span class="number">127.0.0.1:5601</span>;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="section">server</span> {  </span><br><span class="line">	<span class="attribute">listen</span>  <span class="number">80</span>;  </span><br><span class="line">	<span class="attribute">server_name</span>  elk.abc.cn;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">location</span> / {</span><br><span class="line">    <span class="attribute">auth_basic</span> <span class="string">&quot;Please Input user and password&quot;</span>;</span><br><span class="line">    <span class="attribute">auth_basic_user_file</span> /opt/nginx/conf/passwd.db; <span class="comment">#openssl passwd -crypt password</span></span><br><span class="line">        <span class="attribute">proxy_pass</span>        http://kibana;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> Host <span class="variable">$host</span>;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> X-Forwarded-For <span class="variable">$remote_addr</span>;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> X-Forwarded-Host <span class="variable">$server_name</span>;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">        <span class="attribute">add_header</span> Access-Control-Allow-Origin *;</span><br><span class="line">        <span class="attribute">proxy_connect_timeout</span> <span class="number">60s</span>;</span><br><span class="line">        <span class="attribute">proxy_read_timeout</span> <span class="number">60s</span>;</span><br><span class="line">        <span class="attribute">proxy_send_timeout</span> <span class="number">60s</span>;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> Accept-Encoding <span class="string">&apos;gzip&apos;</span>;</span><br><span class="line">        <span class="attribute">gzip</span> <span class="literal">on</span>;</span><br><span class="line">        <span class="attribute">gzip_min_length</span> <span class="number">1000</span>;</span><br><span class="line">        <span class="attribute">gzip_buffers</span> <span class="number">4</span> <span class="number">8k</span>;</span><br><span class="line">        <span class="attribute">gzip_types</span> text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript application/json;</span><br><span class="line">    }</span><br><span class="line">    <span class="attribute">access_log</span>  logs/kibana.log  main;</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<h2 id="&#x65E5;&#x5FD7;&#x5207;&#x5272;"><a href="#&#x65E5;&#x5FD7;&#x5207;&#x5272;" class="headerlink" title="&#x65E5;&#x5FD7;&#x5207;&#x5272;"></a>&#x65E5;&#x5FD7;&#x5207;&#x5272;</h2><h3 id="&#x4F7F;&#x7528;logrotate"><a href="#&#x4F7F;&#x7528;logrotate" class="headerlink" title="&#x4F7F;&#x7528;logrotate"></a>&#x4F7F;&#x7528;logrotate</h3><p>[root@n1 tools]# cat /etc/logrotate.d/nginx </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/opt/nginx/logs/*.log</span><br><span class="line">{</span><br><span class="line">	daily</span><br><span class="line">	rotate 60</span><br><span class="line">	missingok</span><br><span class="line">	dateext</span><br><span class="line">	compress</span><br><span class="line">	delaycompress</span><br><span class="line">	notifempty</span><br><span class="line">	sharedscripts</span><br><span class="line">	postrotate</span><br><span class="line">		[ -f /opt/nginx/logs/nginx.pid ] &amp;&amp; kill -USR1 `cat /opt/nginx/logs/nginx.pid`</span><br><span class="line">	endscript</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>&#x914D;&#x7F6E;&#x8BF4;&#x660E;</p>
+<ul>
+<li><p>daily&#xFF1A;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5C06;&#x6309;&#x5929;&#x8F6E;&#x5FAA;</p>
+</li>
+<li><p>weekly&#xFF1A;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5C06;&#x6309;&#x5468;&#x8F6E;&#x5FAA;</p>
+</li>
+<li><p>monthly&#xFF1A;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5C06;&#x6309;&#x6708;&#x8F6E;&#x5FAA;</p>
+</li>
+<li><p>missingok &#xFF1A;#&#x5728;&#x65E5;&#x5FD7;&#x8F6E;&#x5FAA;&#x671F;&#x95F4;&#xFF0C;&#x4EFB;&#x4F55;&#x9519;&#x8BEF;&#x5C06;&#x88AB;&#x5FFD;&#x7565;&#xFF0C;&#x4F8B;&#x5982;&#x201C;&#x6587;&#x4EF6;&#x65E0;&#x6CD5;&#x627E;&#x5230;&#x201D;&#x4E4B;&#x7C7B;&#x7684;&#x9519;&#x8BEF;</p>
+</li>
+<li><p>notifempty&#xFF1A; #&#x5982;&#x679C;&#x662F;&#x7A7A;&#x6587;&#x4EF6;&#x7684;&#x8BDD;&#xFF0C;&#x4E0D;&#x8FDB;&#x884C;&#x8F6C;&#x50A8;</p>
+</li>
+<li><p>nocompress&#xFF1A;&#x4E0D;&#x9700;&#x8981;&#x538B;&#x7F29;&#x65F6;&#xFF0C;&#x7528;&#x8FD9;&#x4E2A;&#x53C2;&#x6570;</p>
+</li>
+<li><p>copytruncate&#xFF1A;&#x7528;&#x4E8E;&#x8FD8;&#x5728;&#x6253;&#x5F00;&#x4E2D;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#xFF0C;&#x628A;&#x5F53;&#x524D;&#x65E5;&#x5FD7;&#x5907;&#x4EFD;&#x5E76;&#x622A;&#x65AD;</p>
+</li>
+<li><p>nocopytruncate&#xFF1A;&#x5907;&#x4EFD;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x4F46;&#x662F;&#x4E0D;&#x622A;&#x65AD;</p>
+</li>
+<li><p>create mode owner group&#xFF1A;&#x8F6C;&#x50A8;&#x6587;&#x4EF6;&#xFF0C;&#x4F7F;&#x7528;&#x6307;&#x5B9A;&#x7684;&#x6587;&#x4EF6;&#x6A21;&#x5F0F;&#x521B;&#x5EFA;&#x65B0;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;</p>
+</li>
+<li><p>nocreate&#xFF1A;&#x4E0D;&#x5EFA;&#x7ACB;&#x65B0;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;</p>
+</li>
+<li><p>delaycompress &#x548C; compress &#x4E00;&#x8D77;&#x4F7F;&#x7528;&#x65F6;&#xFF0C;&#x8F6C;&#x50A8;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5230;&#x4E0B;&#x4E00;&#x6B21;&#x8F6C;&#x50A8;&#x65F6;&#x624D;&#x538B;&#x7F29;</p>
+</li>
+<li><p>nodelaycompress &#x8986;&#x76D6; delaycompress &#x9009;&#x9879;&#xFF0C;&#x8F6C;&#x50A8;&#x540C;&#x65F6;&#x538B;&#x7F29;&#x3002;</p>
+</li>
+<li><p>size size &#x5F53;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5230;&#x8FBE;&#x6307;&#x5B9A;&#x7684;&#x5927;&#x5C0F;&#x65F6;&#x624D;&#x8F6C;&#x50A8;&#xFF0C;Size &#x53EF;&#x4EE5;&#x6307;&#x5B9A; bytes (&#x7F3A;&#x7701;)&#x4EE5;&#x53CA;KB (sizek)&#x6216;&#x8005;MB (sizem).</p>
+</li>
+<li><p>dateext&#xFF1A;&#x5B9A;&#x4E49;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x540E;&#x7F00;&#x662F;&#x65E5;&#x671F;&#x683C;&#x5F0F;,&#x4E5F;&#x5C31;&#x662F;&#x5207;&#x5272;&#x540E;&#x6587;&#x4EF6;&#x662F;:xxx.log-20160402.gz&#x8FD9;&#x6837;&#x7684;&#x683C;&#x5F0F;&#x3002;&#x5982;&#x679C;&#x8BE5;&#x53C2;&#x6570;</p>
+<p>&#x88AB;&#x6CE8;&#x91CA;&#x6389;,&#x5207;&#x5272;&#x51FA;&#x6765;&#x662F;&#x6309;&#x6570;&#x5B57;&#x9012;&#x589E;,&#x5373;&#x524D;&#x9762;&#x8BF4;&#x7684; xxx.log-1&#x8FD9;&#x79CD;&#x683C;&#x5F0F;</p>
+</li>
+<li><p>delaycompress&#xFF1A;&#x603B;&#x662F;&#x4E0E;compress&#x9009;&#x9879;&#x4E00;&#x8D77;&#x7528;&#xFF0C;delaycompress&#x9009;&#x9879;&#x6307;&#x793A;logrotate&#x4E0D;&#x8981;&#x5C06;&#x6700;&#x8FD1;&#x7684;&#x5F52;&#x6863;&#x538B;&#x7F29;&#xFF0C;</p>
+<p>&#x538B;&#x7F29;&#x5C06;&#x5728;&#x4E0B;&#x4E00;&#x6B21;&#x8F6E;&#x5FAA;&#x5468;&#x671F;&#x8FDB;&#x884C;&#x3002;&#x8FD9;&#x5728;&#x4F60;&#x6216;&#x4EFB;&#x4F55;&#x8F6F;&#x4EF6;&#x4ECD;&#x7136;&#x9700;&#x8981;&#x8BFB;&#x53D6;&#x6700;&#x65B0;&#x5F52;&#x6863;&#x65F6;&#x5F88;&#x6709;&#x7528;</p>
+</li>
+<li><p>create 640 nginx adm&#xFF1A;&#x4EE5;&#x6307;&#x5B9A;&#x7684;&#x6743;&#x9650;&#x548C;&#x7528;&#x6237;&#x5C5E;&#x6027;&#xFF0C;&#x521B;&#x5EFA;&#x5168;&#x65B0;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#xFF0C;&#x540C;&#x65F6;logrotate&#x4E5F;&#x4F1A;&#x91CD;&#x547D;&#x540D;&#x539F;&#x59CB;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x3002;</p>
+</li>
+<li><p>rotate count &#x6307;&#x5B9A;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5220;&#x9664;&#x4E4B;&#x524D;&#x8F6C;&#x50A8;&#x7684;&#x6B21;&#x6570;&#xFF0C;0 &#x6307;&#x6CA1;&#x6709;&#x5907;&#x4EFD;&#xFF0C;5 &#x6307;&#x4FDD;&#x7559;5 &#x4E2A;&#x5907;&#x4EFD;</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><strong>&#x914D;&#x7F6E;&#x53C2;&#x6570;</strong></th>
+<th><strong>&#x8BF4;&#x660E;</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>compress</strong></td>
+<td>&#x901A;&#x8FC7;gzip&#x538B;&#x7F29;&#x8F6C;&#x50A8;&#x4EE5;&#x540E;&#x7684;&#x65E5;&#x5FD7;</td>
+</tr>
+<tr>
+<td><strong>nocompress</strong></td>
+<td>&#x4E0D;&#x538B;&#x7F29;</td>
+</tr>
+<tr>
+<td><strong>copytruncate</strong></td>
+<td>&#x7528;&#x4E8E;&#x8FD8;&#x5728;&#x6253;&#x5F00;&#x4E2D;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#xFF0C;&#x628A;&#x5F53;&#x524D;&#x65E5;&#x5FD7;&#x5907;&#x4EFD;&#x5E76;&#x622A;&#x65AD;</td>
+</tr>
+<tr>
+<td><strong>nocopytruncate</strong></td>
+<td>&#x5907;&#x4EFD;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x4F46;&#x662F;&#x4E0D;&#x622A;&#x65AD;</td>
+</tr>
+<tr>
+<td><strong>create mode owner group</strong></td>
+<td>&#x8F6C;&#x50A8;&#x6587;&#x4EF6;&#xFF0C;&#x4F7F;&#x7528;&#x6307;&#x5B9A;&#x7684;&#x6587;&#x4EF6;&#x6A21;&#x5F0F;&#x521B;&#x5EFA;&#x65B0;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;</td>
+</tr>
+<tr>
+<td><strong>nocreate</strong></td>
+<td>&#x4E0D;&#x5EFA;&#x7ACB;&#x65B0;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;</td>
+</tr>
+<tr>
+<td><strong>delaycompress</strong></td>
+<td>&#x548C; compress &#x4E00;&#x8D77;&#x4F7F;&#x7528;&#x65F6;&#xFF0C;&#x8F6C;&#x50A8;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5230;&#x4E0B;&#x4E00;&#x6B21;&#x8F6C;&#x50A8;&#x65F6;&#x624D;&#x538B;&#x7F29;</td>
+</tr>
+<tr>
+<td><strong>nodelaycompress</strong></td>
+<td>&#x8986;&#x76D6; delaycompress &#x9009;&#x9879;&#xFF0C;&#x8F6C;&#x50A8;&#x540C;&#x65F6;&#x538B;&#x7F29;&#x3002;</td>
+</tr>
+<tr>
+<td><strong>errors address</strong></td>
+<td>&#x4E13;&#x50A8;&#x65F6;&#x7684;&#x9519;&#x8BEF;&#x4FE1;&#x606F;&#x53D1;&#x9001;&#x5230;&#x6307;&#x5B9A;&#x7684;Email &#x5730;&#x5740;</td>
+</tr>
+<tr>
+<td><strong>ifempty</strong></td>
+<td>&#x5373;&#x4F7F;&#x662F;&#x7A7A;&#x6587;&#x4EF6;&#x4E5F;&#x8F6C;&#x50A8;&#xFF0C;&#x8FD9;&#x4E2A;&#x662F; logrotate &#x7684;&#x7F3A;&#x7701;&#x9009;&#x9879;&#x3002;</td>
+</tr>
+<tr>
+<td><strong>notifempty</strong></td>
+<td>&#x5982;&#x679C;&#x662F;&#x7A7A;&#x6587;&#x4EF6;&#x7684;&#x8BDD;&#xFF0C;&#x4E0D;&#x8F6C;&#x50A8;</td>
+</tr>
+<tr>
+<td><strong>mail address</strong></td>
+<td>&#x628A;&#x8F6C;&#x50A8;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x53D1;&#x9001;&#x5230;&#x6307;&#x5B9A;&#x7684;E-mail &#x5730;&#x5740;</td>
+</tr>
+<tr>
+<td><strong>nomail</strong></td>
+<td>&#x8F6C;&#x50A8;&#x65F6;&#x4E0D;&#x53D1;&#x9001;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;</td>
+</tr>
+<tr>
+<td><strong>olddir directory</strong></td>
+<td>&#x8F6C;&#x50A8;&#x540E;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x653E;&#x5165;&#x6307;&#x5B9A;&#x7684;&#x76EE;&#x5F55;&#xFF0C;&#x5FC5;&#x987B;&#x548C;&#x5F53;&#x524D;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5728;&#x540C;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;</td>
+</tr>
+<tr>
+<td><strong>noolddir</strong></td>
+<td>&#x8F6C;&#x50A8;&#x540E;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x548C;&#x5F53;&#x524D;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x653E;&#x5728;&#x540C;&#x4E00;&#x4E2A;&#x76EE;&#x5F55;&#x4E0B;</td>
+</tr>
+<tr>
+<td><strong>prerotate/endscript</strong></td>
+<td>&#x5728;&#x8F6C;&#x50A8;&#x4EE5;&#x524D;&#x9700;&#x8981;&#x6267;&#x884C;&#x7684;&#x547D;&#x4EE4;&#x53EF;&#x4EE5;&#x653E;&#x5165;&#x8FD9;&#x4E2A;&#x5BF9;&#xFF0C;&#x8FD9;&#x4E24;&#x4E2A;&#x5173;&#x952E;&#x5B57;&#x5FC5;&#x987B;&#x5355;&#x72EC;&#x6210;&#x884C;</td>
+</tr>
+<tr>
+<td><strong>daily</strong></td>
+<td>&#x6307;&#x5B9A;&#x8F6C;&#x50A8;&#x5468;&#x671F;&#x4E3A;&#x6BCF;&#x5929;</td>
+</tr>
+<tr>
+<td><strong>weekly</strong></td>
+<td>&#x6307;&#x5B9A;&#x8F6C;&#x50A8;&#x5468;&#x671F;&#x4E3A;&#x6BCF;&#x5468;</td>
+</tr>
+<tr>
+<td><strong>monthly</strong></td>
+<td>&#x6307;&#x5B9A;&#x8F6C;&#x50A8;&#x5468;&#x671F;&#x4E3A;&#x6BCF;&#x6708;</td>
+</tr>
+<tr>
+<td><strong>rotate count</strong></td>
+<td>&#x6307;&#x5B9A;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5220;&#x9664;&#x4E4B;&#x524D;&#x8F6C;&#x50A8;&#x7684;&#x6B21;&#x6570;&#xFF0C;0 &#x6307;&#x6CA1;&#x6709;&#x5907;&#x4EFD;&#xFF0C;5 &#x6307;&#x4FDD;&#x7559;5 &#x4E2A;&#x5907;&#x4EFD;</td>
+</tr>
+<tr>
+<td><strong>tabooext [+] list</strong></td>
+<td>&#x8BA9;logrotate&#x4E0D;&#x8F6C;&#x50A8;&#x6307;&#x5B9A;&#x6269;&#x5C55;&#x540D;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x7F3A;&#x7701;&#x7684;&#x6269;&#x5C55;&#x540D;&#x662F;&#xFF1A;.rpm-orig, .rpmsave, v, &#x548C; ~</td>
+</tr>
+<tr>
+<td><strong>size size</strong></td>
+<td>&#x5F53;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x5230;&#x8FBE;&#x6307;&#x5B9A;&#x7684;&#x5927;&#x5C0F;&#x65F6;&#x624D;&#x8F6C;&#x50A8;&#xFF0C;bytes(&#x7F3A;&#x7701;)&#x53CA;KB(sizek)&#x6216;MB(sizem)</td>
+</tr>
+<tr>
+<td><strong>missingok</strong></td>
+<td>&#x5728;&#x65E5;&#x5FD7;&#x8F6E;&#x5FAA;&#x671F;&#x95F4;&#xFF0C;&#x4EFB;&#x4F55;&#x9519;&#x8BEF;&#x5C06;&#x88AB;&#x5FFD;&#x7565;&#xFF0C;&#x4F8B;&#x5982;&#x201C;&#x6587;&#x4EF6;&#x65E0;&#x6CD5;&#x627E;&#x5230;&#x201D;&#x4E4B;&#x7C7B;&#x7684;&#x9519;&#x8BEF;&#x3002;</td>
+</tr>
+</tbody></table>
+<p>&#x8BBE;&#x7F6E;&#x5B9A;&#x65F6;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">59 23 * * * root /usr/sbin/logrotate -f /etc/logrotate.d/nginx</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x4F7F;&#x7528;&#x811A;&#x672C;"><a href="#&#x4F7F;&#x7528;&#x811A;&#x672C;" class="headerlink" title="&#x4F7F;&#x7528;&#x811A;&#x672C;"></a>&#x4F7F;&#x7528;&#x811A;&#x672C;</h3><p>cat /opt/cutlog.sh</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">LOGS_PATH=/opt/nginx/logs</span><br><span class="line">LOGLIST=$LOGS_PATH/loglist</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"><span class="variable">$LOGLIST</span></span></span><br><span class="line">YESTERDAY=$(date -d &quot;yesterday&quot; +%Y-%m-%d)</span><br><span class="line">for i in `ls $LOGS_PATH |grep &quot;log$&quot;`;</span><br><span class="line">do</span><br><span class="line">mv ${LOGS_PATH}/${i} ${LOGS_PATH}/${i}_${YESTERDAY}</span><br><span class="line">echo ${LOGS_PATH}/${i}_${YESTERDAY} &gt;&gt;$LOGLIST</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">kill -USR1 $(cat ${LOGS_PATH}/nginx.pid)</span><br><span class="line"></span><br><span class="line">while read log;</span><br><span class="line">do</span><br><span class="line">	gzip $log</span><br><span class="line">done&lt;$LOGLIST</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -492,7 +647,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#单节点部署"><span class="nav-number">1.</span> <span class="nav-text">单节点部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装依赖包"><span class="nav-number">1.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载最新稳定版本"><span class="nav-number">1.2.</span> <span class="nav-text">下载最新稳定版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解压"><span class="nav-number">1.3.</span> <span class="nav-text">解压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译安装"><span class="nav-number">1.4.</span> <span class="nav-text">编译安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#做软链，方便后续执行"><span class="nav-number">1.5.</span> <span class="nav-text">做软链，方便后续执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx-keepalive（高可用部署）"><span class="nav-number">2.</span> <span class="nav-text">nginx+keepalive（高可用部署）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#两个节点都执行："><span class="nav-number">2.1.</span> <span class="nav-text">两个节点都执行：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装依赖包-1"><span class="nav-number">2.1.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载最新稳定版本-1"><span class="nav-number">2.1.2.</span> <span class="nav-text">下载最新稳定版本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解压-1"><span class="nav-number">2.1.3.</span> <span class="nav-text">解压</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编译安装-1"><span class="nav-number">2.1.4.</span> <span class="nav-text">编译安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#做软链，方便后续执行-1"><span class="nav-number">2.1.5.</span> <span class="nav-text">做软链，方便后续执行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nginx状态检测脚本"><span class="nav-number">2.1.6.</span> <span class="nav-text">nginx状态检测脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装keepalived"><span class="nav-number">2.1.7.</span> <span class="nav-text">安装keepalived</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置keepalived"><span class="nav-number">2.1.8.</span> <span class="nav-text">配置keepalived</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#keepalived节点1配置"><span class="nav-number">2.1.8.1.</span> <span class="nav-text">keepalived节点1配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#keepalived节点2配置"><span class="nav-number">2.1.8.2.</span> <span class="nav-text">keepalived节点2配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#需要根据实际情况改动的配置"><span class="nav-number">2.1.8.3.</span> <span class="nav-text">需要根据实际情况改动的配置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重启keepalived"><span class="nav-number">2.1.9.</span> <span class="nav-text">重启keepalived</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#单节点部署"><span class="nav-number">1.</span> <span class="nav-text">单节点部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装依赖包"><span class="nav-number">1.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载最新稳定版本"><span class="nav-number">1.2.</span> <span class="nav-text">下载最新稳定版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载nginx-module-vts"><span class="nav-number">1.3.</span> <span class="nav-text">下载nginx-module-vts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解压"><span class="nav-number">1.4.</span> <span class="nav-text">解压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译安装"><span class="nav-number">1.5.</span> <span class="nav-text">编译安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#做软链，方便后续执行"><span class="nav-number">1.6.</span> <span class="nav-text">做软链，方便后续执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx-keepalive（高可用部署）"><span class="nav-number">2.</span> <span class="nav-text">nginx+keepalive（高可用部署）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#两个节点都执行："><span class="nav-number">2.1.</span> <span class="nav-text">两个节点都执行：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装依赖包-1"><span class="nav-number">2.1.1.</span> <span class="nav-text">安装依赖包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下载最新稳定版本-1"><span class="nav-number">2.1.2.</span> <span class="nav-text">下载最新稳定版本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解压-1"><span class="nav-number">2.1.3.</span> <span class="nav-text">解压</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编译安装-1"><span class="nav-number">2.1.4.</span> <span class="nav-text">编译安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#做软链，方便后续执行-1"><span class="nav-number">2.1.5.</span> <span class="nav-text">做软链，方便后续执行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nginx状态检测脚本"><span class="nav-number">2.1.6.</span> <span class="nav-text">nginx状态检测脚本</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装keepalived"><span class="nav-number">2.1.7.</span> <span class="nav-text">安装keepalived</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置keepalived"><span class="nav-number">2.1.8.</span> <span class="nav-text">配置keepalived</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#keepalived节点1配置"><span class="nav-number">2.1.8.1.</span> <span class="nav-text">keepalived节点1配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#keepalived节点2配置"><span class="nav-number">2.1.8.2.</span> <span class="nav-text">keepalived节点2配置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#需要根据实际情况改动的配置"><span class="nav-number">2.1.8.3.</span> <span class="nav-text">需要根据实际情况改动的配置</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重启keepalived"><span class="nav-number">2.1.9.</span> <span class="nav-text">重启keepalived</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主配置"><span class="nav-number">3.</span> <span class="nav-text">主配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反向代理配置"><span class="nav-number">4.</span> <span class="nav-text">反向代理配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日志切割"><span class="nav-number">5.</span> <span class="nav-text">日志切割</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用logrotate"><span class="nav-number">5.1.</span> <span class="nav-text">使用logrotate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用脚本"><span class="nav-number">5.2.</span> <span class="nav-text">使用脚本</span></a></li></ol></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -510,7 +665,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -536,7 +691,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -595,12 +750,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">256k</span>
+    <span title="站点总字数">271k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">10:40</span>
+    <span title="站点阅读时长">11:17</span>
 </div>
 
         

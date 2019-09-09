@@ -239,7 +239,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/13/Nginx的日常维护/">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/13/tar远程备份/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="csz">
@@ -253,7 +253,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2012/05/13/Nginx的日常维护/" class="post-title-link" itemprop="url">Nginx的日常维护</a>
+            <a href="/2012/05/13/tar远程备份/" class="post-title-link" itemprop="url">tar远程备份</a>
           
         </h1>
 
@@ -293,7 +293,7 @@
               
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               
-              <span>7 分钟</span>
+              <span>3 分钟</span>
             </span>
           
 
@@ -306,15 +306,185 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><strong>&#x68C0;&#x9A8C;&#x914D;&#x7F6E;&#x6587;&#x4EF6;</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/nginx/sbin/nginx -t</span><br></pre></td></tr></table></figure>
+          <p>&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar czf - file| ssh server <span class="string">&quot;tar zxf -&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>&#x6216;</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/nginx/sbin/nginx -t -c /opt/nginx/conf/nginx.conf</span><br></pre></td></tr></table></figure>
+<p>&#x538B;&#x7F29;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar czf - file| ssh server <span class="string">&quot;cat &gt; file.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>&#x89E3;&#x538B;&#x5230;&#x8FDC;&#x7A0B;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh server <span class="string">&quot;tar zxf -&quot;</span> &lt; file.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>&#x89E3;&#x538B;&#x5230;&#x672C;&#x5730;&#xFF1A;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh server <span class="string">&quot;cat file.tar.gz&quot;</span> | tar zxf -</span><br></pre></td></tr></table></figure>
+
+<p>&#x53E6;&#x5916;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;-T file&#x5907;&#x4EFD;&#x6307;&#x5B9A;&#x6587;&#x4EF6;&#x3002;</p>
+<p><strong>&#x6D4B;&#x8BD5;&#xFF08;&#x4EC5;&#x4F9B;&#x53C2;&#x8003;&#xFF09;&#xFF1A;</strong><br>&#x6D4B;&#x8BD5;&#x6570;&#x636E;&#xFF1A;y&#x76EE;&#x5F55; &#x5927;&#x5C0F;&#xFF1A;12G &#x6587;&#x4EF6;&#x6570;&#xFF1A;37895</p>
+<p>&#x6D4B;&#x8BD5;&#x547D;&#x4EE4;&#xFF1A;<br>1&#x3001;time scp -r y 192.168.35.224:/test #&#x76F4;&#x63A5;&#x4F7F;&#x7528;scp&#x4F20;&#x8F93;<br>2&#x3001;time tar cf &#x2013; y |ssh 192.168.35.224 &#x201C;cd /test2;tar xf -&#x201D; #&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF0C;&#x4E0D;&#x538B;&#x7F29;<br>3&#x3001;time tar zcf &#x2013; y |ssh 192.168.35.224 &#x201C;cd /test3;tar zxf -&#x201D; #&#x4F20;&#x8F93;&#x5230;&#x8FDC;&#x7A0B;&#xFF0C;&#x538B;&#x7F29;</p>
+<p>&#x7ED3;&#x679C;&#xFF1A;</p>
+<table>
+<thead>
+<tr>
+<th>&#x547D;&#x4EE4;</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&#x8017;&#x65F6;</td>
+<td>38m4.291s</td>
+<td>23m4.931s</td>
+<td>33m35.911s</td>
+</tr>
+</tbody></table>
+
+        
+      
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\09\07\CentOS（RHEL）使用光盘源\" rel="bookmark">CentOS（RHEL）使用光盘源</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\08\03\生产环境常见的HTTP状态码列表\" rel="bookmark">生产环境常见的HTTP状态码列表</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\03\11\LINUX踢人\" rel="bookmark">LINUX踢人</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\01\20\使用Telnet测试邮箱\" rel="bookmark">使用Telnet测试邮箱</a></div>
+      
+    </li>
+  
+  </ul>
+
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/13/Nginx限制ip连接数和流量控制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2012/05/13/Nginx限制ip连接数和流量控制/" class="post-title-link" itemprop="url">Nginx限制ip连接数和流量控制</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-05-13 00:00:00" itemprop="dateCreated datePublished" datetime="2012-05-13T00:00:00+08:00">2012-05-13</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>1 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>&#x5728;&#x914D;&#x7F6E;&#x6587;&#x4EF6;nginx.conf&#x7684;http{}&#x6DFB;&#x52A0;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">limit_zone   one  $binary_remote_addr  10m;</span><br></pre></td></tr></table></figure>
+
+<p>&#x5728;location url&#x91CD;&#x5199;&#x914D;&#x7F6E;&#x91CC;&#x6DFB;&#x52A0;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">limit_conn one 5;</span><br><span class="line">limit_rate 50k;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
             <div class="post-button text-center">
-              <a class="btn" href="/2012/05/13/Nginx的日常维护/#more" rel="contents">
+              <a class="btn" href="/2012/05/13/Nginx限制ip连接数和流量控制/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -333,7 +503,7 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\13\Nginx限制ip连接数和流量控制\" rel="bookmark">Nginx限制ip连接数和流量控制</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\13\Nginx的日常维护\" rel="bookmark">Nginx的日常维护</a></div>
       
     </li>
   
@@ -362,6 +532,287 @@
       
       
       <div class="popular-posts-title"><a href="\2015\11\13\Nginx部署\" rel="bookmark">Nginx部署</a></div>
+      
+    </li>
+  
+  </ul>
+
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/10/MySQL备份方法总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2012/05/10/MySQL备份方法总结/" class="post-title-link" itemprop="url">MySQL备份方法总结</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-05-10 00:00:00" itemprop="dateCreated datePublished" datetime="2012-05-10T00:00:00+08:00">2012-05-10</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>31 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>&#x603B;&#x7ED3;&#x4E0B;&#x51E0;&#x79CD;&#x5E38;&#x7528;&#x7684;mysql&#x5907;&#x4EFD;&#x65B9;&#x6CD5;&#xFF1A;</p>
+<h2 id="&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;"><a href="#&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;" class="headerlink" title="&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;"></a>&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;</h2>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2012/05/10/MySQL备份方法总结/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\05\08\MySQL忘记root密码后强制修改密码的方法\" rel="bookmark">MySQL忘记root密码后强制修改密码的方法</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2019\08\29\mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解\" rel="bookmark">mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2014\02\21\mysql慢查询\" rel="bookmark">mysql慢查询</a></div>
+      
+    </li>
+  
+  </ul>
+
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/10/iptables模块介绍：recent/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2012/05/10/iptables模块介绍：recent/" class="post-title-link" itemprop="url">iptables模块介绍：recent</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2012-05-10 00:00:00" itemprop="dateCreated datePublished" datetime="2012-05-10T00:00:00+08:00">2012-05-10</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>21 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>recent&#x6A21;&#x5757;&#x53EF;&#x4EE5;&#x770B;&#x4F5C;iptables&#x91CC;&#x9762;&#x7EF4;&#x62A4;&#x4E86;&#x4E00;&#x4E2A;&#x5730;&#x5740;&#x5217;&#x8868;&#xFF0C;&#x8FD9;&#x4E2A;&#x5730;&#x5740;&#x5217;&#x8868;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x201D;&#x2013;set&#x201D;&#x3001;&#x201D;&#x2013;update&#x201D;&#x3001;&#x201D;&#x2013;rcheck&#x201D;&#x3001;&#x201D;&#x2013;remove&#x201D;&#x56DB;&#x79CD;&#x65B9;&#x6CD5;&#x6765;&#x4FEE;&#x6539;&#x5217;&#x8868;&#xFF0C;&#x6BCF;&#x6B21;&#x4F7F;&#x7528;&#x65F6;&#x53EA;&#x80FD;&#x9009;&#x7528;&#x4E00;&#x79CD;&#x3002;&#x8FD8;&#x53EF;&#x9644;&#x5E26;&#x201D;&#x2013;name&#x201D;&#x53C2;&#x6570;&#x6765;&#x6307; &#x5B9A;&#x5217;&#x8868;&#x7684;&#x540D;&#x5B57;&#xFF08;&#x9ED8;&#x8BA4;&#x4E3A;DEFAULT&#xFF09;&#xFF0C;&#x201C;&#x2013;rsource&#x201D;&#x3001;&#x201C;&#x2013;rdest&#x201D;&#x6307;&#x793A;&#x5F53;&#x524D;&#x65B9;&#x6CD5;&#x5E94;&#x7528;&#x5230;&#x6570;&#x636E;&#x5305;&#x7684;&#x6E90;&#x5730;&#x5740;&#x8FD8;&#x662F;&#x76EE;&#x7684;&#x5730;&#x5740;&#xFF08;&#x9ED8;&#x8BA4;&#x662F;&#x524D;&#x8005;&#xFF09;&#x3002;</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2012/05/10/iptables模块介绍：recent/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\05\10\iptables模块介绍：limit\" rel="bookmark">iptables模块介绍：limit</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\05\08\iptables范例\" rel="bookmark">iptables范例</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\09\07\CentOS（RHEL）使用光盘源\" rel="bookmark">CentOS（RHEL）使用光盘源</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\05\13\tar远程备份\" rel="bookmark">tar远程备份</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
       
     </li>
   
@@ -675,287 +1126,6 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/10/iptables模块介绍：recent/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="csz">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="csz's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2012/05/10/iptables模块介绍：recent/" class="post-title-link" itemprop="url">iptables模块介绍：recent</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2012-05-10 00:00:00" itemprop="dateCreated datePublished" datetime="2012-05-10T00:00:00+08:00">2012-05-10</time>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span>21 分钟</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>recent&#x6A21;&#x5757;&#x53EF;&#x4EE5;&#x770B;&#x4F5C;iptables&#x91CC;&#x9762;&#x7EF4;&#x62A4;&#x4E86;&#x4E00;&#x4E2A;&#x5730;&#x5740;&#x5217;&#x8868;&#xFF0C;&#x8FD9;&#x4E2A;&#x5730;&#x5740;&#x5217;&#x8868;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x201D;&#x2013;set&#x201D;&#x3001;&#x201D;&#x2013;update&#x201D;&#x3001;&#x201D;&#x2013;rcheck&#x201D;&#x3001;&#x201D;&#x2013;remove&#x201D;&#x56DB;&#x79CD;&#x65B9;&#x6CD5;&#x6765;&#x4FEE;&#x6539;&#x5217;&#x8868;&#xFF0C;&#x6BCF;&#x6B21;&#x4F7F;&#x7528;&#x65F6;&#x53EA;&#x80FD;&#x9009;&#x7528;&#x4E00;&#x79CD;&#x3002;&#x8FD8;&#x53EF;&#x9644;&#x5E26;&#x201D;&#x2013;name&#x201D;&#x53C2;&#x6570;&#x6765;&#x6307; &#x5B9A;&#x5217;&#x8868;&#x7684;&#x540D;&#x5B57;&#xFF08;&#x9ED8;&#x8BA4;&#x4E3A;DEFAULT&#xFF09;&#xFF0C;&#x201C;&#x2013;rsource&#x201D;&#x3001;&#x201C;&#x2013;rdest&#x201D;&#x6307;&#x793A;&#x5F53;&#x524D;&#x65B9;&#x6CD5;&#x5E94;&#x7528;&#x5230;&#x6570;&#x636E;&#x5305;&#x7684;&#x6E90;&#x5730;&#x5740;&#x8FD8;&#x662F;&#x76EE;&#x7684;&#x5730;&#x5740;&#xFF08;&#x9ED8;&#x8BA4;&#x662F;&#x524D;&#x8005;&#xFF09;&#x3002;</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2012/05/10/iptables模块介绍：recent/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\10\iptables模块介绍：limit\" rel="bookmark">iptables模块介绍：limit</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\08\iptables范例\" rel="bookmark">iptables范例</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\09\07\CentOS（RHEL）使用光盘源\" rel="bookmark">CentOS（RHEL）使用光盘源</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\13\tar远程备份\" rel="bookmark">tar远程备份</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
-      
-    </li>
-  
-  </ul>
-
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/10/MySQL备份方法总结/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="csz">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="csz's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2012/05/10/MySQL备份方法总结/" class="post-title-link" itemprop="url">MySQL备份方法总结</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2012-05-10 00:00:00" itemprop="dateCreated datePublished" datetime="2012-05-10T00:00:00+08:00">2012-05-10</time>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span>31 分钟</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>&#x603B;&#x7ED3;&#x4E0B;&#x51E0;&#x79CD;&#x5E38;&#x7528;&#x7684;mysql&#x5907;&#x4EFD;&#x65B9;&#x6CD5;&#xFF1A;</p>
-<h2 id="&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;"><a href="#&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;" class="headerlink" title="&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;"></a>&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x6570;&#x636E;&#x5E93;&#x6587;&#x4EF6;</h2>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2012/05/10/MySQL备份方法总结/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\08\MySQL忘记root密码后强制修改密码的方法\" rel="bookmark">MySQL忘记root密码后强制修改密码的方法</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2019\08\29\mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解\" rel="bookmark">mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2014\02\21\mysql慢查询\" rel="bookmark">mysql慢查询</a></div>
-      
-    </li>
-  
-  </ul>
-
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
     <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/05/08/MySQL忘记root密码后强制修改密码的方法/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1054,14 +1224,14 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
+      <div class="popular-posts-title"><a href="\2019\08\29\mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解\" rel="bookmark">mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2019\08\29\mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解\" rel="bookmark">mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解</a></div>
+      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
       
     </li>
   
@@ -1181,14 +1351,14 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\10\iptables模块介绍：recent\" rel="bookmark">iptables模块介绍：recent</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\10\iptables模块介绍：limit\" rel="bookmark">iptables模块介绍：limit</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\10\iptables模块介绍：limit\" rel="bookmark">iptables模块介绍：limit</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\10\iptables模块介绍：recent\" rel="bookmark">iptables模块介绍：recent</a></div>
       
     </li>
   
@@ -1472,183 +1642,35 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\03\11\Linux下大文件跨网传输的方法\" rel="bookmark">Linux下大文件跨网传输的方法</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\01\20\使用Telnet测试邮箱\" rel="bookmark">使用Telnet测试邮箱</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\13\使用脚本防止ssh暴力破解\" rel="bookmark">使用脚本防止ssh暴力破解</a></div>
-      
-    </li>
-  
-  </ul>
-
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/04/22/简单的系统监控脚本/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="csz">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="csz's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2012/04/22/简单的系统监控脚本/" class="post-title-link" itemprop="url">简单的系统监控脚本</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2012-04-22 00:00:00" itemprop="dateCreated datePublished" datetime="2012-04-22T00:00:00+08:00">2012-04-22</time>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span>4 分钟</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>&#x5468;&#x672B;&#x62BD;&#x7A7A;&#x5199;&#x4E86;&#x4E2A;&#x7CFB;&#x7EDF;&#x76D1;&#x63A7;&#x811A;&#x672C;&#xFF0C;&#x6CA1;&#x4EC0;&#x4E48;&#x6280;&#x672F;&#x542B;&#x91CF;&#xFF0C;&#x5C31;&#x5F53;&#x7EC3;&#x7EC3;&#x624B;&#x3002;<br>&#x82B1;&#x4E86;&#x4E0D;&#x5C11;&#x65F6;&#x95F4;&#xFF0C;&#x4E3B;&#x8981;&#x5728;&#x4E00;&#x4E9B;&#x7EC6;&#x8282;&#x4E0A;&#x5904;&#x7406;&#x5F97;&#x4E0D;&#x591F;&#x4E25;&#x8C28;&#xFF0C;&#x6BD4;&#x5982;awk&#x8C03;&#x7528;&#x7CFB;&#x7EDF;&#x53D8;&#x91CF;&#x65F6;&#x9700;&#x8981;&#x540C;&#x65F6;&#x4F7F;&#x7528;&#x5355;&#x53CC;&#x5F15;&#x53F7;&#xFF0C;&#x5982;&#x201D;&#x2018;$&#x53D8;&#x91CF;&#x540D;&#x2019;&#x201D;<br>&#x770B;&#x6765;&#x81EA;&#x5DF1;&#x7684;&#x811A;&#x672C;&#x64B0;&#x5199;&#x80FD;&#x529B;&#x8FD8;&#x6709;&#x5F85;&#x63D0;&#x9AD8;&#x3002;&#x4E0B;&#x9762;&#x662F;&#x811A;&#x672C;&#x5185;&#x5BB9;&#xFF1A;</p>
-<p>system_monitor.sh  </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2012/04/22/简单的系统监控脚本/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\03\11\Linux下大文件跨网传输的方法\" rel="bookmark">Linux下大文件跨网传输的方法</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\01\20\使用Telnet测试邮箱\" rel="bookmark">使用Telnet测试邮箱</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\13\使用脚本防止ssh暴力破解\" rel="bookmark">使用脚本防止ssh暴力破解</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
       <div class="popular-posts-title"><a href="\2012\03\11\LINUX踢人\" rel="bookmark">LINUX踢人</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\01\20\使用Telnet测试邮箱\" rel="bookmark">使用Telnet测试邮箱</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\04\13\使用脚本防止ssh暴力破解\" rel="bookmark">使用脚本防止ssh暴力破解</a></div>
       
     </li>
   
@@ -1717,7 +1739,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1743,7 +1765,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -1802,12 +1824,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">256k</span>
+    <span title="站点总字数">271k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">10:40</span>
+    <span title="站点阅读时长">11:17</span>
 </div>
 
         

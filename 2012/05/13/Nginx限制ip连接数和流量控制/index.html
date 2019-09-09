@@ -58,20 +58,20 @@
   };
 </script>
 
-  <meta name="description" content="&amp;#x5728;&amp;#x914D;&amp;#x7F6E;&amp;#x6587;&amp;#x4EF6;nginx.conf&amp;#x7684;http{}&amp;#x6DFB;&amp;#x52A0;&amp;#xFF1A; 1limit_zone   one  $binary_remote_addr  10m;">
+  <meta name="description" content="&amp;#x5728;&amp;#x914D;&amp;#x7F6E;&amp;#x6587;&amp;#x4EF6;nginx.conf&amp;#x7684;http{}&amp;#x6DFB;&amp;#x52A0;&amp;#xFF1A; 1limit_zone   one  $binary_remote_addr  10m;  &amp;#x5728;location url&amp;#x91CD;&amp;#x5199;&amp;#x914D;&amp;#x7F6E;&amp;#x91CC;&amp;#x6D">
 <meta name="keywords" content="nginx">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Nginx限制ip连接数和流量控制">
 <meta property="og:url" content="http://blogs.cszhi.com/2012/05/13/Nginx限制ip连接数和流量控制/index.html">
 <meta property="og:site_name" content="csz&#39;s blog">
-<meta property="og:description" content="&amp;#x5728;&amp;#x914D;&amp;#x7F6E;&amp;#x6587;&amp;#x4EF6;nginx.conf&amp;#x7684;http{}&amp;#x6DFB;&amp;#x52A0;&amp;#xFF1A; 1limit_zone   one  $binary_remote_addr  10m;">
+<meta property="og:description" content="&amp;#x5728;&amp;#x914D;&amp;#x7F6E;&amp;#x6587;&amp;#x4EF6;nginx.conf&amp;#x7684;http{}&amp;#x6DFB;&amp;#x52A0;&amp;#xFF1A; 1limit_zone   one  $binary_remote_addr  10m;  &amp;#x5728;location url&amp;#x91CD;&amp;#x5199;&amp;#x914D;&amp;#x7F6E;&amp;#x91CC;&amp;#x6D">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://blogs.cszhi.com/2012/05/13/Nginx限制ip连接数和流量控制/1567498098818.png">
 <meta property="og:image" content="http://blogs.cszhi.com/2012/05/13/Nginx限制ip连接数和流量控制/1567498112863.png">
-<meta property="og:updated_time" content="2019-09-03T08:08:44.394Z">
+<meta property="og:updated_time" content="2019-09-06T06:12:15.208Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Nginx限制ip连接数和流量控制">
-<meta name="twitter:description" content="&amp;#x5728;&amp;#x914D;&amp;#x7F6E;&amp;#x6587;&amp;#x4EF6;nginx.conf&amp;#x7684;http{}&amp;#x6DFB;&amp;#x52A0;&amp;#xFF1A; 1limit_zone   one  $binary_remote_addr  10m;">
+<meta name="twitter:description" content="&amp;#x5728;&amp;#x914D;&amp;#x7F6E;&amp;#x6587;&amp;#x4EF6;nginx.conf&amp;#x7684;http{}&amp;#x6DFB;&amp;#x52A0;&amp;#xFF1A; 1limit_zone   one  $binary_remote_addr  10m;  &amp;#x5728;location url&amp;#x91CD;&amp;#x5199;&amp;#x914D;&amp;#x7F6E;&amp;#x91CC;&amp;#x6D">
 <meta name="twitter:image" content="http://blogs.cszhi.com/2012/05/13/Nginx限制ip连接数和流量控制/1567498098818.png">
   <link rel="canonical" href="http://blogs.cszhi.com/2012/05/13/Nginx限制ip连接数和流量控制/">
 
@@ -325,13 +325,13 @@
         <p>&#x5728;&#x914D;&#x7F6E;&#x6587;&#x4EF6;nginx.conf&#x7684;http{}&#x6DFB;&#x52A0;&#xFF1A;</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">limit_zone   one  $binary_remote_addr  10m;</span><br></pre></td></tr></table></figure>
 
-<a id="more"></a>
-
 <p>&#x5728;location url&#x91CD;&#x5199;&#x914D;&#x7F6E;&#x91CC;&#x6DFB;&#x52A0;&#xFF1A;</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">limit_conn one 5;</span><br><span class="line">limit_rate 50k;</span><br></pre></td></tr></table></figure>
 
+<a id="more"></a>
+
 <p>&#x5982;&#x4E0B;&#xFF1A;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">http{</span><br><span class="line">    .............</span><br><span class="line">    limit_zone   one  $binary_remote_addr  10m;  #&#x6DFB;&#x52A0;&#x8FD9;&#x4E00;&#x884C;</span><br><span class="line">    ..............</span><br><span class="line">    server{</span><br><span class="line">         .................</span><br><span class="line">         location {</span><br><span class="line">             .........</span><br><span class="line">             limit_conn one 5;          #&#x8FDE;&#x63A5;&#x6570;&#x9650;&#x5236;&#xFF08;&#x7EBF;&#x7A0B;&#xFF09;</span><br><span class="line">             limit_rate 50k;            #&#x5E26;&#x5BBD;&#x9650;&#x5236;</span><br><span class="line">             ........</span><br><span class="line">         }</span><br><span class="line">        .................</span><br><span class="line">    }</span><br><span class="line">    .............</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">http{</span><br><span class="line">    .............</span><br><span class="line">    <span class="attribute">limit_zone</span>   one  <span class="variable">$binary_remote_addr</span>  <span class="number">10m</span>;  <span class="comment">#&#x6DFB;&#x52A0;&#x8FD9;&#x4E00;&#x884C;</span></span><br><span class="line">    ..............</span><br><span class="line">    server{</span><br><span class="line">         .................</span><br><span class="line">         <span class="section">location</span> {</span><br><span class="line">             .........</span><br><span class="line">             <span class="attribute">limit_conn</span> one <span class="number">5</span>;          <span class="comment">#&#x8FDE;&#x63A5;&#x6570;&#x9650;&#x5236;&#xFF08;&#x7EBF;&#x7A0B;&#xFF09;</span></span><br><span class="line">             <span class="attribute">limit_rate</span> <span class="number">50k</span>;            <span class="comment">#&#x5E26;&#x5BBD;&#x9650;&#x5236;</span></span><br><span class="line">             ........</span><br><span class="line">         }</span><br><span class="line">        .................</span><br><span class="line">    }</span><br><span class="line">    .............</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
 
 <p>&#x6D4B;&#x8BD5;&#xFF1A;</p>
 <p>&#x9650;&#x5236;&#x524D;&#xFF1A;</p>
@@ -403,8 +403,8 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2012/05/13/tar远程备份/" rel="next" title="tar远程备份">
-                  <i class="fa fa-chevron-left"></i> tar远程备份
+                <a href="/2012/05/10/MySQL备份方法总结/" rel="next" title="MySQL备份方法总结">
+                  <i class="fa fa-chevron-left"></i> MySQL备份方法总结
                 </a>
               
             </div>
@@ -413,8 +413,8 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2012/05/19/硬盘分区为整数/" rel="prev" title="硬盘分区为整数">
-                  硬盘分区为整数 <i class="fa fa-chevron-right"></i>
+                <a href="/2012/05/13/tar远程备份/" rel="prev" title="tar远程备份">
+                  tar远程备份 <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -483,7 +483,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -509,7 +509,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -568,12 +568,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">256k</span>
+    <span title="站点总字数">271k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">10:40</span>
+    <span title="站点阅读时长">11:17</span>
 </div>
 
         
