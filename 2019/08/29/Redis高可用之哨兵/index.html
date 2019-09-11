@@ -66,7 +66,7 @@
 <meta property="og:site_name" content="csz&#39;s blog">
 <meta property="og:description" content="&amp;#x54E8;&amp;#x5175;&amp;#x7684;&amp;#x4ECB;&amp;#x7ECD;sentinel&amp;#xFF0C;&amp;#x4E2D;&amp;#x6587;&amp;#x540D;&amp;#x662F;&amp;#x54E8;&amp;#x5175;&amp;#x3002;&amp;#x54E8;&amp;#x5175;&amp;#x662F; redis &amp;#x96C6;&amp;#x7FA4;&amp;#x673A;&amp;#x6784;&amp;#x4E2D;&amp;#x975E;&amp;#x5E38;&amp;">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-11T01:54:03.177Z">
+<meta property="og:updated_time" content="2019-09-11T01:59:24.590Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis高可用之哨兵">
 <meta name="twitter:description" content="&amp;#x54E8;&amp;#x5175;&amp;#x7684;&amp;#x4ECB;&amp;#x7ECD;sentinel&amp;#xFF0C;&amp;#x4E2D;&amp;#x6587;&amp;#x540D;&amp;#x662F;&amp;#x54E8;&amp;#x5175;&amp;#x3002;&amp;#x54E8;&amp;#x5175;&amp;#x662F; redis &amp;#x96C6;&amp;#x7FA4;&amp;#x673A;&amp;#x6784;&amp;#x4E2D;&amp;#x975E;&amp;#x5E38;&amp;">
@@ -306,7 +306,7 @@
               
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               
-              <span>35 分钟</span>
+              <span>36 分钟</span>
             </span>
           
 
@@ -514,13 +514,18 @@
 <p>redis_test.py</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"><span class="keyword">from</span> redis.sentinel <span class="keyword">import</span> Sentinel</span><br><span class="line"></span><br><span class="line"><span class="comment"># &#x8FDE;&#x63A5;&#x54E8;&#x5175;&#x670D;&#x52A1;&#x5668;(&#x4E3B;&#x673A;&#x540D;&#x4E5F;&#x53EF;&#x4EE5;&#x7528;&#x57DF;&#x540D;)</span></span><br><span class="line">sentinel = Sentinel([(<span class="string">&apos;192.168.10.1&apos;</span>, <span class="number">26379</span>),(<span class="string">&apos;192.168.10.2&apos;</span>, <span class="number">26379</span>),(<span class="string">&apos;192.168.10.2&apos;</span>, <span class="number">26379</span>)],socket_timeout=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># &#x83B7;&#x53D6;&#x4E3B;&#x670D;&#x52A1;&#x5668;&#x5730;&#x5740;</span></span><br><span class="line">master = sentinel.discover_master(<span class="string">&apos;master&apos;</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">&apos;master is&apos;</span>, master </span><br><span class="line"></span><br><span class="line"><span class="comment"># &#x83B7;&#x53D6;&#x4ECE;&#x670D;&#x52A1;&#x5668;&#x5730;&#x5740;</span></span><br><span class="line">slave = sentinel.discover_slaves(<span class="string">&apos;master&apos;</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">&apos;slave is&apos;</span>, slave</span><br><span class="line"></span><br><span class="line"><span class="comment"># &#x83B7;&#x53D6;&#x4E3B;&#x670D;&#x52A1;&#x5668;&#x8FDB;&#x884C;&#x5199;&#x5165;</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">&apos;#set key abc=123&apos;</span></span><br><span class="line">master = sentinel.master_for(<span class="string">&apos;master&apos;</span>, socket_timeout=<span class="number">1</span>, password=<span class="string">&apos;Aa123456&apos;</span>, db=<span class="number">15</span>)</span><br><span class="line">w_ret = master.set(<span class="string">&apos;abc&apos;</span>, <span class="string">&apos;123&apos;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># &#x83B7;&#x53D6;&#x4ECE;&#x670D;&#x52A1;&#x5668;&#x8FDB;&#x884C;&#x8BFB;&#x53D6;&#xFF08;&#x9ED8;&#x8BA4;&#x662F;round-roubin&#xFF09;</span></span><br><span class="line">slave = sentinel.slave_for(<span class="string">&apos;master&apos;</span>, socket_timeout=<span class="number">1</span>, password=<span class="string">&apos;Aa123456&apos;</span>, db=<span class="number">15</span>)</span><br><span class="line">r_ret = slave.get(<span class="string">&apos;abc&apos;</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">&apos;abc value is&apos;</span>, r_ret</span><br></pre></td></tr></table></figure>
 
-<p>&#x6267;&#x884C;&#x811A;&#x672C;<br>python redis_test.py</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">master is (&apos;192.168.10.3&apos;, 6379)</span><br><span class="line">slave is [(&apos;192.168.10.1&apos;, 6379), (&apos;192.168.10.2&apos;, 6379)]</span><br><span class="line">#set key abc=123</span><br><span class="line">abc value is 123</span><br></pre></td></tr></table></figure>
+<p>&#x6267;&#x884C;&#x811A;&#x672C;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; python redis_test.py</span><br><span class="line">master is (&apos;192.168.10.3&apos;, 6379)</span><br><span class="line">slave is [(&apos;192.168.10.1&apos;, 6379), (&apos;192.168.10.2&apos;, 6379)]</span><br><span class="line">#set key abc=123</span><br><span class="line">abc value is 123</span><br></pre></td></tr></table></figure>
 
+<p>r3&#x4E3A;&#x4E3B;&#x8282;&#x70B9;&#xFF0C;r1&#x548C;r2&#x4E3A;&#x4ECE;&#x8282;&#x70B9;&#x3002;</p>
 <p>&#x5C06;r3&#x4E0A;&#x7684;redis&#x8FDB;&#x7A0B;kill&#xFF0C;&#x518D;&#x6267;&#x884C;&#x811A;&#x672C;</p>
-<p>python redis_test.py</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">master is (&apos;192.168.10.2&apos;, 6379)</span><br><span class="line">slave is [(&apos;192.168.10.1&apos;, 6379)]</span><br><span class="line">#set key abc=123</span><br><span class="line">abc value is 123</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; master is (&apos;192.168.10.2&apos;, 6379)</span><br><span class="line">slave is [(&apos;192.168.10.1&apos;, 6379)]</span><br><span class="line">#set key abc=123</span><br><span class="line">abc value is 123</span><br></pre></td></tr></table></figure>
 
+<p>r2&#x53D8;&#x4E3A;&#x4E3B;&#x8282;&#x70B9;&#xFF0C;r1&#x4E3A;&#x4ECE;&#x8282;&#x70B9;&#x3002;</p>
+<p>&#x5C06;r2&#x4E0A;&#x7684;redis&#x8FDB;&#x7A0B;&#x4E5F;kill&#x6389;&#xFF0C;&#x518D;&#x6267;&#x884C;&#x811A;&#x672C;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; python redis_test.py</span><br><span class="line">master is (&apos;192.168.10.1&apos;, 6379)</span><br><span class="line">slave is []</span><br><span class="line">#set key abc=123</span><br><span class="line">abc value is 123</span><br></pre></td></tr></table></figure>
+
+<p>r1&#x53D8;&#x4E3A;&#x4E3B;&#x8282;&#x70B9;&#xFF0C;&#x6CA1;&#x6709;&#x4ECE;&#x8282;&#x70B9;</p>
 
     </div>
 
@@ -734,12 +739,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">307k</span>
+    <span title="站点总字数">308k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">12:48</span>
+    <span title="站点阅读时长">12:49</span>
 </div>
 
         
