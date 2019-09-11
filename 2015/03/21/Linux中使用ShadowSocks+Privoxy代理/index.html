@@ -323,9 +323,9 @@
 
 <a id="more"></a>
 
-<h4 id="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;"><a href="#&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;" class="headerlink" title="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;"></a>&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup sslocal -s 39.109.8.5 -p 8008 -l 1080 -k huayun2014 -t 600 -m aes-256-cfb &gt; /root/ss.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
+<h4 id="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;"><a href="#&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;" class="headerlink" title="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;"></a>&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x4E00;&#x6761;&#x547D;&#x4EE4;&#xFF09;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup sslocal -s 1.1.1.1 -p 8008 -l 1080 -k abc123 -t 600 -m aes-256-cfb &gt; /root/ss.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
 
-<h4 id="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;"><a href="#&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;" class="headerlink" title="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;"></a>&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">nohup sslocal -c /etc/shadowsocks.json &gt;&gt;/root/ss.log 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">{</span><br><span class="line">    &quot;server&quot;:&quot;39.109.8.5&quot;,</span><br><span class="line">    &quot;server_port&quot;:8008,</span><br><span class="line">    &quot;local_address&quot;: &quot;127.0.0.1&quot;,</span><br><span class="line">    &quot;local_port&quot;:1080,</span><br><span class="line">    &quot;password&quot;:&quot;huayun2014&quot;,</span><br><span class="line">    &quot;timeout&quot;:300,</span><br><span class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">    &quot;fast_open&quot;: false,</span><br><span class="line">    &quot;workers&quot;: 1</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+<h4 id="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;"><a href="#&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;" class="headerlink" title="&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;"></a>&#x8FD0;&#x884C;shadowsocks&#xFF08;&#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF09;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">nohup sslocal -c /etc/shadowsocks.json &gt;&gt;/root/ss.log 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">{</span><br><span class="line">    &quot;server&quot;:&quot;1.1.1.1&quot;,</span><br><span class="line">    &quot;server_port&quot;:8008,</span><br><span class="line">    &quot;local_address&quot;: &quot;127.0.0.1&quot;,</span><br><span class="line">    &quot;local_port&quot;:1080,</span><br><span class="line">    &quot;password&quot;:&quot;abc123&quot;,</span><br><span class="line">    &quot;timeout&quot;:300,</span><br><span class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">    &quot;fast_open&quot;: false,</span><br><span class="line">    &quot;workers&quot;: 1</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
 
 <h3 id="&#x5B89;&#x88C5;privoxy"><a href="#&#x5B89;&#x88C5;privoxy" class="headerlink" title="&#x5B89;&#x88C5;privoxy"></a>&#x5B89;&#x88C5;privoxy</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install privoxy -y</span><br></pre></td></tr></table></figure>
 
@@ -334,7 +334,7 @@
 
 <h4 id="&#x542F;&#x52A8;"><a href="#&#x542F;&#x52A8;" class="headerlink" title="&#x542F;&#x52A8;"></a>&#x542F;&#x52A8;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl restart privoxy </span><br><span class="line">systemctl <span class="built_in">enable</span> privoxy</span><br></pre></td></tr></table></figure>
 
-<h4 id="&#x8F6C;&#x53D1;&#x914D;&#x7F6E;"><a href="#&#x8F6C;&#x53D1;&#x914D;&#x7F6E;" class="headerlink" title="&#x8F6C;&#x53D1;&#x914D;&#x7F6E;"></a>&#x8F6C;&#x53D1;&#x914D;&#x7F6E;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; vim /etc/profile</span><br><span class="line"><span class="built_in">export</span> http_proxy=http://127.0.0.1:8118</span><br><span class="line"><span class="built_in">export</span> https_proxy=http://127.0.0.1:8118</span><br><span class="line">\&gt; <span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure>
+<h4 id="&#x8F6C;&#x53D1;&#x914D;&#x7F6E;"><a href="#&#x8F6C;&#x53D1;&#x914D;&#x7F6E;" class="headerlink" title="&#x8F6C;&#x53D1;&#x914D;&#x7F6E;"></a>&#x8F6C;&#x53D1;&#x914D;&#x7F6E;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; vim /etc/profile</span><br><span class="line"><span class="built_in">export</span> http_proxy=http://127.0.0.1:8118</span><br><span class="line"><span class="built_in">export</span> https_proxy=http://127.0.0.1:8118</span><br><span class="line">&gt; <span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure>
 
 <h4 id="&#x4EC5;&#x5728;&#x5F53;&#x524D;-session-&#x751F;&#x6548;"><a href="#&#x4EC5;&#x5728;&#x5F53;&#x524D;-session-&#x751F;&#x6548;" class="headerlink" title="&#x4EC5;&#x5728;&#x5F53;&#x524D; session &#x751F;&#x6548;"></a>&#x4EC5;&#x5728;&#x5F53;&#x524D; session &#x751F;&#x6548;</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> http_proxy=http://127.0.0.1:8118</span><br><span class="line"><span class="built_in">export</span> https_proxy=http://127.0.0.1:8118</span><br></pre></td></tr></table></figure>
 
@@ -458,7 +458,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-count">56</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -484,7 +484,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -543,12 +543,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">286k</span>
+    <span title="站点总字数">307k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">11:55</span>
+    <span title="站点阅读时长">12:48</span>
 </div>
 
         
