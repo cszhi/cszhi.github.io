@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: true,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. PG&amp;#x4ECB;&amp;#x7ECD;&amp;#x7EE7;&amp;#x4E0A;&amp;#x6B21;&amp;#x5206;&amp;#x4EAB;&amp;#x7684;&amp;#x300A;Ceph&amp;#x4ECB;&amp;#x7ECD;&amp;#x53CA;&amp;#x539F;&amp;#x7406;&amp;#x67B6;&amp;#x6784;&amp;#x5206;&amp;#x4EAB;&amp;#x300B;&amp;#xFF0C;&amp;#x8FD9;&amp;#x6B21;&amp;#x4E3B;&amp;#x8981">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式存储Ceph之PG状态详解">
+<meta property="og:url" content="http://blogs.cszhi.com/2018/09/21/分布式存储Ceph之PG状态详解/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="1. PG&amp;#x4ECB;&amp;#x7ECD;&amp;#x7EE7;&amp;#x4E0A;&amp;#x6B21;&amp;#x5206;&amp;#x4EAB;&amp;#x7684;&amp;#x300A;Ceph&amp;#x4ECB;&amp;#x7ECD;&amp;#x53CA;&amp;#x539F;&amp;#x7406;&amp;#x67B6;&amp;#x6784;&amp;#x5206;&amp;#x4EAB;&amp;#x300B;&amp;#xFF0C;&amp;#x8FD9;&amp;#x6B21;&amp;#x4E3B;&amp;#x8981">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-22T06:26:15.123Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式存储Ceph之PG状态详解">
+<meta name="twitter:description" content="1. PG&amp;#x4ECB;&amp;#x7ECD;&amp;#x7EE7;&amp;#x4E0A;&amp;#x6B21;&amp;#x5206;&amp;#x4EAB;&amp;#x7684;&amp;#x300A;Ceph&amp;#x4ECB;&amp;#x7ECD;&amp;#x53CA;&amp;#x539F;&amp;#x7406;&amp;#x67B6;&amp;#x6784;&amp;#x5206;&amp;#x4EAB;&amp;#x300B;&amp;#xFF0C;&amp;#x8FD9;&amp;#x6B21;&amp;#x4E3B;&amp;#x8981">
+  <link rel="canonical" href="http://blogs.cszhi.com/2018/09/21/分布式存储Ceph之PG状态详解/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>分布式存储Ceph之PG状态详解 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2018/09/21/分布式存储Ceph之PG状态详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">分布式存储Ceph之PG状态详解
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-21 00:00:00" itemprop="dateCreated datePublished" datetime="2018-09-21T00:00:00+08:00">2018-09-21</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>1:04</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-PG&#x4ECB;&#x7ECD;"><a href="#1-PG&#x4ECB;&#x7ECD;" class="headerlink" title="1. PG&#x4ECB;&#x7ECD;"></a>1. PG&#x4ECB;&#x7ECD;</h1><p>&#x7EE7;&#x4E0A;&#x6B21;&#x5206;&#x4EAB;&#x7684;<a href="https://www.cszhi.com/2018/09/19/Ceph%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%8E%9F%E7%90%86%E6%9E%B6%E6%9E%84%E5%88%86%E4%BA%AB/" target="_blank" rel="noopener">&#x300A;Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;&#x300B;</a>&#xFF0C;&#x8FD9;&#x6B21;&#x4E3B;&#x8981;&#x6765;&#x5206;&#x4EAB;Ceph&#x4E2D;&#x7684;PG&#x5404;&#x79CD;&#x72B6;&#x6001;&#x8BE6;&#x89E3;&#xFF0C;PG&#x662F;&#x6700;&#x590D;&#x6742;&#x548C;&#x96BE;&#x4E8E;&#x7406;&#x89E3;&#x7684;&#x6982;&#x5FF5;&#x4E4B;&#x4E00;&#xFF0C;PG&#x7684;&#x590D;&#x6742;&#x5982;&#x4E0B;&#xFF1A;</p>
+<ul>
+<li>&#x5728;&#x67B6;&#x6784;&#x5C42;&#x6B21;&#x4E0A;&#xFF0C;PG&#x4F4D;&#x4E8E;RADOS&#x5C42;&#x7684;&#x4E2D;&#x95F4;&#x3002;<br> a. &#x5F80;&#x4E0A;&#x8D1F;&#x8D23;&#x63A5;&#x6536;&#x548C;&#x5904;&#x7406;&#x6765;&#x81EA;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x8BF7;&#x6C42;&#x3002;<br> b. &#x5F80;&#x4E0B;&#x8D1F;&#x8D23;&#x5C06;&#x8FD9;&#x4E9B;&#x6570;&#x636E;&#x8BF7;&#x6C42;&#x7FFB;&#x8BD1;&#x4E3A;&#x80FD;&#x591F;&#x88AB;&#x672C;&#x5730;&#x5BF9;&#x8C61;&#x5B58;&#x50A8;&#x6240;&#x80FD;&#x7406;&#x89E3;&#x7684;&#x4E8B;&#x52A1;&#x3002;</li>
+<li>&#x662F;&#x7EC4;&#x6210;&#x5B58;&#x50A8;&#x6C60;&#x7684;&#x57FA;&#x672C;&#x5355;&#x4F4D;&#xFF0C;&#x5B58;&#x50A8;&#x6C60;&#x4E2D;&#x7684;&#x5F88;&#x591A;&#x7279;&#x6027;&#xFF0C;&#x90FD;&#x662F;&#x76F4;&#x63A5;&#x4F9D;&#x6258;&#x4E8E;PG&#x5B9E;&#x73B0;&#x7684;&#x3002;</li>
+<li>&#x9762;&#x5411;&#x5BB9;&#x707E;&#x57DF;&#x7684;&#x5907;&#x4EFD;&#x7B56;&#x7565;&#x4F7F;&#x5F97;&#x4E00;&#x822C;&#x800C;&#x8A00;&#x7684;PG&#x9700;&#x8981;&#x6267;&#x884C;&#x8DE8;&#x8282;&#x70B9;&#x7684;&#x5206;&#x5E03;&#x5F0F;&#x5199;&#xFF0C;&#x56E0;&#x6B64;&#x6570;&#x636E;&#x5728;&#x4E0D;&#x540C;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x540C;&#x6B65;&#x3001;&#x6062;&#x590D;&#x65F6;&#x7684;&#x6570;&#x636E;&#x4FEE;&#x590D;&#x4E5F;&#x90FD;&#x662F;&#x4F9D;&#x8D56;PG&#x5B8C;&#x6210;&#x3002;</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="2-PG&#x72B6;&#x6001;&#x8868;"><a href="#2-PG&#x72B6;&#x6001;&#x8868;" class="headerlink" title="2. PG&#x72B6;&#x6001;&#x8868;"></a>2. PG&#x72B6;&#x6001;&#x8868;</h1><p>&#x6B63;&#x5E38;&#x7684;PG&#x72B6;&#x6001;&#x662F; 100%&#x7684;active + clean&#xFF0C; &#x8FD9;&#x8868;&#x793A;&#x6240;&#x6709;&#x7684;PG&#x662F;&#x53EF;&#x8BBF;&#x95EE;&#x7684;&#xFF0C;&#x6240;&#x6709;&#x526F;&#x672C;&#x90FD;&#x5BF9;&#x5168;&#x90E8;PG&#x90FD;&#x53EF;&#x7528;&#x3002;<br> &#x5982;&#x679C;Ceph&#x4E5F;&#x62A5;&#x544A;PG&#x7684;&#x5176;&#x4ED6;&#x7684;&#x8B66;&#x544A;&#x6216;&#x8005;&#x9519;&#x8BEF;&#x72B6;&#x6001;&#x3002;PG&#x72B6;&#x6001;&#x8868;&#xFF1A;</p>
+<table>
+<thead>
+<tr>
+<th>&#x72B6;&#x6001;</th>
+<th>&#x63CF;&#x8FF0;</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Activating</td>
+<td>Peering&#x5DF2;&#x7ECF;&#x5B8C;&#x6210;&#xFF0C;PG&#x6B63;&#x5728;&#x7B49;&#x5F85;&#x6240;&#x6709;PG&#x5B9E;&#x4F8B;&#x540C;&#x6B65;&#x5E76;&#x56FA;&#x5316;Peering&#x7684;&#x7ED3;&#x679C;(Info&#x3001;Log&#x7B49;)</td>
+</tr>
+<tr>
+<td>Active</td>
+<td>&#x6D3B;&#x8DC3;&#x6001;&#x3002;PG&#x53EF;&#x4EE5;&#x6B63;&#x5E38;&#x5904;&#x7406;&#x6765;&#x81EA;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x8BFB;&#x5199;&#x8BF7;&#x6C42;</td>
+</tr>
+<tr>
+<td>Backfilling</td>
+<td>&#x6B63;&#x5728;&#x540E;&#x53F0;&#x586B;&#x5145;&#x6001;&#x3002; backfill&#x662F;recovery&#x7684;&#x4E00;&#x79CD;&#x7279;&#x6B8A;&#x573A;&#x666F;&#xFF0C;&#x6307;peering&#x5B8C;&#x6210;&#x540E;&#xFF0C;&#x5982;&#x679C;&#x57FA;&#x4E8E;&#x5F53;&#x524D;&#x6743;&#x5A01;&#x65E5;&#x5FD7;&#x65E0;&#x6CD5;&#x5BF9;Up  Set&#x5F53;&#x4E2D;&#x7684;&#x67D0;&#x4E9B;PG&#x5B9E;&#x4F8B;&#x5B9E;&#x65BD;&#x589E;&#x91CF;&#x540C;&#x6B65;(&#x4F8B;&#x5982;&#x627F;&#x8F7D;&#x8FD9;&#x4E9B;PG&#x5B9E;&#x4F8B;&#x7684;OSD&#x79BB;&#x7EBF;&#x592A;&#x4E45;&#xFF0C;&#x6216;&#x8005;&#x662F;&#x65B0;&#x7684;OSD&#x52A0;&#x5165;&#x96C6;&#x7FA4;&#x5BFC;&#x81F4;&#x7684;PG&#x5B9E;&#x4F8B;&#x6574;&#x4F53;&#x8FC1;&#x79FB;)  &#x5219;&#x901A;&#x8FC7;&#x5B8C;&#x5168;&#x62F7;&#x8D1D;&#x5F53;&#x524D;Primary&#x6240;&#x6709;&#x5BF9;&#x8C61;&#x7684;&#x65B9;&#x5F0F;&#x8FDB;&#x884C;&#x5168;&#x91CF;&#x540C;&#x6B65;</td>
+</tr>
+<tr>
+<td>Backfill-toofull</td>
+<td>&#x67D0;&#x4E2A;&#x9700;&#x8981;&#x88AB;Backfill&#x7684;PG&#x5B9E;&#x4F8B;&#xFF0C;&#x5176;&#x6240;&#x5728;&#x7684;OSD&#x53EF;&#x7528;&#x7A7A;&#x95F4;&#x4E0D;&#x8DB3;&#xFF0C;Backfill&#x6D41;&#x7A0B;&#x5F53;&#x524D;&#x88AB;&#x6302;&#x8D77;</td>
+</tr>
+<tr>
+<td>Backfill-wait</td>
+<td>&#x7B49;&#x5F85;Backfill &#x8D44;&#x6E90;&#x9884;&#x7559;</td>
+</tr>
+<tr>
+<td>Clean</td>
+<td>&#x5E72;&#x51C0;&#x6001;&#x3002;PG&#x5F53;&#x524D;&#x4E0D;&#x5B58;&#x5728;&#x5F85;&#x4FEE;&#x590D;&#x7684;&#x5BF9;&#x8C61;&#xFF0C; Acting Set&#x548C;Up Set&#x5185;&#x5BB9;&#x4E00;&#x81F4;&#xFF0C;&#x5E76;&#x4E14;&#x5927;&#x5C0F;&#x7B49;&#x4E8E;&#x5B58;&#x50A8;&#x6C60;&#x7684;&#x526F;&#x672C;&#x6570;</td>
+</tr>
+<tr>
+<td>Creating</td>
+<td>PG&#x6B63;&#x5728;&#x88AB;&#x521B;&#x5EFA;</td>
+</tr>
+<tr>
+<td>Deep</td>
+<td>PG&#x6B63;&#x5728;&#x6216;&#x8005;&#x5373;&#x5C06;&#x8FDB;&#x884C;&#x5BF9;&#x8C61;&#x4E00;&#x81F4;&#x6027;&#x626B;&#x63CF;&#x6E05;&#x6D17;</td>
+</tr>
+<tr>
+<td>Degraded</td>
+<td>&#x964D;&#x7EA7;&#x72B6;&#x6001;&#x3002;Peering&#x5B8C;&#x6210;&#x540E;&#xFF0C;PG&#x68C0;&#x6D4B;&#x5230;&#x4EFB;&#x610F;&#x4E00;&#x4E2A;PG&#x5B9E;&#x4F8B;&#x5B58;&#x5728;&#x4E0D;&#x4E00;&#x81F4;(&#x9700;&#x8981;&#x88AB;&#x540C;&#x6B65;/&#x4FEE;&#x590D;)&#x7684;&#x5BF9;&#x8C61;&#xFF0C;&#x6216;&#x8005;&#x5F53;&#x524D;ActingSet &#x5C0F;&#x4E8E;&#x5B58;&#x50A8;&#x6C60;&#x526F;&#x672C;&#x6570;</td>
+</tr>
+<tr>
+<td>Down</td>
+<td>Peering&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;PG&#x68C0;&#x6D4B;&#x5230;&#x67D0;&#x4E2A;&#x4E0D;&#x80FD;&#x88AB;&#x8DF3;&#x8FC7;&#x7684;Interval&#x4E2D;(&#x4F8B;&#x5982;&#x8BE5;Interval&#x671F;&#x95F4;&#xFF0C;PG&#x5B8C;&#x6210;&#x4E86;Peering&#xFF0C;&#x5E76;&#x4E14;&#x6210;&#x529F;&#x5207;&#x6362;&#x81F3;Active&#x72B6;&#x6001;&#xFF0C;&#x4ECE;&#x800C;&#x6709;&#x53EF;&#x80FD;&#x6B63;&#x5E38;&#x5904;&#x7406;&#x4E86;&#x6765;&#x81EA;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x8BFB;&#x5199;&#x8BF7;&#x6C42;),&#x5F53;&#x524D;&#x5269;&#x4F59;&#x5728;&#x7EBF;&#x7684;OSD&#x4E0D;&#x8DB3;&#x4EE5;&#x5B8C;&#x6210;&#x6570;&#x636E;&#x4FEE;&#x590D;</td>
+</tr>
+<tr>
+<td>Incomplete</td>
+<td>Peering&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C; &#x7531;&#x4E8E; a. &#x65E0;&#x975E;&#x9009;&#x51FA;&#x6743;&#x5A01;&#x65E5;&#x5FD7; b. &#x901A;&#x8FC7;choose_acting&#x9009;&#x51FA;&#x7684;Acting Set&#x540E;&#x7EED;&#x4E0D;&#x8DB3;&#x4EE5;&#x5B8C;&#x6210;&#x6570;&#x636E;&#x4FEE;&#x590D;&#xFF0C;&#x5BFC;&#x81F4;Peering&#x65E0;&#x975E;&#x6B63;&#x5E38;&#x5B8C;&#x6210;</td>
+</tr>
+<tr>
+<td>Inconsistent</td>
+<td>&#x4E0D;&#x4E00;&#x81F4;&#x6001;&#x3002;&#x96C6;&#x7FA4;&#x6E05;&#x7406;&#x548C;&#x6DF1;&#x5EA6;&#x6E05;&#x7406;&#x540E;&#x68C0;&#x6D4B;&#x5230;PG&#x4E2D;&#x7684;&#x5BF9;&#x8C61;&#x5728;&#x526F;&#x672C;&#x5B58;&#x5728;&#x4E0D;&#x4E00;&#x81F4;&#xFF0C;&#x4F8B;&#x5982;&#x5BF9;&#x8C61;&#x7684;&#x6587;&#x4EF6;&#x5927;&#x5C0F;&#x4E0D;&#x4E00;&#x81F4;&#x6216;Recovery&#x7ED3;&#x675F;&#x540E;&#x4E00;&#x4E2A;&#x5BF9;&#x8C61;&#x7684;&#x526F;&#x672C;&#x4E22;&#x5931;</td>
+</tr>
+<tr>
+<td>Peered</td>
+<td>Peering&#x5DF2;&#x7ECF;&#x5B8C;&#x6210;&#xFF0C;&#x4F46;&#x662F;PG&#x5F53;&#x524D;ActingSet&#x89C4;&#x6A21;&#x5C0F;&#x4E8E;&#x5B58;&#x50A8;&#x6C60;&#x89C4;&#x5B9A;&#x7684;&#x6700;&#x5C0F;&#x526F;&#x672C;&#x6570;(min_size)</td>
+</tr>
+<tr>
+<td>Peering</td>
+<td>&#x6B63;&#x5728;&#x540C;&#x6B65;&#x6001;&#x3002;PG&#x6B63;&#x5728;&#x6267;&#x884C;&#x540C;&#x6B65;&#x5904;&#x7406;</td>
+</tr>
+<tr>
+<td>Recovering</td>
+<td>&#x6B63;&#x5728;&#x6062;&#x590D;&#x6001;&#x3002;&#x96C6;&#x7FA4;&#x6B63;&#x5728;&#x6267;&#x884C;&#x8FC1;&#x79FB;&#x6216;&#x540C;&#x6B65;&#x5BF9;&#x8C61;&#x548C;&#x4ED6;&#x4EEC;&#x7684;&#x526F;&#x672C;</td>
+</tr>
+<tr>
+<td>Recovering-wait</td>
+<td>&#x7B49;&#x5F85;Recovery&#x8D44;&#x6E90;&#x9884;&#x7559;</td>
+</tr>
+<tr>
+<td>Remapped</td>
+<td>&#x91CD;&#x65B0;&#x6620;&#x5C04;&#x6001;&#x3002;PG&#x6D3B;&#x52A8;&#x96C6;&#x4EFB;&#x4F55;&#x7684;&#x4E00;&#x4E2A;&#x6539;&#x53D8;&#xFF0C;&#x6570;&#x636E;&#x53D1;&#x751F;&#x4ECE;&#x8001;&#x6D3B;&#x52A8;&#x96C6;&#x5230;&#x65B0;&#x6D3B;&#x52A8;&#x96C6;&#x7684;&#x8FC1;&#x79FB;&#x3002;&#x5728;&#x8FC1;&#x79FB;&#x671F;&#x95F4;&#x8FD8;&#x662F;&#x7528;&#x8001;&#x7684;&#x6D3B;&#x52A8;&#x96C6;&#x4E2D;&#x7684;&#x4E3B;OSD&#x5904;&#x7406;&#x5BA2;&#x6237;&#x7AEF;&#x8BF7;&#x6C42;&#xFF0C;&#x4E00;&#x65E6;&#x8FC1;&#x79FB;&#x5B8C;&#x6210;&#x65B0;&#x6D3B;&#x52A8;&#x96C6;&#x4E2D;&#x7684;&#x4E3B;OSD&#x5F00;&#x59CB;&#x5904;&#x7406;</td>
+</tr>
+<tr>
+<td>Repair</td>
+<td>PG&#x5728;&#x6267;&#x884C;Scrub&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;&#x5982;&#x679C;&#x53D1;&#x73B0;&#x5B58;&#x5728;&#x4E0D;&#x4E00;&#x81F4;&#x7684;&#x5BF9;&#x8C61;&#xFF0C;&#x5E76;&#x4E14;&#x80FD;&#x591F;&#x4FEE;&#x590D;&#xFF0C;&#x5219;&#x81EA;&#x52A8;&#x8FDB;&#x884C;&#x4FEE;&#x590D;&#x72B6;&#x6001;</td>
+</tr>
+<tr>
+<td>Scrubbing</td>
+<td>PG&#x6B63;&#x5728;&#x6216;&#x8005;&#x5373;&#x5C06;&#x8FDB;&#x884C;&#x5BF9;&#x8C61;&#x4E00;&#x81F4;&#x6027;&#x626B;&#x63CF;</td>
+</tr>
+<tr>
+<td>Unactive</td>
+<td>&#x975E;&#x6D3B;&#x8DC3;&#x6001;&#x3002;PG&#x4E0D;&#x80FD;&#x5904;&#x7406;&#x8BFB;&#x5199;&#x8BF7;&#x6C42;</td>
+</tr>
+<tr>
+<td>Unclean</td>
+<td>&#x975E;&#x5E72;&#x51C0;&#x6001;&#x3002;PG&#x4E0D;&#x80FD;&#x4ECE;&#x4E0A;&#x4E00;&#x4E2A;&#x5931;&#x8D25;&#x4E2D;&#x6062;&#x590D;</td>
+</tr>
+<tr>
+<td>Stale</td>
+<td>&#x672A;&#x5237;&#x65B0;&#x6001;&#x3002;PG&#x72B6;&#x6001;&#x6CA1;&#x6709;&#x88AB;&#x4EFB;&#x4F55;OSD&#x66F4;&#x65B0;&#xFF0C;&#x8FD9;&#x8BF4;&#x660E;&#x6240;&#x6709;&#x5B58;&#x50A8;&#x8FD9;&#x4E2A;PG&#x7684;OSD&#x53EF;&#x80FD;&#x6302;&#x6389;, &#x6216;&#x8005;Mon&#x6CA1;&#x6709;&#x68C0;&#x6D4B;&#x5230;Primary&#x7EDF;&#x8BA1;&#x4FE1;&#x606F;(&#x7F51;&#x7EDC;&#x6296;&#x52A8;)</td>
+</tr>
+<tr>
+<td>Undersized</td>
+<td>PG&#x5F53;&#x524D;Acting Set&#x5C0F;&#x4E8E;&#x5B58;&#x50A8;&#x6C60;&#x526F;&#x672C;&#x6570;</td>
+</tr>
+</tbody></table>
+<h1 id="3-&#x72B6;&#x6001;&#x8BE6;&#x89E3;&#x53CA;&#x6545;&#x969C;&#x6A21;&#x62DF;&#x590D;&#x73B0;"><a href="#3-&#x72B6;&#x6001;&#x8BE6;&#x89E3;&#x53CA;&#x6545;&#x969C;&#x6A21;&#x62DF;&#x590D;&#x73B0;" class="headerlink" title="3. &#x72B6;&#x6001;&#x8BE6;&#x89E3;&#x53CA;&#x6545;&#x969C;&#x6A21;&#x62DF;&#x590D;&#x73B0;"></a>3. &#x72B6;&#x6001;&#x8BE6;&#x89E3;&#x53CA;&#x6545;&#x969C;&#x6A21;&#x62DF;&#x590D;&#x73B0;</h1><h2 id="3-1-Degraded"><a href="#3-1-Degraded" class="headerlink" title="3.1 Degraded"></a>3.1 Degraded</h2><h3 id="3-1-1-&#x8BF4;&#x660E;"><a href="#3-1-1-&#x8BF4;&#x660E;" class="headerlink" title="3.1.1 &#x8BF4;&#x660E;"></a>3.1.1 &#x8BF4;&#x660E;</h3><ul>
+<li>&#x964D;&#x7EA7;&#xFF1A;&#x7531;&#x4E0A;&#x6587;&#x53EF;&#x4EE5;&#x5F97;&#x77E5;&#xFF0C;&#x6BCF;&#x4E2A;PG&#x6709;&#x4E09;&#x4E2A;&#x526F;&#x672C;&#xFF0C;&#x5206;&#x522B;&#x4FDD;&#x5B58;&#x5728;&#x4E0D;&#x540C;&#x7684;OSD&#x4E2D;&#xFF0C;&#x5728;&#x975E;&#x6545;&#x969C;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x8FD9;&#x4E2A;PG&#x662F;active+clean &#x72B6;&#x6001;&#xFF0C;&#x90A3;&#x4E48;&#xFF0C;&#x5982;&#x679C;PG &#x7684; &#x526F;&#x672C;osd.4 &#x6302;&#x6389;&#x4E86;&#xFF0C;&#x8FD9;&#x4E2A; PG &#x662F;&#x964D;&#x7EA7;&#x72B6;&#x6001;&#x3002;</li>
+</ul>
+<h3 id="3-1-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-1-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.1.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.1.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x505C;&#x6B62;osd.1</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@1</span><br></pre></td></tr></table></figure>
+
+<p>b. &#x67E5;&#x770B;PG&#x72B6;&#x6001;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ bin/ceph pg <span class="built_in">stat</span></span><br><span class="line">20 pgs: 20 active+undersized+degraded; 14512 kB data, 302 GB used, 6388 GB / 6691 GB avail; 12/36 objects degraded (33.333%)</span><br></pre></td></tr></table></figure>
+
+<p>c. &#x67E5;&#x770B;&#x96C6;&#x7FA4;&#x76D1;&#x63A7;&#x72B6;&#x6001;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ bin/ceph health detail</span><br><span class="line">HEALTH_WARN <span class="number">1</span> osds down; Degraded data redundancy: <span class="number">12</span>/<span class="number">36</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">33.333</span>%</span>), 20 pgs unclean, 20 pgs degraded</span>; application not enabled <span class="keyword">on</span> <span class="number">1</span> pool(s)</span><br><span class="line">OSD_DOWN <span class="number">1</span> osds down</span><br><span class="line">    osd<span class="number">.1</span> (root=<span class="keyword">default</span>,host=ceph-xx-cc00) <span class="keyword">is</span> down</span><br><span class="line">PG_DEGRADED Degraded data redundancy: <span class="number">12</span>/<span class="number">36</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">33.333</span>%</span>), 20 pgs unclean, 20 pgs degraded</span></span><br><span class="line"><span class="function">    pg 1.0 <span class="keyword">is</span> active+undersized+degraded, acting [0,2]</span></span><br><span class="line"><span class="function">    pg 1.1 <span class="keyword">is</span> active+undersized+degraded, acting [2,0]</span></span><br></pre></td></tr></table></figure>
+
+<p>d. &#x5BA2;&#x6237;&#x7AEF;IO&#x64CD;&#x4F5C;</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x5199;&#x5165;&#x5BF9;&#x8C61;</span></span><br><span class="line">$ bin/rados -p test_pool put myobject ceph.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#&#x8BFB;&#x53D6;&#x5BF9;&#x8C61;&#x5230;&#x6587;&#x4EF6;</span></span><br><span class="line">$ bin/rados -p test_pool get myobject.old</span><br><span class="line"></span><br><span class="line"><span class="comment">#&#x67E5;&#x770B;&#x6587;&#x4EF6;</span></span><br><span class="line">$ ll ceph.conf*</span><br><span class="line">-rw-r--r-- <span class="number">1</span> root root <span class="number">6211</span> Jun <span class="number">25</span> <span class="number">14</span><span class="symbol">:</span><span class="number">01</span> ceph.conf</span><br><span class="line">-rw-r--r-- <span class="number">1</span> root root <span class="number">6211</span> Jul  <span class="number">3</span> <span class="number">19</span><span class="symbol">:</span><span class="number">57</span> ceph.conf.old</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6545;&#x969C;&#x603B;&#x7ED3;</strong>&#xFF1A;<br> &#x4E3A;&#x4E86;&#x6A21;&#x62DF;&#x6545;&#x969C;&#xFF0C;(size = 3, min_size = 2) &#x6211;&#x4EEC;&#x624B;&#x52A8;&#x505C;&#x6B62;&#x4E86;  osd.1&#xFF0C;&#x7136;&#x540E;&#x67E5;&#x770B;PG&#x72B6;&#x6001;&#xFF0C;&#x53EF;&#x89C1;&#xFF0C;&#x5B83;&#x6B64;&#x523B;&#x7684;&#x72B6;&#x6001;&#x662F;active+undersized+degraded,&#x5F53;&#x4E00;&#x4E2A; PG &#x6240;&#x5728;&#x7684; OSD  &#x6302;&#x6389;&#x4E4B;&#x540E;&#xFF0C;&#x8FD9;&#x4E2A; PG &#x5C31;&#x4F1A;&#x8FDB;&#x5165;undersized+degraded &#x72B6;&#x6001;&#xFF0C;&#x800C;&#x540E;&#x9762;&#x7684;[0,2]&#x7684;&#x610F;&#x4E49;&#x5C31;&#x662F;&#x8FD8;&#x6709;&#x4E24;&#x4E2A;&#x526F;&#x672C;&#x5B58;&#x6D3B;&#x5728; osd.0 &#x548C;  osd.2 &#x4E0A;, &#x5E76;&#x4E14;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x5BA2;&#x6237;&#x7AEF;&#x53EF;&#x4EE5;&#x6B63;&#x5E38;&#x8BFB;&#x5199;IO&#x3002;</p>
+<h3 id="3-1-3-&#x603B;&#x7ED3;"><a href="#3-1-3-&#x603B;&#x7ED3;" class="headerlink" title="3.1.3 &#x603B;&#x7ED3;"></a>3.1.3 &#x603B;&#x7ED3;</h3><ul>
+<li>&#x964D;&#x7EA7;&#x5C31;&#x662F;&#x5728;&#x53D1;&#x751F;&#x4E86;&#x4E00;&#x4E9B;&#x6545;&#x969C;&#x6BD4;&#x5982;OSD&#x6302;&#x6389;&#x4E4B;&#x540E;&#xFF0C;Ceph &#x5C06;&#x8FD9;&#x4E2A; OSD &#x4E0A;&#x7684;&#x6240;&#x6709; PG &#x6807;&#x8BB0;&#x4E3A; Degraded&#x3002;</li>
+<li>&#x964D;&#x7EA7;&#x7684;&#x96C6;&#x7FA4;&#x53EF;&#x4EE5;&#x6B63;&#x5E38;&#x8BFB;&#x5199;&#x6570;&#x636E;&#xFF0C;&#x964D;&#x7EA7;&#x7684; PG &#x53EA;&#x662F;&#x76F8;&#x5F53;&#x4E8E;&#x5C0F;&#x6BDB;&#x75C5;&#x800C;&#x5DF2;&#xFF0C;&#x5E76;&#x4E0D;&#x662F;&#x4E25;&#x91CD;&#x7684;&#x95EE;&#x9898;&#x3002;</li>
+<li>Undersized&#x7684;&#x610F;&#x601D;&#x5C31;&#x662F;&#x5F53;&#x524D;&#x5B58;&#x6D3B;&#x7684;PG &#x526F;&#x672C;&#x6570;&#x4E3A; 2&#xFF0C;&#x5C0F;&#x4E8E;&#x526F;&#x672C;&#x6570;3&#xFF0C;&#x5C06;&#x5176;&#x505A;&#x6B64;&#x6807;&#x8BB0;&#xFF0C;&#x8868;&#x660E;&#x5B58;&#x8D27;&#x526F;&#x672C;&#x6570;&#x4E0D;&#x8DB3;&#xFF0C;&#x4E5F;&#x4E0D;&#x662F;&#x4E25;&#x91CD;&#x7684;&#x95EE;&#x9898;&#x3002;</li>
+</ul>
+<h2 id="3-2-Peered"><a href="#3-2-Peered" class="headerlink" title="3.2 Peered"></a>3.2 Peered</h2><h3 id="3-2-1-&#x8BF4;&#x660E;"><a href="#3-2-1-&#x8BF4;&#x660E;" class="headerlink" title="3.2.1 &#x8BF4;&#x660E;"></a>3.2.1 &#x8BF4;&#x660E;</h3><ul>
+<li>Peering&#x5DF2;&#x7ECF;&#x5B8C;&#x6210;&#xFF0C;&#x4F46;&#x662F;PG&#x5F53;&#x524D;Acting Set&#x89C4;&#x6A21;&#x5C0F;&#x4E8E;&#x5B58;&#x50A8;&#x6C60;&#x89C4;&#x5B9A;&#x7684;&#x6700;&#x5C0F;&#x526F;&#x672C;&#x6570;(min_size)&#x3002;</li>
+</ul>
+<h3 id="3-2-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-2-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.2.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.2.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x505C;&#x6389;&#x4E24;&#x4E2A;&#x526F;&#x672C;osd.1,osd.0</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@1</span><br><span class="line">$ systemctl stop ceph-osd@0</span><br></pre></td></tr></table></figure>
+
+<p>b. &#x67E5;&#x770B;&#x96C6;&#x7FA4;&#x5065;&#x5EB7;&#x72B6;&#x6001;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ bin/ceph health detail</span><br><span class="line">HEALTH_WARN <span class="number">1</span> osds down; Reduced data availability: <span class="number">4</span> pgs inactive; Degraded data redundancy: <span class="number">26</span>/<span class="number">39</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">66.667</span>%</span>), 20 pgs unclean, 20 pgs degraded</span>; application not enabled <span class="keyword">on</span> <span class="number">1</span> pool(s)</span><br><span class="line">OSD_DOWN <span class="number">1</span> osds down</span><br><span class="line">    osd<span class="number">.0</span> (root=<span class="keyword">default</span>,host=ceph-xx-cc00) <span class="keyword">is</span> down</span><br><span class="line">PG_AVAILABILITY Reduced data availability: <span class="number">4</span> pgs inactive</span><br><span class="line">    pg <span class="number">1.6</span> <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> <span class="number">516.741081</span>, current state undersized+degraded+peered, last acting [<span class="number">2</span>]</span><br><span class="line">    pg <span class="number">1.10</span> <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> <span class="number">516.737888</span>, current state undersized+degraded+peered, last acting [<span class="number">2</span>]</span><br><span class="line">    pg <span class="number">1.11</span> <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> <span class="number">516.737408</span>, current state undersized+degraded+peered, last acting [<span class="number">2</span>]</span><br><span class="line">    pg <span class="number">1.12</span> <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> <span class="number">516.736955</span>, current state undersized+degraded+peered, last acting [<span class="number">2</span>]</span><br><span class="line">PG_DEGRADED Degraded data redundancy: <span class="number">26</span>/<span class="number">39</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">66.667</span>%</span>), 20 pgs unclean, 20 pgs degraded</span></span><br><span class="line"><span class="function">    pg 1.0 <span class="keyword">is</span> undersized+degraded+peered, acting [2]</span></span><br><span class="line"><span class="function">    pg 1.1 <span class="keyword">is</span> undersized+degraded+peered, acting [2]</span></span><br></pre></td></tr></table></figure>
+
+<p>c. &#x5BA2;&#x6237;&#x7AEF;IO&#x64CD;&#x4F5C;(&#x592F;&#x4F4F;)</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#&#x8BFB;&#x53D6;&#x5BF9;&#x8C61;&#x5230;&#x6587;&#x4EF6;&#xFF0C;&#x592F;&#x4F4F;IO</span></span><br><span class="line">$ bin/rados -p test_pool <span class="keyword">get</span> myobject  ceph.conf.old</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6545;&#x969C;&#x603B;&#x7ED3;&#xFF1A;</strong></p>
+<ul>
+<li>&#x73B0;&#x5728;pg &#x53EA;&#x5269;&#x4E0B;osd.2&#x4E0A;&#x5B58;&#x6D3B;&#xFF0C;&#x5E76;&#x4E14; pg &#x8FD8;&#x591A;&#x4E86;&#x4E00;&#x4E2A;&#x72B6;&#x6001;&#xFF1A;peered&#xFF0C;&#x82F1;&#x6587;&#x7684;&#x610F;&#x601D;&#x662F;&#x4ED4;&#x7EC6;&#x770B;&#xFF0C;&#x8FD9;&#x91CC;&#x6211;&#x4EEC;&#x53EF;&#x4EE5;&#x7406;&#x89E3;&#x6210;&#x534F;&#x5546;&#x3001;&#x641C;&#x7D22;&#x3002;</li>
+<li>&#x8FD9;&#x65F6;&#x5019;&#x8BFB;&#x53D6;&#x6587;&#x4EF6;&#xFF0C;&#x4F1A;&#x53D1;&#x73B0;&#x6307;&#x4EE4;&#x4F1A;&#x5361;&#x5728;&#x90A3;&#x4E2A;&#x5730;&#x65B9;&#x4E00;&#x76F4;&#x4E0D;&#x52A8;&#xFF0C;&#x4E3A;&#x4EC0;&#x4E48;&#x5C31;&#x4E0D;&#x80FD;&#x8BFB;&#x53D6;&#x5185;&#x5BB9;&#x4E86;&#xFF0C;&#x56E0;&#x4E3A;&#x6211;&#x4EEC;&#x8BBE;&#x7F6E;&#x7684; min_size=2 &#xFF0C;&#x5982;&#x679C;&#x5B58;&#x6D3B;&#x6570;&#x5C11;&#x4E8E;2&#xFF0C;&#x6BD4;&#x5982;&#x8FD9;&#x91CC;&#x7684; 1 &#xFF0C;&#x90A3;&#x4E48;&#x5C31;&#x4E0D;&#x4F1A;&#x54CD;&#x5E94;&#x5916;&#x90E8;&#x7684;IO&#x8BF7;&#x6C42;&#x3002;</li>
+</ul>
+<p>d. &#x8C03;&#x6574;min_size=1&#x53EF;&#x4EE5;&#x89E3;&#x51B3;IO&#x592F;&#x4F4F;&#x95EE;&#x9898;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x8BBE;&#x7F6E;min_size = 1</span></span><br><span class="line">$ bin/ceph osd pool <span class="built_in">set</span> test_pool min_size 1</span><br><span class="line"><span class="built_in">set</span> pool 1 min_size to 1</span><br></pre></td></tr></table></figure>
+
+<p>e. &#x67E5;&#x770B;&#x96C6;&#x7FA4;&#x76D1;&#x63A7;&#x72B6;&#x6001;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ bin/ceph health detail</span><br><span class="line">HEALTH_WARN <span class="number">1</span> osds down; Degraded data redundancy: <span class="number">26</span>/<span class="number">39</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">66.667</span>%</span>), 20 pgs unclean, 20 pgs degraded, 20 pgs undersized</span>; application not enabled <span class="keyword">on</span> <span class="number">1</span> pool(s)</span><br><span class="line">OSD_DOWN <span class="number">1</span> osds down</span><br><span class="line">    osd<span class="number">.0</span> (root=<span class="keyword">default</span>,host=ceph-xx-cc00) <span class="keyword">is</span> down</span><br><span class="line">PG_DEGRADED Degraded data redundancy: <span class="number">26</span>/<span class="number">39</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">66.667</span>%</span>), 20 pgs unclean, 20 pgs degraded, 20 pgs undersized</span></span><br><span class="line"><span class="function">    pg 1.0 <span class="keyword">is</span> stuck undersized <span class="keyword">for</span> 65.958983, current state active+undersized+degraded, last acting [2]</span></span><br><span class="line"><span class="function">    pg 1.1 <span class="keyword">is</span> stuck undersized <span class="keyword">for</span> 65.960092, current state active+undersized+degraded, last acting [2]</span></span><br><span class="line"><span class="function">    pg 1.2 <span class="keyword">is</span> stuck undersized <span class="keyword">for</span> 65.960974, current state active+undersized+degraded, last acting [2]</span></span><br></pre></td></tr></table></figure>
+
+<p>f. &#x5BA2;&#x6237;&#x7AEF;IO&#x64CD;&#x4F5C;</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x8BFB;&#x53D6;&#x5BF9;&#x8C61;&#x5230;&#x6587;&#x4EF6;&#x4E2D;</span></span><br><span class="line">$ ll -lh ceph.conf*</span><br><span class="line">-rw-r--r-- <span class="number">1</span> root root <span class="number">6.1</span>K Jun <span class="number">25</span> <span class="number">14</span><span class="symbol">:</span><span class="number">01</span> ceph.conf</span><br><span class="line">-rw-r--r-- <span class="number">1</span> root root <span class="number">6.1</span>K Jul  <span class="number">3</span> <span class="number">20</span><span class="symbol">:</span><span class="number">11</span> ceph.conf.old</span><br><span class="line">-rw-r--r-- <span class="number">1</span> root root <span class="number">6.1</span>K Jul  <span class="number">3</span> <span class="number">20</span><span class="symbol">:</span><span class="number">11</span> ceph.conf.old.<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6545;&#x969C;&#x603B;&#x7ED3;&#xFF1A;</strong></p>
+<ul>
+<li>&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;PG&#x72B6;&#x6001;Peered&#x6CA1;&#x6709;&#x4E86;&#xFF0C;&#x5E76;&#x4E14;&#x5BA2;&#x6237;&#x7AEF;&#x6587;&#x4EF6;IO&#x53EF;&#x4EE5;&#x6B63;&#x5E38;&#x8BFB;&#x5199;&#x4E86;&#x3002;</li>
+<li>&#x5F53;min_size=1&#x65F6;&#xFF0C;&#x53EA;&#x8981;&#x96C6;&#x7FA4;&#x91CC;&#x9762;&#x6709;&#x4E00;&#x4EFD;&#x526F;&#x672C;&#x6D3B;&#x7740;&#xFF0C;&#x90A3;&#x5C31;&#x53EF;&#x4EE5;&#x54CD;&#x5E94;&#x5916;&#x90E8;&#x7684;IO&#x8BF7;&#x6C42;&#x3002;</li>
+</ul>
+<h3 id="3-2-3-&#x603B;&#x7ED3;"><a href="#3-2-3-&#x603B;&#x7ED3;" class="headerlink" title="3.2.3 &#x603B;&#x7ED3;"></a>3.2.3 &#x603B;&#x7ED3;</h3><ul>
+<li>Peered&#x72B6;&#x6001;&#x6211;&#x4EEC;&#x8FD9;&#x91CC;&#x53EF;&#x4EE5;&#x5C06;&#x5B83;&#x7406;&#x89E3;&#x6210;&#x5B83;&#x5728;&#x7B49;&#x5F85;&#x5176;&#x4ED6;&#x526F;&#x672C;&#x4E0A;&#x7EBF;&#x3002;</li>
+<li>&#x5F53;min_size = 2 &#x65F6;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x5FC5;&#x987B;&#x4FDD;&#x8BC1;&#x6709;&#x4E24;&#x4E2A;&#x526F;&#x672C;&#x5B58;&#x6D3B;&#x7684;&#x65F6;&#x5019;&#x5C31;&#x53EF;&#x4EE5;&#x53BB;&#x9664;Peered&#x8FD9;&#x4E2A;&#x72B6;&#x6001;&#x3002;</li>
+<li>&#x5904;&#x4E8E; Peered &#x72B6;&#x6001;&#x7684; PG &#x662F;&#x4E0D;&#x80FD;&#x54CD;&#x5E94;&#x5916;&#x90E8;&#x7684;&#x8BF7;&#x6C42;&#x7684;&#x5E76;&#x4E14;IO&#x88AB;&#x6302;&#x8D77;&#x3002;</li>
+</ul>
+<h2 id="3-3-Remapped"><a href="#3-3-Remapped" class="headerlink" title="3.3 Remapped"></a>3.3 Remapped</h2><h3 id="3-3-1-&#x8BF4;&#x660E;"><a href="#3-3-1-&#x8BF4;&#x660E;" class="headerlink" title="3.3.1 &#x8BF4;&#x660E;"></a>3.3.1 &#x8BF4;&#x660E;</h3><ul>
+<li>Peering&#x5B8C;&#x6210;&#xFF0C;PG&#x5F53;&#x524D;Acting Set&#x4E0E;Up Set&#x4E0D;&#x4E00;&#x81F4;&#x5C31;&#x4F1A;&#x51FA;&#x73B0;Remapped&#x72B6;&#x6001;&#x3002;</li>
+</ul>
+<h3 id="3-3-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-3-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.3.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.3.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x505C;&#x6B62;osd.x</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@x</span><br></pre></td></tr></table></figure>
+
+<p>b. &#x95F4;&#x9694;5&#x5206;&#x949F;&#xFF0C;&#x542F;&#x52A8;osd.x</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl start ceph-osd@x</span><br></pre></td></tr></table></figure>
+
+<p>c. &#x67E5;&#x770B;PG&#x72B6;&#x6001;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ ceph pg <span class="built_in">stat</span></span><br><span class="line">1416 pgs: 6 active+clean+remapped, 1288 active+clean, 3 stale+active+clean, 119 active+undersized+degraded; 74940 MB data, 250 GB used, 185 TB / 185 TB avail; 1292/48152 objects degraded (2.683%)</span><br><span class="line">$ ceph pg dump | grep remapped</span><br><span class="line">dumped all</span><br><span class="line">13.cd         0                  0        0         0       0         0    2        2      active+clean+remapped 2018-07-03 20:26:14.478665       9453<span class="string">&apos;2   20716:11343    [10,23]         10 [10,23,14]             10       9453&apos;</span>2 2018-07-03 20:26:14.478597          9453<span class="string">&apos;2 2018-07-01 13:11:43.262605</span></span><br><span class="line"><span class="string">3.1a         44                  0        0         0       0 373293056 1500     1500      active+clean+remapped 2018-07-03 20:25:47.885366  20272&apos;</span>79063  20716:109173     [9,23]          9  [9,23,12]              9  20272<span class="string">&apos;79063 2018-07-03 03:14:23.960537     20272&apos;</span>79063 2018-07-03 03:14:23.960537</span><br><span class="line">5.f           0                  0        0         0       0         0    0        0      active+clean+remapped 2018-07-03 20:25:47.888430          0<span class="string">&apos;0   20716:15530     [23,8]         23  [23,8,22]             23          0&apos;</span>0 2018-07-03 06:44:05.232179             0<span class="string">&apos;0 2018-06-30 22:27:16.778466</span></span><br><span class="line"><span class="string">3.4a         45                  0        0         0       0 390070272 1500     1500      active+clean+remapped 2018-07-03 20:25:47.886669  20272&apos;</span>78385  20716:108086     [7,23]          7  [7,23,17]              7  20272<span class="string">&apos;78385 2018-07-03 13:49:08.190133      7998&apos;</span>78363 2018-06-28 10:30:38.201993</span><br><span class="line">13.102        0                  0        0         0       0         0    5        5      active+clean+remapped 2018-07-03 20:25:47.884983       9453<span class="string">&apos;5   20716:11334     [1,23]          1  [1,23,14]              1       9453&apos;</span>5 2018-07-02 21:10:42.028288          9453<span class="string">&apos;5 2018-07-02 21:10:42.028288</span></span><br><span class="line"><span class="string">13.11d        1                  0        0         0       0   4194304 1539     1539      active+clean+remapped 2018-07-03 20:25:47.886535  20343&apos;</span>22439   20716:86294     [4,23]          4  [4,23,15]              4  20343<span class="string">&apos;22439 2018-07-03 17:21:18.567771     20343&apos;</span>22439 2018-07-03 17:21:18.567771<span class="comment">#2&#x5206;&#x949F;&#x4E4B;&#x540E;&#x67E5;&#x8BE2;$ ceph pg stat</span></span><br><span class="line">1416 pgs: 2 active+undersized+degraded+remapped+backfilling, 10 active+undersized+degraded+remapped+backfill_wait, 1401 active+clean, 3 stale+active+clean; 74940 MB data, 247 GB used, 179 TB / 179 TB avail; 260/48152 objects degraded (0.540%); 49665 kB/s, 9 objects/s recovering$ ceph pg dump | grep remapped</span><br><span class="line">dumped all</span><br><span class="line">13.1e8 2 0 2 0 0 8388608 1527 1527 active+undersized+degraded+remapped+backfill_wait 2018-07-03 20:30:13.999637 9493<span class="string">&apos;38727 20754:165663 [18,33,10] 18 [18,10] 18 9493&apos;</span>38727 2018-07-03 19:53:43.462188 0<span class="string">&apos;0 2018-06-28 20:09:36.303126</span></span><br></pre></td></tr></table></figure>
+
+<p>d. &#x5BA2;&#x6237;&#x7AEF;IO&#x64CD;&#x4F5C;</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#rados&#x8BFB;&#x5199;&#x6B63;&#x5E38;</span></span><br><span class="line">rados -p test_pool put myobject /tmp/test.<span class="built_in">log</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-3-&#x603B;&#x7ED3;"><a href="#3-3-3-&#x603B;&#x7ED3;" class="headerlink" title="3.3.3 &#x603B;&#x7ED3;"></a>3.3.3 &#x603B;&#x7ED3;</h3><ul>
+<li>&#x5728; OSD &#x6302;&#x6389;&#x6216;&#x8005;&#x5728;&#x6269;&#x5BB9;&#x7684;&#x65F6;&#x5019;PG &#x4E0A;&#x7684;OSD&#x4F1A;&#x6309;&#x7167;Crush&#x7B97;&#x6CD5;&#x91CD;&#x65B0;&#x5206;&#x914D;PG &#x6240;&#x5C5E;&#x7684;osd&#x7F16;&#x53F7;&#x3002;&#x5E76;&#x4E14;&#x4F1A;&#x628A; PG  Remap&#x5230;&#x522B;&#x7684;OSD&#x4E0A;&#x53BB;&#x3002;</li>
+<li>Remapped&#x72B6;&#x6001;&#x65F6;&#xFF0C;PG&#x5F53;&#x524D;Acting Set&#x4E0E;Up Set&#x4E0D;&#x4E00;&#x81F4;&#x3002;</li>
+<li>&#x5BA2;&#x6237;&#x7AEF;IO&#x53EF;&#x4EE5;&#x6B63;&#x5E38;&#x8BFB;&#x5199;&#x3002;</li>
+</ul>
+<h2 id="3-4-Recovery"><a href="#3-4-Recovery" class="headerlink" title="3.4 Recovery"></a>3.4 Recovery</h2><h3 id="3-4-1-&#x8BF4;&#x660E;"><a href="#3-4-1-&#x8BF4;&#x660E;" class="headerlink" title="3.4.1 &#x8BF4;&#x660E;"></a>3.4.1 &#x8BF4;&#x660E;</h3><ul>
+<li>&#x6307;PG&#x901A;&#x8FC7;PGLog&#x65E5;&#x5FD7;&#x9488;&#x5BF9;&#x6570;&#x636E;&#x4E0D;&#x4E00;&#x81F4;&#x7684;&#x5BF9;&#x8C61;&#x8FDB;&#x884C;&#x540C;&#x6B65;&#x548C;&#x4FEE;&#x590D;&#x7684;&#x8FC7;&#x7A0B;&#x3002;</li>
+</ul>
+<h3 id="3-4-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-4-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.4.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.4.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x505C;&#x6B62;osd.x</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@x</span><br></pre></td></tr></table></figure>
+
+<p>b. &#x95F4;&#x9694;1&#x5206;&#x949F;&#x542F;&#x52A8;osd.x</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd$ systemctl start ceph-osd@x</span><br></pre></td></tr></table></figure>
+
+<p>c. &#x67E5;&#x770B;&#x96C6;&#x7FA4;&#x76D1;&#x63A7;&#x72B6;&#x6001;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ ceph health detail</span><br><span class="line">HEALTH_WARN Degraded data redundancy: <span class="number">183</span>/<span class="number">57960</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">0.316</span>%</span>), 17 pgs unclean, 17 pgs degraded</span></span><br><span class="line"><span class="function">PG_DEGRADED Degraded data redundancy: 183/57960 objects <span class="title">degraded</span> (<span class="params"><span class="number">0.316</span>%</span>), 17 pgs unclean, 17 pgs degraded</span></span><br><span class="line"><span class="function">    pg 1.19 <span class="keyword">is</span> active+recovery_wait+degraded, acting [29,9,17]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-3-&#x603B;&#x7ED3;"><a href="#3-4-3-&#x603B;&#x7ED3;" class="headerlink" title="3.4.3 &#x603B;&#x7ED3;"></a>3.4.3 &#x603B;&#x7ED3;</h3><ul>
+<li>Recovery&#x662F;&#x901A;&#x8FC7;&#x8BB0;&#x5F55;&#x7684;PGLog&#x8FDB;&#x884C;&#x6062;&#x590D;&#x6570;&#x636E;&#x7684;&#x3002;</li>
+<li>&#x8BB0;&#x5F55;&#x7684;PGLog &#x5728;osd_max_pg_log_entries=10000&#x6761;&#x4EE5;&#x5185;&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x901A;&#x8FC7;PGLog&#x5C31;&#x80FD;&#x589E;&#x91CF;&#x6062;&#x590D;&#x6570;&#x636E;&#x3002;</li>
+</ul>
+<h2 id="3-5-Backfill"><a href="#3-5-Backfill" class="headerlink" title="3.5 Backfill"></a>3.5 Backfill</h2><h3 id="3-5-1-&#x8BF4;&#x660E;"><a href="#3-5-1-&#x8BF4;&#x660E;" class="headerlink" title="3.5.1 &#x8BF4;&#x660E;"></a>3.5.1 &#x8BF4;&#x660E;</h3><ul>
+<li>&#x5F53;PG&#x7684;&#x526F;&#x672C;&#x65E0;&#x6CD5;&#x901A;&#x8FC7;PGLog&#x6765;&#x6062;&#x590D;&#x6570;&#x636E;&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x5C31;&#x9700;&#x8981;&#x8FDB;&#x884C;&#x5168;&#x91CF;&#x540C;&#x6B65;&#xFF0C;&#x901A;&#x8FC7;&#x5B8C;&#x5168;&#x62F7;&#x8D1D;&#x5F53;&#x524D;Primary&#x6240;&#x6709;&#x5BF9;&#x8C61;&#x7684;&#x65B9;&#x5F0F;&#x8FDB;&#x884C;&#x5168;&#x91CF;&#x540C;&#x6B65;&#x3002;</li>
+</ul>
+<h3 id="3-5-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-5-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.5.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.5.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x505C;&#x6B62;osd.x</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@x</span><br></pre></td></tr></table></figure>
+
+<p>b. &#x95F4;&#x9694;10&#x5206;&#x949F;&#x542F;&#x52A8;osd.x</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ osd systemctl start ceph-osd@x</span><br></pre></td></tr></table></figure>
+
+<p>c. &#x67E5;&#x770B;&#x96C6;&#x7FA4;&#x5065;&#x5EB7;&#x72B6;&#x6001;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ ceph health detail</span><br><span class="line">HEALTH_WARN Degraded data redundancy: <span class="number">6</span>/<span class="number">57927</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">0.010</span>%</span>), 1 pg unclean, 1 pg degraded</span></span><br><span class="line"><span class="function">PG_DEGRADED Degraded data redundancy: 6/57927 objects <span class="title">degraded</span> (<span class="params"><span class="number">0.010</span>%</span>), 1 pg unclean, 1 pg degraded</span></span><br><span class="line"><span class="function">    pg 3.7f <span class="keyword">is</span> active+undersized+degraded+remapped+backfilling, acting [21,29]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-5-3-&#x603B;&#x7ED3;"><a href="#3-5-3-&#x603B;&#x7ED3;" class="headerlink" title="3.5.3 &#x603B;&#x7ED3;"></a>3.5.3 &#x603B;&#x7ED3;</h3><ul>
+<li>&#x65E0;&#x6CD5;&#x6839;&#x636E;&#x8BB0;&#x5F55;&#x7684;PGLog&#x8FDB;&#x884C;&#x6062;&#x590D;&#x6570;&#x636E;&#x65F6;&#xFF0C;&#x5C31;&#x9700;&#x8981;&#x6267;&#x884C;Backfill&#x8FC7;&#x7A0B;&#x5168;&#x91CF;&#x6062;&#x590D;&#x6570;&#x636E;&#x3002;</li>
+<li>&#x5982;&#x679C;&#x8D85;&#x8FC7;osd_max_pg_log_entries=10000&#x6761;&#xFF0C; &#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x9700;&#x8981;&#x5168;&#x91CF;&#x6062;&#x590D;&#x6570;&#x636E;&#x3002;</li>
+</ul>
+<h2 id="3-6-Stale"><a href="#3-6-Stale" class="headerlink" title="3.6 Stale"></a>3.6 Stale</h2><h3 id="3-6-1-&#x8BF4;&#x660E;"><a href="#3-6-1-&#x8BF4;&#x660E;" class="headerlink" title="3.6.1 &#x8BF4;&#x660E;"></a>3.6.1 &#x8BF4;&#x660E;</h3><ul>
+<li>mon&#x68C0;&#x6D4B;&#x5230;&#x5F53;&#x524D;PG&#x7684;Primary&#x6240;&#x5728;&#x7684;osd&#x5B95;&#x673A;&#x3002;</li>
+<li>Primary&#x8D85;&#x65F6;&#x672A;&#x5411;mon&#x4E0A;&#x62A5;pg&#x76F8;&#x5173;&#x7684;&#x4FE1;&#x606F;(&#x4F8B;&#x5982;&#x7F51;&#x7EDC;&#x963B;&#x585E;)&#x3002;</li>
+<li>PG&#x5185;&#x4E09;&#x4E2A;&#x526F;&#x672C;&#x90FD;&#x6302;&#x6389;&#x7684;&#x60C5;&#x51B5;&#x3002;</li>
+</ul>
+<h3 id="3-6-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-6-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.6.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.6.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x5206;&#x522B;&#x505C;&#x6B62;PG&#x4E2D;&#x7684;&#x4E09;&#x4E2A;&#x526F;&#x672C;osd, &#x9996;&#x5148;&#x505C;&#x6B62;osd.23</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@23</span><br></pre></td></tr></table></figure>
+
+<p>b. &#x7136;&#x540E;&#x505C;&#x6B62;osd.24</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@24</span><br></pre></td></tr></table></figure>
+
+<p>c. &#x67E5;&#x770B;&#x505C;&#x6B62;&#x4E24;&#x4E2A;&#x526F;&#x672C;PG 1.45&#x7684;&#x72B6;&#x6001;(undersized+degraded+peered)</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ ceph health detail</span><br><span class="line">HEALTH_WARN <span class="number">2</span> osds down; Reduced data availability: <span class="number">9</span> pgs inactive; Degraded data redundancy: <span class="number">3041</span>/<span class="number">47574</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">6.392</span>%</span>), 149 pgs unclean, 149 pgs degraded, 149 pgs undersized</span></span><br><span class="line"><span class="function">OSD_DOWN 2 osds down</span></span><br><span class="line"><span class="function">    osd.23 (<span class="params">root=<span class="keyword">default</span>,host=ceph-xx-osd02</span>) <span class="keyword">is</span> down</span></span><br><span class="line"><span class="function">    osd.24 (<span class="params">root=<span class="keyword">default</span>,host=ceph-xx-osd03</span>) <span class="keyword">is</span> down</span></span><br><span class="line"><span class="function">PG_AVAILABILITY Reduced data availability: 9 pgs inactive</span></span><br><span class="line"><span class="function">    pg 1.45 <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> 281.355588, current state undersized+degraded+peered, last acting [10]</span></span><br></pre></td></tr></table></figure>
+
+<p>d. &#x5728;&#x505C;&#x6B62;PG 1.45&#x4E2D;&#x7B2C;&#x4E09;&#x4E2A;&#x526F;&#x672C;osd.10</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@10</span><br></pre></td></tr></table></figure>
+
+<p>e. &#x67E5;&#x770B;&#x505C;&#x6B62;&#x4E09;&#x4E2A;&#x526F;&#x672C;PG 1.45&#x7684;&#x72B6;&#x6001;(stale+undersized+degraded+peered)</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ ceph health detail</span><br><span class="line">HEALTH_WARN <span class="number">3</span> osds down; Reduced data availability: <span class="number">26</span> pgs inactive, <span class="number">2</span> pgs stale; Degraded data redundancy: <span class="number">4770</span>/<span class="number">47574</span> <span class="function">objects <span class="title">degraded</span> (<span class="params"><span class="number">10.026</span>%</span>), 222 pgs unclean, 222 pgs degraded, 222 pgs undersized</span></span><br><span class="line"><span class="function">OSD_DOWN 3 osds down</span></span><br><span class="line"><span class="function">    osd.10 (<span class="params">root=<span class="keyword">default</span>,host=ceph-xx-osd01</span>) <span class="keyword">is</span> down</span></span><br><span class="line"><span class="function">    osd.23 (<span class="params">root=<span class="keyword">default</span>,host=ceph-xx-osd02</span>) <span class="keyword">is</span> down</span></span><br><span class="line"><span class="function">    osd.24 (<span class="params">root=<span class="keyword">default</span>,host=ceph-xx-osd03</span>) <span class="keyword">is</span> down</span></span><br><span class="line"><span class="function">PG_AVAILABILITY Reduced data availability: 26 pgs inactive, 2 pgs stale</span></span><br><span class="line"><span class="function">    pg 1.9 <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> 171.200290, current state undersized+degraded+peered, last acting [13]</span></span><br><span class="line"><span class="function">    pg 1.45 <span class="keyword">is</span> stuck stale <span class="keyword">for</span> 171.206909, current state stale+undersized+degraded+peered, last acting [10]</span></span><br><span class="line"><span class="function">    pg 1.89 <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> 435.573694, current state undersized+degraded+peered, last acting [32]</span></span><br><span class="line"><span class="function">    pg 1.119 <span class="keyword">is</span> stuck inactive <span class="keyword">for</span> 435.574626, current state undersized+degraded+peered, last acting [28]</span></span><br></pre></td></tr></table></figure>
+
+<p>f. &#x5BA2;&#x6237;&#x7AEF;IO&#x64CD;&#x4F5C;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x8BFB;&#x5199;&#x6302;&#x8F7D;&#x78C1;&#x76D8;IO &#x592F;&#x4F4F;</span></span><br><span class="line">ll /mnt/</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6545;&#x969C;&#x603B;&#x7ED3;&#xFF1A;</strong><br> &#x5148;&#x505C;&#x6B62;&#x540C;&#x4E00;&#x4E2A;PG&#x5185;&#x4E24;&#x4E2A;&#x526F;&#x672C;&#xFF0C;&#x72B6;&#x6001;&#x662F;undersized+degraded+peered&#x3002;<br> &#x7136;&#x540E;&#x505C;&#x6B62;&#x540C;&#x4E00;&#x4E2A;PG&#x5185;&#x4E09;&#x4E2A;&#x526F;&#x672C;&#xFF0C;&#x72B6;&#x6001;&#x662F;stale+undersized+degraded+peered&#x3002;</p>
+<h3 id="3-6-3-&#x603B;&#x7ED3;"><a href="#3-6-3-&#x603B;&#x7ED3;" class="headerlink" title="3.6.3 &#x603B;&#x7ED3;"></a>3.6.3 &#x603B;&#x7ED3;</h3><ul>
+<li>&#x5F53;&#x51FA;&#x73B0;&#x4E00;&#x4E2A;PG&#x5185;&#x4E09;&#x4E2A;&#x526F;&#x672C;&#x90FD;&#x6302;&#x6389;&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x5C31;&#x4F1A;&#x51FA;&#x73B0;stale&#x72B6;&#x6001;&#x3002;</li>
+<li>&#x6B64;&#x65F6;&#x8BE5;PG&#x4E0D;&#x80FD;&#x63D0;&#x4F9B;&#x5BA2;&#x6237;&#x7AEF;&#x8BFB;&#x5199;&#xFF0C;IO&#x6302;&#x8D77;&#x592F;&#x4F4F;&#x3002;</li>
+<li>Primary&#x8D85;&#x65F6;&#x672A;&#x5411;mon&#x4E0A;&#x62A5;pg&#x76F8;&#x5173;&#x7684;&#x4FE1;&#x606F;(&#x4F8B;&#x5982;&#x7F51;&#x7EDC;&#x963B;&#x585E;),&#x4E5F;&#x4F1A;&#x51FA;&#x73B0;stale&#x72B6;&#x6001;&#x3002;</li>
+</ul>
+<h2 id="3-7-Inconsistent"><a href="#3-7-Inconsistent" class="headerlink" title="3.7 Inconsistent"></a>3.7 Inconsistent</h2><h3 id="3-7-1-&#x8BF4;&#x660E;"><a href="#3-7-1-&#x8BF4;&#x660E;" class="headerlink" title="3.7.1 &#x8BF4;&#x660E;"></a>3.7.1 &#x8BF4;&#x660E;</h3><ul>
+<li>PG&#x901A;&#x8FC7;Scrub&#x68C0;&#x6D4B;&#x5230;&#x67D0;&#x4E2A;&#x6216;&#x8005;&#x67D0;&#x4E9B;&#x5BF9;&#x8C61;&#x5728;PG&#x5B9E;&#x4F8B;&#x95F4;&#x51FA;&#x73B0;&#x4E86;&#x4E0D;&#x4E00;&#x81F4;</li>
+</ul>
+<h3 id="3-7-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-7-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.7.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.7.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x5220;&#x9664;PG 3.0&#x4E2D;&#x526F;&#x672C;osd.34&#x5934;&#x6587;&#x4EF6;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ rm -rf /<span class="keyword">var</span>/lib/ceph/osd/ceph<span class="number">-34</span>/current/<span class="number">3.0</span>_head/DIR_0/<span class="number">1000000697</span>c<span class="number">.0000122</span>c__head_19785300__3</span><br></pre></td></tr></table></figure>
+
+<p>b. &#x624B;&#x52A8;&#x6267;&#x884C;PG 3.0&#x8FDB;&#x884C;&#x6570;&#x636E;&#x6E05;&#x6D17;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ceph pg scrub <span class="number">3.0</span></span><br><span class="line">instructing pg <span class="number">3.0</span> <span class="keyword">on</span> osd<span class="number">.34</span> to scrub</span><br></pre></td></tr></table></figure>
+
+<p>c. &#x68C0;&#x67E5;&#x96C6;&#x7FA4;&#x76D1;&#x63A7;&#x72B6;&#x6001;</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ceph health detail</span><br><span class="line">HEALTH_ERR <span class="number">1</span> scrub errors; Possible data damage: <span class="number">1</span> pg inconsistent</span><br><span class="line">OSD_SCRUB_ERRORS <span class="number">1</span> scrub errors</span><br><span class="line">PG_DAMAGED Possible data damage: <span class="number">1</span> pg inconsistent</span><br><span class="line">    pg <span class="number">3.0</span> <span class="keyword">is</span> active+clean+inconsistent, acting [<span class="number">34</span>,<span class="number">23</span>,<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+
+<p>d. &#x4FEE;&#x590D;PG 3.0</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ ceph pg repair <span class="number">3.0</span></span><br><span class="line">instructing pg <span class="number">3.0</span> on osd.<span class="number">34</span> to repair</span><br><span class="line"></span><br><span class="line"><span class="comment">#&#x67E5;&#x770B;&#x96C6;&#x7FA4;&#x76D1;&#x63A7;&#x72B6;&#x6001;</span></span><br><span class="line">$ ceph health detail</span><br><span class="line">HEALTH_ERR <span class="number">1</span> scrub errors; Possible data <span class="symbol">damage:</span> <span class="number">1</span> pg inconsistent, <span class="number">1</span> pg repair</span><br><span class="line">OSD_SCRUB_ERRORS <span class="number">1</span> scrub errors</span><br><span class="line">PG_DAMAGED Possible data <span class="symbol">damage:</span> <span class="number">1</span> pg inconsistent, <span class="number">1</span> pg repair</span><br><span class="line">    pg <span class="number">3.0</span> is active+clean+scrubbing+deep+inconsistent+repair, acting [<span class="number">34</span>,<span class="number">23</span>,<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#&#x96C6;&#x7FA4;&#x76D1;&#x63A7;&#x72B6;&#x6001;&#x5DF2;&#x6062;&#x590D;&#x6B63;&#x5E38;</span></span><br><span class="line">$ ceph health detail</span><br><span class="line">HEALTH_OK</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6545;&#x969C;&#x603B;&#x7ED3;&#xFF1A;</strong><br> &#x5F53;PG&#x5185;&#x90E8;&#x4E09;&#x4E2A;&#x526F;&#x672C;&#x6709;&#x6570;&#x636E;&#x4E0D;&#x4E00;&#x81F4;&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x60F3;&#x8981;&#x4FEE;&#x590D;&#x4E0D;&#x4E00;&#x81F4;&#x7684;&#x6570;&#x636E;&#x6587;&#x4EF6;&#xFF0C;&#x53EA;&#x9700;&#x8981;&#x6267;&#x884C;ceph pg repair&#x4FEE;&#x590D;&#x6307;&#x4EE4;&#xFF0C;ceph&#x5C31;&#x4F1A;&#x4ECE;&#x5176;&#x4ED6;&#x7684;&#x526F;&#x672C;&#x4E2D;&#x5C06;&#x4E22;&#x5931;&#x7684;&#x6587;&#x4EF6;&#x62F7;&#x8D1D;&#x8FC7;&#x6765;&#x5C31;&#x884C;&#x4FEE;&#x590D;&#x6570;&#x636E;&#x3002;</p>
+<h3 id="3-7-3-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-7-3-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.7.3 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.7.3 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><ul>
+<li>&#x5F53;osd&#x77ED;&#x6682;&#x6302;&#x6389;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x56E0;&#x4E3A;&#x96C6;&#x7FA4;&#x5185;&#x8FD8;&#x5B58;&#x5728;&#x7740;&#x4E24;&#x4E2A;&#x526F;&#x672C;&#xFF0C;&#x662F;&#x53EF;&#x4EE5;&#x6B63;&#x5E38;&#x5199;&#x5165;&#x7684;&#xFF0C;&#x4F46;&#x662F; osd.34  &#x5185;&#x7684;&#x6570;&#x636E;&#x5E76;&#x6CA1;&#x6709;&#x5F97;&#x5230;&#x66F4;&#x65B0;&#xFF0C;&#x8FC7;&#x4E86;&#x4E00;&#x4F1A;osd.34&#x4E0A;&#x7EBF;&#x4E86;&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;osd.34&#x7684;&#x6570;&#x636E;&#x662F;&#x9648;&#x65E7;&#x7684;&#xFF0C;&#x5C31;&#x901A;&#x8FC7;&#x5176;&#x4ED6;&#x7684;OSD &#x5411; osd.34  &#x8FDB;&#x884C;&#x6570;&#x636E;&#x7684;&#x6062;&#x590D;&#xFF0C;&#x4F7F;&#x5176;&#x6570;&#x636E;&#x4E3A;&#x6700;&#x65B0;&#x7684;&#xFF0C;&#x800C;&#x8FD9;&#x4E2A;&#x6062;&#x590D;&#x7684;&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;PG&#x7684;&#x72B6;&#x6001;&#x4F1A;&#x4ECE;inconsistent -&gt;recover -&gt;  clean,&#x6700;&#x7EC8;&#x6062;&#x590D;&#x6B63;&#x5E38;&#x3002;</li>
+<li>&#x8FD9;&#x662F;&#x96C6;&#x7FA4;&#x6545;&#x969C;&#x81EA;&#x6108;&#x4E00;&#x79CD;&#x573A;&#x666F;&#x3002;</li>
+</ul>
+<h2 id="3-8-Down"><a href="#3-8-Down" class="headerlink" title="3.8 Down"></a>3.8 Down</h2><h3 id="3-8-1-&#x8BF4;&#x660E;"><a href="#3-8-1-&#x8BF4;&#x660E;" class="headerlink" title="3.8.1 &#x8BF4;&#x660E;"></a>3.8.1 &#x8BF4;&#x660E;</h3><ul>
+<li>Peering&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;PG&#x68C0;&#x6D4B;&#x5230;&#x67D0;&#x4E2A;&#x4E0D;&#x80FD;&#x88AB;&#x8DF3;&#x8FC7;&#x7684;Interval&#x4E2D;(&#x4F8B;&#x5982;&#x8BE5;Interval&#x671F;&#x95F4;&#xFF0C;PG&#x5B8C;&#x6210;&#x4E86;Peering&#xFF0C;&#x5E76;&#x4E14;&#x6210;&#x529F;&#x5207;&#x6362;&#x81F3;Active&#x72B6;&#x6001;&#xFF0C;&#x4ECE;&#x800C;&#x6709;&#x53EF;&#x80FD;&#x6B63;&#x5E38;&#x5904;&#x7406;&#x4E86;&#x6765;&#x81EA;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x8BFB;&#x5199;&#x8BF7;&#x6C42;),&#x5F53;&#x524D;&#x5269;&#x4F59;&#x5728;&#x7EBF;&#x7684;OSD&#x4E0D;&#x8DB3;&#x4EE5;&#x5B8C;&#x6210;&#x6570;&#x636E;&#x4FEE;&#x590D;.</li>
+</ul>
+<h3 id="3-8-2-&#x6545;&#x969C;&#x6A21;&#x62DF;"><a href="#3-8-2-&#x6545;&#x969C;&#x6A21;&#x62DF;" class="headerlink" title="3.8.2 &#x6545;&#x969C;&#x6A21;&#x62DF;"></a>3.8.2 &#x6545;&#x969C;&#x6A21;&#x62DF;</h3><p>a. &#x67E5;&#x770B;PG 3.7f&#x5185;&#x526F;&#x672C;&#x6570;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ ceph pg dump | grep ^3.7f</span><br><span class="line">dumped all</span><br><span class="line">3.7f         43                  0        0         0       0 494927872 1569     1569               active+clean 2018-07-05 02:52:51.512598  21315<span class="string">&apos;80115  21356:111666  [5,21,29]          5  [5,21,29]              5  21315&apos;</span>80115 2018-07-05 02:52:51.512568      6206<span class="string">&apos;80083 2018-06-29 22:51:05.831219</span></span><br></pre></td></tr></table></figure>
+
+<p>b. &#x505C;&#x6B62;PG 3.7f &#x526F;&#x672C;osd.21</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl stop ceph-osd@21</span><br></pre></td></tr></table></figure>
+
+<p>c. &#x67E5;&#x770B;PG 3.7f&#x72B6;&#x6001;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ ceph pg dump | grep ^3.7f</span><br><span class="line">dumped all</span><br><span class="line">3.7f         66                  0       89         0       0 591396864 1615     1615 active+undersized+degraded 2018-07-05 15:29:15.741318  21361<span class="string">&apos;80161  21365:128307     [5,29]          5     [5,29]              5  21315&apos;</span>80115 2018-07-05 02:52:51.512568      6206<span class="string">&apos;80083 2018-06-29 22:51:05.831219</span></span><br></pre></td></tr></table></figure>
+
+<p>d. &#x5BA2;&#x6237;&#x7AEF;&#x5199;&#x5165;&#x6570;&#x636E;&#xFF0C;&#x4E00;&#x5B9A;&#x8981;&#x786E;&#x4FDD;&#x6570;&#x636E;&#x5199;&#x5165;&#x5230;PG 3.7f&#x7684;&#x526F;&#x672C;&#x4E2D;[5,29]</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">$ fio -filename=/mnt/xxxsssss -direct=1 -iodepth 1 -thread -rw=<span class="built_in">read</span> -ioengine=libaio -bs=4M -size=2G -numjobs=30 -runtime=200 -group_reporting -name=<span class="built_in">read</span>-libaio</span><br><span class="line"><span class="built_in">read</span>-libaio: (g=0): rw=<span class="built_in">read</span>, bs=4M-4M/4M-4M/4M-4M, ioengine=libaio, iodepth=1</span><br><span class="line">...</span><br><span class="line">fio-2.2.8</span><br><span class="line">Starting 30 threads</span><br><span class="line"><span class="built_in">read</span>-libaio: Laying out IO file(s) (1 file(s) / 2048MB)</span><br><span class="line">Jobs: 5 (f=5): [_(5),R(1),_(5),R(1),_(3),R(1),_(2),R(1),_(1),R(1),_(9)] [96.5% <span class="keyword">done</span>] [1052MB/0KB/0KB /s] [263/0/0 iops] [eta 00m:02s]                                                            s]</span><br><span class="line"><span class="built_in">read</span>-libaio: (groupid=0, <span class="built_in">jobs</span>=30): err= 0: pid=32966: Thu Jul  5 15:35:16 2018</span><br><span class="line">  <span class="built_in">read</span> : io=61440MB, bw=1112.2MB/s, iops=278, runt= 55203msec</span><br><span class="line">    slat (msec): min=18, max=418, avg=103.77, stdev=46.19</span><br><span class="line">    clat (usec): min=0, max=33, avg= 2.51, stdev= 1.45</span><br><span class="line">     lat (msec): min=18, max=418, avg=103.77, stdev=46.19</span><br><span class="line">    clat percentiles (usec):</span><br><span class="line">     |  1.00th=[    1],  5.00th=[    1], 10.00th=[    1], 20.00th=[    2],</span><br><span class="line">     | 30.00th=[    2], 40.00th=[    2], 50.00th=[    2], 60.00th=[    2],</span><br><span class="line">     | 70.00th=[    3], 80.00th=[    3], 90.00th=[    4], 95.00th=[    5],</span><br><span class="line">     | 99.00th=[    7], 99.50th=[    8], 99.90th=[   10], 99.95th=[   14],</span><br><span class="line">     | 99.99th=[   32]</span><br><span class="line">    bw (KB  /s): min=15058, max=185448, per=3.48%, avg=39647.57, stdev=12643.04</span><br><span class="line">    lat (usec) : 2=19.59%, 4=64.52%, 10=15.78%, 20=0.08%, 50=0.03%</span><br><span class="line">  cpu          : usr=0.01%, sys=0.37%, ctx=491792, majf=0, minf=15492</span><br><span class="line">  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, &gt;=64=0.0%</span><br><span class="line">     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, &gt;=64=0.0%</span><br><span class="line">     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, &gt;=64=0.0%</span><br><span class="line">     issued    : total=r=15360/w=0/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0</span><br><span class="line">     latency   : target=0, window=0, percentile=100.00%, depth=1</span><br><span class="line">Run status group 0 (all <span class="built_in">jobs</span>):</span><br><span class="line">   READ: io=61440MB, aggrb=1112.2MB/s, minb=1112.2MB/s, maxb=1112.2MB/s, mint=55203msec, maxt=55203msec</span><br></pre></td></tr></table></figure>
+
+<p>e. &#x505C;&#x6B62;PG 3.7f&#x4E2D;&#x526F;&#x672C;osd.29,&#x5E76;&#x4E14;&#x67E5;&#x770B;PG 3.7f&#x72B6;&#x6001;(undersized+degraded+peered)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x505C;&#x6B62;&#x8BE5;PG&#x526F;&#x672C;osd.29</span></span><br><span class="line">systemctl stop ceph-osd@29</span><br><span class="line"> </span><br><span class="line"><span class="comment">#&#x67E5;&#x770B;&#x8BE5;PG 3.7f&#x72B6;&#x6001;&#x4E3A;undersized+degraded+peered</span></span><br><span class="line">ceph pg dump | grep ^3.7f</span><br><span class="line">dumped all</span><br><span class="line">3.7f         70                  0      140         0       0 608174080 1623     1623 undersized+degraded+peered 2018-07-05 15:35:51.629636  21365<span class="string">&apos;80169  21367:132165        [5]          5        [5]              5  21315&apos;</span>80115 2018-07-05 02:52:51.512568      6206<span class="string">&apos;80083 2018-06-29 22:51:05.831219</span></span><br></pre></td></tr></table></figure>
+
+<p>f. &#x505C;&#x6B62;PG 3.7f&#x4E2D;&#x526F;&#x672C;osd.5,&#x5E76;&#x4E14;&#x67E5;&#x770B;PG 3.7f&#x72B6;&#x6001;(undersized+degraded+peered)</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x505C;&#x6B62;&#x8BE5;PG&#x526F;&#x672C;osd.5</span></span><br><span class="line">$ systemctl stop ceph-osd@5</span><br><span class="line"> </span><br><span class="line"><span class="comment">#&#x67E5;&#x770B;&#x8BE5;PG&#x72B6;&#x6001;undersized+degraded+peered</span></span><br><span class="line">$ ceph pg dump <span class="params">| grep ^3.7f</span></span><br><span class="line"><span class="params">dumped all</span></span><br><span class="line"><span class="params">3.7f         70                  0      140         0       0 608174080 1623     1623 stale+undersized+degraded+peered 2018-07-05 15:35:51.629636  21365&apos;80169  21367:132165        [5]          5        [5]              5  21315&apos;80115 2018-07-05 02:52:51.512568      6206&apos;80083 2018-06-29 22:51:05.831219</span></span><br></pre></td></tr></table></figure>
+
+<p>g. &#x62C9;&#x8D77;PG 3.7f&#x4E2D;&#x526F;&#x672C;osd.21(&#x6B64;&#x65F6;&#x7684;osd.21&#x6570;&#x636E;&#x6BD4;&#x8F83;&#x9648;&#x65E7;), &#x67E5;&#x770B;PG&#x72B6;&#x6001;(down)</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x62C9;&#x8D77;&#x8BE5;PG&#x7684;osd.21</span></span><br><span class="line">$ systemctl start ceph-osd@21</span><br><span class="line"> </span><br><span class="line"><span class="comment">#&#x67E5;&#x770B;&#x8BE5;PG&#x7684;&#x72B6;&#x6001;down</span></span><br><span class="line">$ ceph pg dump <span class="params">| grep ^3.7f</span></span><br><span class="line"><span class="params">dumped all</span></span><br><span class="line"><span class="params">3.7f         66                  0        0         0       0 591396864 1548     1548                          down 2018-07-05 15:36:38.365500  21361&apos;80161  21370:111729       [21]         21       [21]             21  21315&apos;80115 2018-07-05 02:52:51.512568      6206&apos;80083 2018-06-29 22:51:05.831219</span></span><br></pre></td></tr></table></figure>
+
+<p>h. &#x5BA2;&#x6237;&#x7AEF;IO&#x64CD;&#x4F5C;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#&#x6B64;&#x65F6;&#x5BA2;&#x6237;&#x7AEF;IO&#x90FD;&#x4F1A;&#x592F;&#x4F4F;</span></span><br><span class="line">ll /mnt/</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x6545;&#x969C;&#x603B;&#x7ED3;&#xFF1A;</strong><br> &#x9996;&#x5148;&#x6709;&#x4E00;&#x4E2A;PG 3.7f&#x6709;&#x4E09;&#x4E2A;&#x526F;&#x672C;[5,21,29]&#xFF0C; &#x5F53;&#x505C;&#x6389;&#x4E00;&#x4E2A;osd.21&#x4E4B;&#x540E;&#xFF0C; &#x5199;&#x5165;&#x6570;&#x636E;&#x5230;osd.5, osd.29&#x3002;  &#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x505C;&#x6389;osd.29, osd.5 &#xFF0C;&#x6700;&#x540E;&#x62C9;&#x8D77;osd.21&#x3002;  &#x8FD9;&#x4E2A;&#x65F6;&#x5019;osd.21&#x7684;&#x6570;&#x636E;&#x6BD4;&#x8F83;&#x65E7;&#xFF0C;&#x5C31;&#x4F1A;&#x51FA;&#x73B0;PG&#x4E3A;down&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x5BA2;&#x6237;&#x7AEF;IO&#x4F1A;&#x592F;&#x4F4F;&#xFF0C;&#x53EA;&#x80FD;&#x62C9;&#x8D77;&#x6302;&#x6389;&#x7684;osd&#x624D;&#x80FD;&#x4FEE;&#x590D;&#x95EE;&#x9898;&#x3002;</p>
+<h3 id="3-8-3-PG&#x4E3A;Down&#x7684;OSD&#x4E22;&#x5931;&#x6216;&#x65E0;&#x6CD5;&#x62C9;&#x8D77;"><a href="#3-8-3-PG&#x4E3A;Down&#x7684;OSD&#x4E22;&#x5931;&#x6216;&#x65E0;&#x6CD5;&#x62C9;&#x8D77;" class="headerlink" title="3.8.3 PG&#x4E3A;Down&#x7684;OSD&#x4E22;&#x5931;&#x6216;&#x65E0;&#x6CD5;&#x62C9;&#x8D77;"></a>3.8.3 PG&#x4E3A;Down&#x7684;OSD&#x4E22;&#x5931;&#x6216;&#x65E0;&#x6CD5;&#x62C9;&#x8D77;</h3><ul>
+<li>&#x4FEE;&#x590D;&#x65B9;&#x5F0F;(&#x751F;&#x4EA7;&#x73AF;&#x5883;&#x5DF2;&#x9A8C;&#x8BC1;)</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a. &#x5220;&#x9664;&#x65E0;&#x6CD5;&#x62C9;&#x8D77;&#x7684;OSD</span><br><span class="line">b. &#x521B;&#x5EFA;&#x5BF9;&#x5E94;&#x7F16;&#x53F7;&#x7684;OSD</span><br><span class="line">c. PG&#x7684;Down&#x72B6;&#x6001;&#x5C31;&#x4F1A;&#x6D88;&#x5931;</span><br><span class="line">d. &#x5BF9;&#x4E8E;unfound &#x7684;PG &#xFF0C;&#x53EF;&#x4EE5;&#x9009;&#x62E9;<span class="keyword">delete</span>&#x6216;&#x8005;revert </span><br><span class="line">   ceph pg {pg-id} mark_unfound_lost revert|<span class="keyword">delete</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-8-4-&#x7ED3;&#x8BBA;"><a href="#3-8-4-&#x7ED3;&#x8BBA;" class="headerlink" title="3.8.4 &#x7ED3;&#x8BBA;"></a>3.8.4 &#x7ED3;&#x8BBA;</h3><ul>
+<li>&#x5178;&#x578B;&#x7684;&#x573A;&#x666F;&#xFF1A;A(&#x4E3B;)&#x3001;B&#x3001;C</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a. &#x9996;&#x5148;<span class="built_in">kill</span> B </span><br><span class="line">b. &#x65B0;&#x5199;&#x5165;&#x6570;&#x636E;&#x5230; A&#x3001;C </span><br><span class="line">c. <span class="built_in">kill</span> A&#x548C;C</span><br><span class="line">d. &#x62C9;&#x8D77;B</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>&#x51FA;&#x73B0;PG&#x4E3A;Down&#x7684;&#x573A;&#x666F;&#x662F;&#x7531;&#x4E8E;osd&#x8282;&#x70B9;&#x6570;&#x636E;&#x592A;&#x65E7;&#xFF0C;&#x5E76;&#x4E14;&#x5176;&#x4ED6;&#x5728;&#x7EBF;&#x7684;osd&#x4E0D;&#x8DB3;&#x4EE5;&#x5B8C;&#x6210;&#x6570;&#x636E;&#x4FEE;&#x590D;&#x3002;</li>
+<li>&#x8FD9;&#x4E2A;&#x65F6;&#x5019;&#x8BE5;PG&#x4E0D;&#x80FD;&#x63D0;&#x4F9B;&#x5BA2;&#x6237;&#x7AEF;IO&#x8BFB;&#x5199;&#xFF0C; IO&#x4F1A;&#x6302;&#x8D77;&#x592F;&#x4F4F;&#x3002;</li>
+</ul>
+<h2 id="3-9-Incomplete"><a href="#3-9-Incomplete" class="headerlink" title="3.9 Incomplete"></a>3.9 Incomplete</h2><p>Peering&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C; &#x7531;&#x4E8E; a. &#x65E0;&#x975E;&#x9009;&#x51FA;&#x6743;&#x5A01;&#x65E5;&#x5FD7; b. &#x901A;&#x8FC7;choose_acting&#x9009;&#x51FA;&#x7684;Acting Set&#x540E;&#x7EED;&#x4E0D;&#x8DB3;&#x4EE5;&#x5B8C;&#x6210;&#x6570;&#x636E;&#x4FEE;&#x590D;&#xFF0C;&#x5BFC;&#x81F4;Peering&#x65E0;&#x975E;&#x6B63;&#x5E38;&#x5B8C;&#x6210;&#x3002;<br> &#x5E38;&#x89C1;&#x4E8E;ceph&#x96C6;&#x7FA4;&#x5728;peering&#x72B6;&#x6001;&#x4E0B;&#xFF0C;&#x6765;&#x56DE;&#x91CD;&#x542F;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x6216;&#x8005;&#x6389;&#x7535;&#x3002;</p>
+<h3 id="3-9-1-&#x603B;&#x7ED3;"><a href="#3-9-1-&#x603B;&#x7ED3;" class="headerlink" title="3.9.1 &#x603B;&#x7ED3;"></a>3.9.1 &#x603B;&#x7ED3;</h3><ul>
+<li>&#x4FEE;&#x590D;&#x65B9;&#x5F0F; <a href="http://tracker.ceph.com/issues/10098" target="_blank" rel="noopener">wanted: command to clear &#x2018;incomplete&#x2019; PGs</a><br> &#x6BD4;&#x5982;&#xFF1A;pg 1.1&#x662F;incomplete&#xFF0C;&#x5148;&#x5BF9;&#x6BD4;pg 1.1&#x7684;&#x4E3B;&#x526F;&#x672C;&#x4E4B;&#x95F4; pg&#x91CC;&#x9762;&#x7684;&#x5BF9;&#x8C61;&#x6570; &#x54EA;&#x4E2A;&#x5BF9;&#x8C61;&#x6570;&#x591A; &#x5C31;&#x628A;&#x54EA;&#x4E2A;pg export&#x51FA;&#x6765;<br> &#x7136;&#x540E;import&#x5230;&#x5BF9;&#x8C61;&#x6570;&#x5C11;&#x7684;pg&#x91CC;&#x9762; &#x7136;&#x540E;&#x518D;mark complete&#xFF0C;&#x4E00;&#x5B9A;&#x8981;&#x5148;export pg&#x5907;&#x4EFD;&#x3002;</li>
+</ul>
+<p><strong>&#x7B80;&#x5355;&#x65B9;&#x5F0F;&#xFF0C;&#x6570;&#x636E;&#x53EF;&#x80FD;&#x53C8;&#x4E22;&#x7684;&#x60C5;&#x51B5;</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a. stop the osd that is primary <span class="keyword">for</span> the incomplete PG;</span><br><span class="line">b. run: ceph-objectstore-tool --data-path ... --journal-path ... --pgid <span class="variable">$PGID</span> --op mark-complete</span><br><span class="line">c. start the osd.</span><br></pre></td></tr></table></figure>
+
+<p><strong>&#x4FDD;&#x8BC1;&#x6570;&#x636E;&#x5B8C;&#x6574;&#x6027;</strong></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#1. &#x67E5;&#x770B;pg 1.1&#x4E3B;&#x526F;&#x672C;&#x91CC;&#x9762;&#x7684;&#x5BF9;&#x8C61;&#x6570;&#xFF0C;&#x5047;&#x8BBE;&#x4E3B;&#x672C;&#x5BF9;&#x8C61;&#x6570;&#x591A;&#xFF0C;&#x5219;&#x5230;&#x4E3B;&#x672C;&#x6240;&#x5728;osd&#x8282;&#x70B9;&#x6267;&#x884C;</span></span><br><span class="line">$ ceph-objectstore-tool --data-path /<span class="keyword">var</span>/lib/ceph/osd/ceph<span class="number">-0</span>/ --journal-path /<span class="keyword">var</span>/lib/ceph/osd/ceph<span class="number">-0</span>/journal --pgid <span class="number">1.1</span> --op export --file /home/pg1<span class="number">.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#2. &#x7136;&#x540E;&#x5C06;/home/pg1.1 scp&#x5230;&#x526F;&#x672C;&#x6240;&#x5728;&#x8282;&#x70B9;&#xFF08;&#x6709;&#x591A;&#x4E2A;&#x526F;&#x672C;&#xFF0C;&#x6BCF;&#x4E2A;&#x526F;&#x672C;&#x90FD;&#x8981;&#x8FD9;&#x4E48;&#x64CD;&#x4F5C;&#xFF09;&#xFF0C;&#x7136;&#x540E;&#x5230;&#x526F;&#x672C;&#x6240;&#x5728;&#x8282;&#x70B9;&#x6267;&#x884C;</span></span><br><span class="line">$ ceph-objectstore-tool --data-path /<span class="keyword">var</span>/lib/ceph/osd/ceph<span class="number">-1</span>/ --journal-path /<span class="keyword">var</span>/lib/ceph/osd/ceph<span class="number">-1</span>/journal --pgid <span class="number">1.1</span> --op import --file /home/pg1<span class="number">.1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#3. &#x7136;&#x540E;&#x518D;makr complete</span></span><br><span class="line">$ ceph-objectstore-tool --data-path /<span class="keyword">var</span>/lib/ceph/osd/ceph<span class="number">-1</span>/ --journal-path /<span class="keyword">var</span>/lib/ceph/osd/ceph<span class="number">-1</span>/journal --pgid <span class="number">1.1</span> --op mark-complete</span><br><span class="line"></span><br><span class="line"><span class="meta">#4. &#x6700;&#x540E;&#x542F;&#x52A8;osd</span></span><br><span class="line">$ start osd</span><br></pre></td></tr></table></figure>
+
+<h1 id="&#x6765;&#x81EA;"><a href="#&#x6765;&#x81EA;" class="headerlink" title="&#x6765;&#x81EA;"></a>&#x6765;&#x81EA;</h1><p><a href="https://www.jianshu.com/p/36c2d5682d87" target="_blank" rel="noopener">https://www.jianshu.com/p/36c2d5682d87</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2018\09\19\Ceph介绍及原理架构分享\" rel="bookmark">Ceph介绍及原理架构分享</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/ceph/" rel="tag"><i class="fa fa-tag"></i> ceph</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2018/09/19/Ceph介绍及原理架构分享/" rel="next" title="Ceph介绍及原理架构分享">
+                  <i class="fa fa-chevron-left"></i> Ceph介绍及原理架构分享
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2018/11/03/Nginx平滑升级/" rel="prev" title="Nginx平滑升级">
+                  Nginx平滑升级 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-PG介绍"><span class="nav-number">1.</span> <span class="nav-text">1. PG介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-PG状态表"><span class="nav-number">2.</span> <span class="nav-text">2. PG状态表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-状态详解及故障模拟复现"><span class="nav-number">3.</span> <span class="nav-text">3. 状态详解及故障模拟复现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-Degraded"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Degraded</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-说明"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-故障模拟"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-3-总结"><span class="nav-number">3.1.3.</span> <span class="nav-text">3.1.3 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-Peered"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 Peered</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-说明"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-故障模拟"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-3-总结"><span class="nav-number">3.2.3.</span> <span class="nav-text">3.2.3 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-Remapped"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 Remapped</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-1-说明"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.3.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-2-故障模拟"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.3.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-3-总结"><span class="nav-number">3.3.3.</span> <span class="nav-text">3.3.3 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-Recovery"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 Recovery</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-1-说明"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.4.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-2-故障模拟"><span class="nav-number">3.4.2.</span> <span class="nav-text">3.4.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-3-总结"><span class="nav-number">3.4.3.</span> <span class="nav-text">3.4.3 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-Backfill"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 Backfill</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-1-说明"><span class="nav-number">3.5.1.</span> <span class="nav-text">3.5.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-2-故障模拟"><span class="nav-number">3.5.2.</span> <span class="nav-text">3.5.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-3-总结"><span class="nav-number">3.5.3.</span> <span class="nav-text">3.5.3 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-Stale"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 Stale</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-1-说明"><span class="nav-number">3.6.1.</span> <span class="nav-text">3.6.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-2-故障模拟"><span class="nav-number">3.6.2.</span> <span class="nav-text">3.6.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-3-总结"><span class="nav-number">3.6.3.</span> <span class="nav-text">3.6.3 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-Inconsistent"><span class="nav-number">3.7.</span> <span class="nav-text">3.7 Inconsistent</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-1-说明"><span class="nav-number">3.7.1.</span> <span class="nav-text">3.7.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-2-故障模拟"><span class="nav-number">3.7.2.</span> <span class="nav-text">3.7.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-3-故障模拟"><span class="nav-number">3.7.3.</span> <span class="nav-text">3.7.3 故障模拟</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-Down"><span class="nav-number">3.8.</span> <span class="nav-text">3.8 Down</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-1-说明"><span class="nav-number">3.8.1.</span> <span class="nav-text">3.8.1 说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-2-故障模拟"><span class="nav-number">3.8.2.</span> <span class="nav-text">3.8.2 故障模拟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-3-PG为Down的OSD丢失或无法拉起"><span class="nav-number">3.8.3.</span> <span class="nav-text">3.8.3 PG为Down的OSD丢失或无法拉起</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-4-结论"><span class="nav-number">3.8.4.</span> <span class="nav-text">3.8.4 结论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-9-Incomplete"><span class="nav-number">3.9.</span> <span class="nav-text">3.9 Incomplete</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-1-总结"><span class="nav-number">3.9.1.</span> <span class="nav-text">3.9.1 总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#来自"><span class="nav-number">4.</span> <span class="nav-text">来自</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@cszhi.com" title="E-Mail &rarr; mailto:cszhi@cszhi.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2011 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">382k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">15:54</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '091529c38ad591e045ce',
+      clientSecret: 'b66b5ffda0604e75b3d6d4e74d8658e8dfea76a4',
+      repo: 'cszhi.github.io',
+      owner: 'cszhi',
+      admin: ['cszhi'],
+      id: '49dd42d369a8c2661bb1e445f9f212c2',
+        language: 'zh-CN',
+      
+      distractionFreeMode: 'false'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>

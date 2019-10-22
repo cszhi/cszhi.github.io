@@ -239,6 +239,344 @@
   
   
   <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2018/09/19/Ceph介绍及原理架构分享/" class="post-title-link" itemprop="url">Ceph介绍及原理架构分享</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-19 00:00:00" itemprop="dateCreated datePublished" datetime="2018-09-19T00:00:00+08:00">2018-09-19</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>1:55</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="1-Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;"><a href="#1-Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;" class="headerlink" title="1. Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;"></a>1. Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;</h1><h2 id="1-1-Ceph&#x7B80;&#x4ECB;"><a href="#1-1-Ceph&#x7B80;&#x4ECB;" class="headerlink" title="1.1 Ceph&#x7B80;&#x4ECB;"></a>1.1 Ceph&#x7B80;&#x4ECB;</h2><p>Ceph&#x662F;&#x4E00;&#x4E2A;&#x7EDF;&#x4E00;&#x7684;&#x5206;&#x5E03;&#x5F0F;&#x5B58;&#x50A8;&#x7CFB;&#x7EDF;&#xFF0C;&#x8BBE;&#x8BA1;&#x521D;&#x8877;&#x662F;&#x63D0;&#x4F9B;&#x8F83;&#x597D;&#x7684;&#x6027;&#x80FD;&#x3001;&#x53EF;&#x9760;&#x6027;&#x548C;&#x53EF;&#x6269;&#x5C55;&#x6027;&#x3002;</p>
+<p>Ceph&#x9879;&#x76EE;&#x6700;&#x65E9;&#x8D77;&#x6E90;&#x4E8E;Sage&#x5C31;&#x8BFB;&#x535A;&#x58EB;&#x671F;&#x95F4;&#x7684;&#x5DE5;&#x4F5C;&#xFF08;&#x6700;&#x65E9;&#x7684;&#x6210;&#x679C;&#x4E8E;2004&#x5E74;&#x53D1;&#x8868;&#xFF09;&#xFF0C;&#x5E76;&#x968F;&#x540E;&#x8D21;&#x732E;&#x7ED9;&#x5F00;&#x6E90;&#x793E;&#x533A;&#x3002;&#x5728;&#x7ECF;&#x8FC7;&#x4E86;&#x6570;&#x5E74;&#x7684;&#x53D1;&#x5C55;&#x4E4B;&#x540E;&#xFF0C;&#x76EE;&#x524D;&#x5DF2;&#x5F97;&#x5230;&#x4F17;&#x591A;&#x4E91;&#x8BA1;&#x7B97;&#x5382;&#x5546;&#x7684;&#x652F;&#x6301;&#x5E76;&#x88AB;&#x5E7F;&#x6CDB;&#x5E94;&#x7528;&#x3002;RedHat&#x53CA;OpenStack&#x90FD;&#x53EF;&#x4E0E;Ceph&#x6574;&#x5408;&#x4EE5;&#x652F;&#x6301;&#x865A;&#x62DF;&#x673A;&#x955C;&#x50CF;&#x7684;&#x540E;&#x7AEF;&#x5B58;&#x50A8;&#x3002;</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2018/09/19/Ceph介绍及原理架构分享/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2018\09\21\分布式存储Ceph之PG状态详解\" rel="bookmark">分布式存储Ceph之PG状态详解</a></div>
+      
+    </li>
+  
+  </ul>
+
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2018/09/18/CentOS7系统优化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2018/09/18/CentOS7系统优化/" class="post-title-link" itemprop="url">CentOS7系统优化</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-18 00:00:00" itemprop="dateCreated datePublished" datetime="2018-09-18T00:00:00+08:00">2018-09-18</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>1 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="&#x963F;&#x91CC;&#x4E91;&#x6E90;&#xFF08;&#x53EF;&#x9009;&#xFF09;"><a href="#&#x963F;&#x91CC;&#x4E91;&#x6E90;&#xFF08;&#x53EF;&#x9009;&#xFF09;" class="headerlink" title="&#x963F;&#x91CC;&#x4E91;&#x6E90;&#xFF08;&#x53EF;&#x9009;&#xFF09;"></a>&#x963F;&#x91CC;&#x4E91;&#x6E90;&#xFF08;&#x53EF;&#x9009;&#xFF09;</h3><p>CentOS7&#x548C;epel-7</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo</span><br><span class="line">wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2018/09/18/CentOS7系统优化/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2019\08\02\Cobbler部署及使用\" rel="bookmark">Cobbler部署及使用</a></div>
+      
+    </li>
+  
+  </ul>
+
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2018/04/22/Apache2.4+PHP7.1部署/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2018/04/22/Apache2.4+PHP7.1部署/" class="post-title-link" itemprop="url">Apache2.4+PHP7.1部署</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2018-04-22 00:00:00" itemprop="dateCreated datePublished" datetime="2018-04-22T00:00:00+08:00">2018-04-22</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>3 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="&#x5B89;&#x88C5;apache"><a href="#&#x5B89;&#x88C5;apache" class="headerlink" title="&#x5B89;&#x88C5;apache"></a>&#x5B89;&#x88C5;apache</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install httpd</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2018/04/22/Apache2.4+PHP7.1部署/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\03\04\使用mod_limitipconn模块限制IP并发连接数\" rel="bookmark">使用mod_limitipconn模块限制IP并发连接数</a></div>
+      
+    </li>
+  
+  </ul>
+
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
     <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2018/02/21/TinyProxy http代理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -390,7 +728,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
 
                 
                 
@@ -511,7 +849,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
 
                 
                 
@@ -540,7 +878,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;"><a href="#&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;" class="headerlink" title="&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;"></a>&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;</h2><h3 id="&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;"><a href="#&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;" class="headerlink" title="&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;"></a>&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install gcc pcre-devel zlib-devel openssl-devel</span><br></pre></td></tr></table></figure>
+          <h2 id="&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;"><a href="#&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;" class="headerlink" title="&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;"></a>&#x5355;&#x8282;&#x70B9;&#x90E8;&#x7F72;</h2><h3 id="&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;"><a href="#&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;" class="headerlink" title="&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;"></a>&#x5B89;&#x88C5;&#x4F9D;&#x8D56;&#x5305;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install gcc pcre-devel zlib-devel openssl-devel git</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -725,6 +1063,106 @@
   
   
   <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2014/12/11/xenserver创建本地ISO SR/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2014/12/11/xenserver创建本地ISO SR/" class="post-title-link" itemprop="url">xenserver创建本地ISO SR</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2014-12-11 00:00:00" itemprop="dateCreated datePublished" datetime="2014-12-11T00:00:00+08:00">2014-12-11</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>1 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>ssh&#x767B;&#x9646;xenserver&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x521B;&#x5EFA;&#x76EE;&#x5F55;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /iso</span><br></pre></td></tr></table></figure>
+
+<p>&#x521B;&#x5EFA;IOS SR&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xe sr-create name-label=boot-iso type=iso device-config:location=/iso device-config:legacy_mode=true content-type=iso</span><br></pre></td></tr></table></figure>
+
+<p>&#x4E0A;&#x4F20;iso&#x955C;&#x50CF;&#x5230;&#x4E3B;&#x673A;&#x7684;/iso&#x3002;</p>
+
+        
+      
+    </div>
+
+    
+    
+    
+      
+
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
     <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2014/11/19/xenserver虚拟机实时性能查看/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -763,7 +1201,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
 
                 
                 
@@ -910,7 +1348,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
 
                 
                 
@@ -1012,521 +1450,6 @@
   </article>
 
     
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2014/02/21/mysql慢查询/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="csz">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="csz's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2014/02/21/mysql慢查询/" class="post-title-link" itemprop="url">mysql慢查询</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2014-02-21 00:00:00" itemprop="dateCreated datePublished" datetime="2014-02-21T00:00:00+08:00">2014-02-21</time>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span>2:30</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="&#x6982;&#x5FF5;"><a href="#&#x6982;&#x5FF5;" class="headerlink" title="&#x6982;&#x5FF5;"></a>&#x6982;&#x5FF5;</h3><p>MySQL&#x7684;&#x6162;&#x67E5;&#x8BE2;&#xFF0C;&#x5168;&#x540D;&#x662F;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#xFF0C;&#x662F;MySQL&#x63D0;&#x4F9B;&#x7684;&#x4E00;&#x79CD;&#x65E5;&#x5FD7;&#x8BB0;&#x5F55;&#xFF0C;&#x7528;&#x6765;&#x8BB0;&#x5F55;&#x5728;MySQL&#x4E2D;&#x54CD;&#x5E94;&#x65F6;&#x95F4;&#x8D85;&#x8FC7;&#x9600;&#x503C;&#x7684;&#x8BED;&#x53E5;&#x3002;<br>&#x5177;&#x4F53;&#x73AF;&#x5883;&#x4E2D;&#xFF0C;&#x8FD0;&#x884C;&#x65F6;&#x95F4;&#x8D85;&#x8FC7;long_query_time&#x503C;&#x7684;SQL&#x8BED;&#x53E5;&#xFF0C;&#x5219;&#x4F1A;&#x88AB;&#x8BB0;&#x5F55;&#x5230;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x4E2D;&#x3002;<br>long_query_time&#x7684;&#x9ED8;&#x8BA4;&#x503C;&#x4E3A;10&#xFF0C;&#x610F;&#x601D;&#x662F;&#x8BB0;&#x5F55;&#x8FD0;&#x884C;10&#x79D2;&#x4EE5;&#x4E0A;&#x7684;&#x8BED;&#x53E5;&#x3002;<br>&#x9ED8;&#x8BA4;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;MySQL&#x6570;&#x636E;&#x5E93;&#x5E76;&#x4E0D;&#x542F;&#x52A8;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#xFF0C;&#x9700;&#x8981;&#x624B;&#x52A8;&#x6765;&#x8BBE;&#x7F6E;&#x8FD9;&#x4E2A;&#x53C2;&#x6570;&#x3002;<br>&#x5F53;&#x7136;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x662F;&#x8C03;&#x4F18;&#x9700;&#x8981;&#x7684;&#x8BDD;&#xFF0C;&#x4E00;&#x822C;&#x4E0D;&#x5EFA;&#x8BAE;&#x542F;&#x52A8;&#x8BE5;&#x53C2;&#x6570;&#xFF0C;&#x56E0;&#x4E3A;&#x5F00;&#x542F;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x4F1A;&#x6216;&#x591A;&#x6216;&#x5C11;&#x5E26;&#x6765;&#x4E00;&#x5B9A;&#x7684;&#x6027;&#x80FD;&#x5F71;&#x54CD;&#x3002;<br>&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x652F;&#x6301;&#x5C06;&#x65E5;&#x5FD7;&#x8BB0;&#x5F55;&#x5199;&#x5165;&#x6587;&#x4EF6;&#x548C;&#x6570;&#x636E;&#x5E93;&#x8868;&#x3002;</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2014/02/21/mysql慢查询/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\10\MySQL备份方法总结\" rel="bookmark">MySQL备份方法总结</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\08\MySQL忘记root密码后强制修改密码的方法\" rel="bookmark">MySQL忘记root密码后强制修改密码的方法</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2019\08\29\mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解\" rel="bookmark">mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解</a></div>
-      
-    </li>
-  
-  </ul>
-
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2014/01/03/简单备份监控程序/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="csz">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="csz's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2014/01/03/简单备份监控程序/" class="post-title-link" itemprop="url">简单备份监控程序</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2014-01-03 00:00:00" itemprop="dateCreated datePublished" datetime="2014-01-03T00:00:00+08:00">2014-01-03</time>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span>11 分钟</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="&#x524D;&#x8A00;"><a href="#&#x524D;&#x8A00;" class="headerlink" title="&#x524D;&#x8A00;"></a>&#x524D;&#x8A00;</h2><p>&#x968F;&#x7740;&#x7EF4;&#x62A4;&#x670D;&#x52A1;&#x5668;&#x7684;&#x589E;&#x591A;&#xFF0C;&#x6BCF;&#x5929;&#x4E00;&#x53F0;&#x53F0;&#x68C0;&#x67E5;&#x5907;&#x4EFD;&#x5DF2;&#x7ECF;&#x4E0D;&#x5207;&#x5B9E;&#x9645;&#xFF0C;&#x5373;&#x4F7F;&#x901A;&#x8FC7;email&#x7684;&#x65B9;&#x5F0F;&#xFF08;&#x5907;&#x4EFD;&#x811A;&#x672C;&#x6267;&#x884C;&#x5B8C;&#x540E;&#x5C06;&#x5907;&#x4EFD;&#x4FE1;&#x606F;&#x53D1;&#x9001;&#x5230;&#x6307;&#x5B9A;&#x90AE;&#x7BB1;&#xFF09;&#x68C0;&#x67E5;&#x4E5F;&#x8981;&#x8017;&#x8D39;&#x4E0D;&#x5C11;&#x7684;&#x65F6;&#x95F4;&#xFF0C;&#x6BCF;&#x5929;&#x505A;&#x8FD9;&#x79CD;&#x91CD;&#x590D;&#x6027;&#x4E14;&#x7E41;&#x6742;&#x7684;&#x4E8B;&#x60C5;&#x5BF9;&#x6211;&#x4EEC;&#x8FD9;&#x7C7B;&#x61D2;&#x4EBA;&#x6765;&#x8BF4;&#x7B80;&#x76F4;&#x75DB;&#x4E0D;&#x6B32;&#x751F;&#x3002;&#x7ECF;&#x8FC7;&#x4E00;&#x6B21;&#x60E8;&#x75DB;&#x7684;&#x6559;&#x8BAD;&#x4E4B;&#x540E;&#xFF0C;&#x51B3;&#x5B9A;&#x505A;&#x4E2A;&#x5907;&#x4EFD;&#x68C0;&#x67E5;&#xFF08;&#x76D1;&#x63A7;&#xFF09;&#x7A0B;&#x5E8F;&#x3002;</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2014/01/03/简单备份监控程序/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2013\05\19\开发自己的监控系统一、email篇\" rel="bookmark">开发自己的监控系统一、email篇</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2013\05\21\开发自己的监控系统二、web篇\" rel="bookmark">开发自己的监控系统二、web篇</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2013\05\22\开发自己的监控系统三、移动篇（android）\" rel="bookmark">开发自己的监控系统三、移动篇（android）</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\05\27\Linux监控利器nagios–NSCA被动监控\" rel="bookmark">Linux监控利器nagios–NSCA被动监控</a></div>
-      
-    </li>
-  
-  </ul>
-
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2013/06/13/linux多线程网页截图-python/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="csz">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="csz's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2013/06/13/linux多线程网页截图-python/" class="post-title-link" itemprop="url">linux多线程网页截图-python</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2013-06-13 00:00:00" itemprop="dateCreated datePublished" datetime="2013-06-13T00:00:00+08:00">2013-06-13</time>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span>8 分钟</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>&#x4E0A;&#x4E00;&#x7BC7;&#x4E2D;&#xFF08;<a href="http://www.cszhi.com/20130608/multiwebshot-shell.html" target="_blank" rel="noopener">linux&#x591A;&#x7EBF;&#x7A0B;&#x7F51;&#x9875;&#x622A;&#x56FE;-shell</a>&#xFF09;&#xFF0C;&#x4F7F;&#x7528;shell&#x591A;&#x8FDB;&#x7A0B;&#x5BF9;&#x5927;&#x91CF;&#x7684;&#x7F51;&#x7AD9;&#x622A;&#x56FE;&#xFF0C;&#x5927;&#x5927;&#x51CF;&#x5C11;&#x4E86;&#x622A;&#x56FE;&#x7684;&#x65F6;&#x95F4;&#x3002;&#x4F46;&#x6162;&#x6162;&#x7684;&#x4E5F;&#x53D1;&#x73B0;&#x4E86;&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x7684;&#x5F0A;&#x7AEF;&#xFF1A;&#x6BCF;&#x4E2A;&#x8FDB;&#x7A0B;&#x5206;&#x914D;&#x7684;&#x7F51;&#x7AD9;&#x6570;&#x91CF;&#x662F;&#x76F8;&#x7B49;&#x7684;&#xFF0C;&#x6709;&#x4E9B;&#x8FDB;&#x7A0B;&#x622A;&#x56FE;&#x8F83;&#x5FEB;&#xFF0C;&#x6709;&#x4E9B;&#x8F83;&#x6162;&#xFF0C;&#x4E2A;&#x522B;&#x8FDB;&#x7A0B;&#x5728;&#x5176;&#x5B83;&#x8FDB;&#x7A0B;&#x5DF2;&#x7ECF;&#x622A;&#x56FE;&#x5B8C;&#x6210;&#x540E;&#xFF0C;&#x8FD8;&#x8981;&#x8FD0;&#x884C;10&#x591A;&#x4E2A;&#x5C0F;&#x65F6;&#x624D;&#x80FD;&#x628A;&#x5206;&#x914D;&#x7684;&#x7F51;&#x7AD9;&#x622A;&#x56FE;&#x5B8C;&#x3002;<br>&#x5982;&#x4F55;&#x628A;&#x73B0;&#x6709;&#x7684;&#x201C;&#x5E73;&#x5747;&#x5206;&#x914D;&#x201D;&#x622A;&#x56FE;&#x65B9;&#x5F0F;&#x6539;&#x6210;&#x201C;&#x80FD;&#x8005;&#x591A;&#x52B3;&#x201D;&#x5462;&#xFF1F;</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2013/06/13/linux多线程网页截图-python/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2013/06/08/linux多线程网页截图-shell/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="csz">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="csz's blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2013/06/08/linux多线程网页截图-shell/" class="post-title-link" itemprop="url">linux多线程网页截图-shell</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2013-06-08 00:00:00" itemprop="dateCreated datePublished" datetime="2013-06-08T00:00:00+08:00">2013-06-08</time>
-            </span>
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/运维/" itemprop="url" rel="index"><span itemprop="name">运维</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              
-              <span>12 分钟</span>
-            </span>
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>&#x8001;&#x5927;&#x4E34;&#x65F6;&#x5B89;&#x6392;&#x4EFB;&#x52A1;&#xFF0C;&#x8981;&#x5B9A;&#x671F;&#x5BF9;&#x5927;&#x91CF;&#xFF08;&#x4E07;&#x4E3A;&#x5355;&#x4F4D;&#xFF09;&#x7684;&#x7F51;&#x7AD9;&#x622A;&#x56FE;&#x5E76;&#x5F52;&#x6863;&#x4FDD;&#x5B58;&#x3002;&#x6700;&#x65E9;&#x4F7F;&#x7528;&#x7684;&#x662F;window&#x4E0B;&#x7684;&#x4E00;&#x4E2A;&#x89E3;&#x51B3;&#x65B9;&#x6848;&#xFF1A;webshotcmd.exe+&#x6279;&#x5904;&#x7406;&#x3002;&#x8FD0;&#x884C;&#x4E86;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#xFF0C;&#x53D1;&#x73B0;&#x7ECF;&#x5E38;&#x5F39;&#x51FA;webshotcmd.exe&#x7A0B;&#x5E8F;&#x672A;&#x54CD;&#x5E94;&#x7684;&#x7A97;&#x53E3;&#xFF0C;&#x9700;&#x8981;&#x4EBA;&#x5DE5;&#x70B9;&#x51FB;&#x786E;&#x5B9A;&#x540E;&#x624D;&#x80FD;&#x7EE7;&#x7EED;&#x622A;&#x56FE;&#xFF0C;&#x800C;&#x4E14;webshocmd&#x672A;&#x6CE8;&#x518C;&#x7248;&#x672C;&#x622A;&#x51FA;&#x7684;&#x56FE;&#x662F;&#x7070;&#x8272;&#x7684;&#xFF0C;&#x4E0D;&#x65B9;&#x4FBF;&#x67E5;&#x770B;&#x3002;</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2013/06/08/linux多线程网页截图-shell/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2013\05\19\开发自己的监控系统一、email篇\" rel="bookmark">开发自己的监控系统一、email篇</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\08\20\shell算数运算方法总结\" rel="bookmark">shell算数运算方法总结</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\06\25\工作中常用的shell命令\" rel="bookmark">工作中常用的shell命令</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\04\22\简单的系统监控脚本\" rel="bookmark">简单的系统监控脚本</a></div>
-      
-    </li>
-  
-    <li class="popular-posts-item">
-      
-      
-      <div class="popular-posts-title"><a href="\2012\10\30\脚本实现实时显示linux网络流量\" rel="bookmark">脚本实现实时显示linux网络流量</a></div>
-      
-    </li>
-  
-  </ul>
-
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
   </div>
 
   
@@ -1579,7 +1502,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1605,7 +1528,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -1664,12 +1587,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">308k</span>
+    <span title="站点总字数">382k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">12:49</span>
+    <span title="站点阅读时长">15:54</span>
 </div>
 
         

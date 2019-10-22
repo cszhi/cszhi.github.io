@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: true,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. Ceph&amp;#x67B6;&amp;#x6784;&amp;#x7B80;&amp;#x4ECB;&amp;#x53CA;&amp;#x4F7F;&amp;#x7528;&amp;#x573A;&amp;#x666F;&amp;#x4ECB;&amp;#x7ECD;1.1 Ceph&amp;#x7B80;&amp;#x4ECB;Ceph&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x7EDF;&amp;#x4E00;&amp;#x7684;&amp;#x5206;&amp;#x5E03;&amp;#x5F0F;&amp;#x5B">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph介绍及原理架构分享">
+<meta property="og:url" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="1. Ceph&amp;#x67B6;&amp;#x6784;&amp;#x7B80;&amp;#x4ECB;&amp;#x53CA;&amp;#x4F7F;&amp;#x7528;&amp;#x573A;&amp;#x666F;&amp;#x4ECB;&amp;#x7ECD;1.1 Ceph&amp;#x7B80;&amp;#x4ECB;Ceph&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x7EDF;&amp;#x4E00;&amp;#x7684;&amp;#x5206;&amp;#x5E03;&amp;#x5F0F;&amp;#x5B">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/1568330271491.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/1568330344529.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/1568330370511.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-372ff5a93ceca813.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-db0fd6e3e3f49f68.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-2c47144a5118bcf0.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-9cc1013f7e3dc8f9.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-b24c72ac8bbf1a19.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-ed51d7d8050dbf64.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-850a745bc0f44494.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-d49d90ae6a918ef2.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-4dda9e2648dabe90.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-9e324e87c6d086f3.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-797b8f8c9e2de4d7.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-a04c96ba04ec47df.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-06fcd181ba5c2671.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-8662667e6a06e931.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-f7e6ef5c9d3fe38f.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-a7d2248cb9963f1d.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-f0f7321a9e37361f.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-ac18dabc9fb44d20.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-1bd6980a2141bc51.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-127c6f8a40938233.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-0084962b3a7847b4.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-1e1649e967f3ae12.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-44d8c1a4d4bfd7bb.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-ee0e5f4494379b96.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-a5c9368ebffc0c96.png">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/2099201-da583f0fc10fbd87.png">
+<meta property="og:updated_time" content="2019-10-01T07:37:59.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ceph介绍及原理架构分享">
+<meta name="twitter:description" content="1. Ceph&amp;#x67B6;&amp;#x6784;&amp;#x7B80;&amp;#x4ECB;&amp;#x53CA;&amp;#x4F7F;&amp;#x7528;&amp;#x573A;&amp;#x666F;&amp;#x4ECB;&amp;#x7ECD;1.1 Ceph&amp;#x7B80;&amp;#x4ECB;Ceph&amp;#x662F;&amp;#x4E00;&amp;#x4E2A;&amp;#x7EDF;&amp;#x4E00;&amp;#x7684;&amp;#x5206;&amp;#x5E03;&amp;#x5F0F;&amp;#x5B">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/1568330271491.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Ceph介绍及原理架构分享 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2018/09/19/Ceph介绍及原理架构分享/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Ceph介绍及原理架构分享
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-19 00:00:00" itemprop="dateCreated datePublished" datetime="2018-09-19T00:00:00+08:00">2018-09-19</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>1:55</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;"><a href="#1-Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;" class="headerlink" title="1. Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;"></a>1. Ceph&#x67B6;&#x6784;&#x7B80;&#x4ECB;&#x53CA;&#x4F7F;&#x7528;&#x573A;&#x666F;&#x4ECB;&#x7ECD;</h1><h2 id="1-1-Ceph&#x7B80;&#x4ECB;"><a href="#1-1-Ceph&#x7B80;&#x4ECB;" class="headerlink" title="1.1 Ceph&#x7B80;&#x4ECB;"></a>1.1 Ceph&#x7B80;&#x4ECB;</h2><p>Ceph&#x662F;&#x4E00;&#x4E2A;&#x7EDF;&#x4E00;&#x7684;&#x5206;&#x5E03;&#x5F0F;&#x5B58;&#x50A8;&#x7CFB;&#x7EDF;&#xFF0C;&#x8BBE;&#x8BA1;&#x521D;&#x8877;&#x662F;&#x63D0;&#x4F9B;&#x8F83;&#x597D;&#x7684;&#x6027;&#x80FD;&#x3001;&#x53EF;&#x9760;&#x6027;&#x548C;&#x53EF;&#x6269;&#x5C55;&#x6027;&#x3002;</p>
+<p>Ceph&#x9879;&#x76EE;&#x6700;&#x65E9;&#x8D77;&#x6E90;&#x4E8E;Sage&#x5C31;&#x8BFB;&#x535A;&#x58EB;&#x671F;&#x95F4;&#x7684;&#x5DE5;&#x4F5C;&#xFF08;&#x6700;&#x65E9;&#x7684;&#x6210;&#x679C;&#x4E8E;2004&#x5E74;&#x53D1;&#x8868;&#xFF09;&#xFF0C;&#x5E76;&#x968F;&#x540E;&#x8D21;&#x732E;&#x7ED9;&#x5F00;&#x6E90;&#x793E;&#x533A;&#x3002;&#x5728;&#x7ECF;&#x8FC7;&#x4E86;&#x6570;&#x5E74;&#x7684;&#x53D1;&#x5C55;&#x4E4B;&#x540E;&#xFF0C;&#x76EE;&#x524D;&#x5DF2;&#x5F97;&#x5230;&#x4F17;&#x591A;&#x4E91;&#x8BA1;&#x7B97;&#x5382;&#x5546;&#x7684;&#x652F;&#x6301;&#x5E76;&#x88AB;&#x5E7F;&#x6CDB;&#x5E94;&#x7528;&#x3002;RedHat&#x53CA;OpenStack&#x90FD;&#x53EF;&#x4E0E;Ceph&#x6574;&#x5408;&#x4EE5;&#x652F;&#x6301;&#x865A;&#x62DF;&#x673A;&#x955C;&#x50CF;&#x7684;&#x540E;&#x7AEF;&#x5B58;&#x50A8;&#x3002;</p>
+<a id="more"></a>
+
+<h2 id="1-2-Ceph&#x7279;&#x70B9;"><a href="#1-2-Ceph&#x7279;&#x70B9;" class="headerlink" title="1.2 Ceph&#x7279;&#x70B9;"></a>1.2 Ceph&#x7279;&#x70B9;</h2><ul>
+<li>&#x9AD8;&#x6027;&#x80FD;<ul>
+<li>a. &#x6452;&#x5F03;&#x4E86;&#x4F20;&#x7EDF;&#x7684;&#x96C6;&#x4E2D;&#x5F0F;&#x5B58;&#x50A8;&#x5143;&#x6570;&#x636E;&#x5BFB;&#x5740;&#x7684;&#x65B9;&#x6848;&#xFF0C;&#x91C7;&#x7528;CRUSH&#x7B97;&#x6CD5;&#xFF0C;&#x6570;&#x636E;&#x5206;&#x5E03;&#x5747;&#x8861;&#xFF0C;&#x5E76;&#x884C;&#x5EA6;&#x9AD8;&#x3002;</li>
+<li>b.&#x8003;&#x8651;&#x4E86;&#x5BB9;&#x707E;&#x57DF;&#x7684;&#x9694;&#x79BB;&#xFF0C;&#x80FD;&#x591F;&#x5B9E;&#x73B0;&#x5404;&#x7C7B;&#x8D1F;&#x8F7D;&#x7684;&#x526F;&#x672C;&#x653E;&#x7F6E;&#x89C4;&#x5219;&#xFF0C;&#x4F8B;&#x5982;&#x8DE8;&#x673A;&#x623F;&#x3001;&#x673A;&#x67B6;&#x611F;&#x77E5;&#x7B49;&#x3002;</li>
+<li>c. &#x80FD;&#x591F;&#x652F;&#x6301;&#x4E0A;&#x5343;&#x4E2A;&#x5B58;&#x50A8;&#x8282;&#x70B9;&#x7684;&#x89C4;&#x6A21;&#xFF0C;&#x652F;&#x6301;TB&#x5230;PB&#x7EA7;&#x7684;&#x6570;&#x636E;&#x3002;</li>
+</ul>
+</li>
+<li>&#x9AD8;&#x53EF;&#x7528;&#x6027;<ul>
+<li>a. &#x526F;&#x672C;&#x6570;&#x53EF;&#x4EE5;&#x7075;&#x6D3B;&#x63A7;&#x5236;&#x3002;</li>
+<li>b. &#x652F;&#x6301;&#x6545;&#x969C;&#x57DF;&#x5206;&#x9694;&#xFF0C;&#x6570;&#x636E;&#x5F3A;&#x4E00;&#x81F4;&#x6027;&#x3002;</li>
+<li>c. &#x591A;&#x79CD;&#x6545;&#x969C;&#x573A;&#x666F;&#x81EA;&#x52A8;&#x8FDB;&#x884C;&#x4FEE;&#x590D;&#x81EA;&#x6108;&#x3002;</li>
+<li>d. &#x6CA1;&#x6709;&#x5355;&#x70B9;&#x6545;&#x969C;&#xFF0C;&#x81EA;&#x52A8;&#x7BA1;&#x7406;&#x3002;</li>
+</ul>
+</li>
+<li>&#x9AD8;&#x53EF;&#x6269;&#x5C55;&#x6027;<ul>
+<li>a. &#x53BB;&#x4E2D;&#x5FC3;&#x5316;&#x3002;</li>
+<li>b. &#x6269;&#x5C55;&#x7075;&#x6D3B;&#x3002;</li>
+<li>c. &#x968F;&#x7740;&#x8282;&#x70B9;&#x589E;&#x52A0;&#x800C;&#x7EBF;&#x6027;&#x589E;&#x957F;&#x3002;</li>
+</ul>
+</li>
+<li>&#x7279;&#x6027;&#x4E30;&#x5BCC;<ul>
+<li>a. &#x652F;&#x6301;&#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x63A5;&#x53E3;&#xFF1A;&#x5757;&#x5B58;&#x50A8;&#x3001;&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x3001;&#x5BF9;&#x8C61;&#x5B58;&#x50A8;&#x3002;</li>
+<li>b. &#x652F;&#x6301;&#x81EA;&#x5B9A;&#x4E49;&#x63A5;&#x53E3;&#xFF0C;&#x652F;&#x6301;&#x591A;&#x79CD;&#x8BED;&#x8A00;&#x9A71;&#x52A8;&#x3002;</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-3-Ceph&#x67B6;&#x6784;"><a href="#1-3-Ceph&#x67B6;&#x6784;" class="headerlink" title="1.3 Ceph&#x67B6;&#x6784;"></a>1.3 Ceph&#x67B6;&#x6784;</h2><p><strong>&#x652F;&#x6301;&#x4E09;&#x79CD;&#x63A5;&#x53E3;&#xFF1A;</strong></p>
+<ul>
+<li><p><strong>Object</strong>&#xFF1A;&#x6709;&#x539F;&#x751F;&#x7684;API&#xFF0C;&#x800C;&#x4E14;&#x4E5F;&#x517C;&#x5BB9;Swift&#x548C;S3&#x7684;API&#x3002;</p>
+</li>
+<li><p><strong>Block</strong>&#xFF1A;&#x652F;&#x6301;&#x7CBE;&#x7B80;&#x914D;&#x7F6E;&#x3001;&#x5FEB;&#x7167;&#x3001;&#x514B;&#x9686;&#x3002;</p>
+</li>
+<li><p>File</p>
+<p>&#xFF1A;Posix&#x63A5;&#x53E3;&#xFF0C;&#x652F;&#x6301;&#x5FEB;&#x7167;&#x3002;</p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/1568330271491.png" alt></p>
+</li>
+</ul>
+<h2 id="1-4-Ceph&#x6838;&#x5FC3;&#x7EC4;&#x4EF6;&#x53CA;&#x6982;&#x5FF5;&#x4ECB;&#x7ECD;"><a href="#1-4-Ceph&#x6838;&#x5FC3;&#x7EC4;&#x4EF6;&#x53CA;&#x6982;&#x5FF5;&#x4ECB;&#x7ECD;" class="headerlink" title="1.4 Ceph&#x6838;&#x5FC3;&#x7EC4;&#x4EF6;&#x53CA;&#x6982;&#x5FF5;&#x4ECB;&#x7ECD;"></a>1.4 Ceph&#x6838;&#x5FC3;&#x7EC4;&#x4EF6;&#x53CA;&#x6982;&#x5FF5;&#x4ECB;&#x7ECD;</h2><ul>
+<li><p><strong>Monitor</strong></p>
+<p>&#x4E00;&#x4E2A;Ceph&#x96C6;&#x7FA4;&#x9700;&#x8981;&#x591A;&#x4E2A;Monitor&#x7EC4;&#x6210;&#x7684;&#x5C0F;&#x96C6;&#x7FA4;&#xFF0C;&#x5B83;&#x4EEC;&#x901A;&#x8FC7;Paxos&#x540C;&#x6B65;&#x6570;&#x636E;&#xFF0C;&#x7528;&#x6765;&#x4FDD;&#x5B58;OSD&#x7684;&#x5143;&#x6570;&#x636E;&#x3002;</p>
+</li>
+<li><p><strong>OSD</strong></p>
+<p>OSD&#x5168;&#x79F0;Object Storage Device&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x8D1F;&#x8D23;&#x54CD;&#x5E94;&#x5BA2;&#x6237;&#x7AEF;&#x8BF7;&#x6C42;&#x8FD4;&#x56DE;&#x5177;&#x4F53;&#x6570;&#x636E;&#x7684;&#x8FDB;&#x7A0B;&#x3002;&#x4E00;&#x4E2A;Ceph&#x96C6;&#x7FA4;&#x4E00;&#x822C;&#x90FD;&#x6709;&#x5F88;&#x591A;&#x4E2A;OSD&#x3002;</p>
+</li>
+<li><p><strong>MDS</strong></p>
+<p>MDS&#x5168;&#x79F0;Ceph Metadata Server&#xFF0C;&#x662F;CephFS&#x670D;&#x52A1;&#x4F9D;&#x8D56;&#x7684;&#x5143;&#x6570;&#x636E;&#x670D;&#x52A1;&#x3002;</p>
+</li>
+<li><p><strong>Object</strong></p>
+<p>Ceph&#x6700;&#x5E95;&#x5C42;&#x7684;&#x5B58;&#x50A8;&#x5355;&#x5143;&#x662F;Object&#x5BF9;&#x8C61;&#xFF0C;&#x6BCF;&#x4E2A;Object&#x5305;&#x542B;&#x5143;&#x6570;&#x636E;&#x548C;&#x539F;&#x59CB;&#x6570;&#x636E;&#x3002;</p>
+</li>
+<li><p><strong>PG</strong></p>
+<p>PG&#x5168;&#x79F0;Placement Grouops&#xFF0C;&#x662F;&#x4E00;&#x4E2A;&#x903B;&#x8F91;&#x7684;&#x6982;&#x5FF5;&#xFF0C;&#x4E00;&#x4E2A;PG&#x5305;&#x542B;&#x591A;&#x4E2A;OSD&#x3002;&#x5F15;&#x5165;PG&#x8FD9;&#x4E00;&#x5C42;&#x5176;&#x5B9E;&#x662F;&#x4E3A;&#x4E86;&#x66F4;&#x597D;&#x7684;&#x5206;&#x914D;&#x6570;&#x636E;&#x548C;&#x5B9A;&#x4F4D;&#x6570;&#x636E;&#x3002;</p>
+</li>
+<li><p><strong>RADOS</strong></p>
+<p>RADOS&#x5168;&#x79F0;Reliable Autonomic Distributed Object Store&#xFF0C;&#x662F;Ceph&#x96C6;&#x7FA4;&#x7684;&#x7CBE;&#x534E;&#xFF0C;&#x7528;&#x6237;&#x5B9E;&#x73B0;&#x6570;&#x636E;&#x5206;&#x914D;&#x3001;Failover&#x7B49;&#x96C6;&#x7FA4;&#x64CD;&#x4F5C;&#x3002;</p>
+</li>
+<li><p><strong>Libradio</strong></p>
+<p>Librados&#x662F;Rados&#x63D0;&#x4F9B;&#x5E93;&#xFF0C;&#x56E0;&#x4E3A;RADOS&#x662F;&#x534F;&#x8BAE;&#x5F88;&#x96BE;&#x76F4;&#x63A5;&#x8BBF;&#x95EE;&#xFF0C;&#x56E0;&#x6B64;&#x4E0A;&#x5C42;&#x7684;RBD&#x3001;RGW&#x548C;CephFS&#x90FD;&#x662F;&#x901A;&#x8FC7;librados&#x8BBF;&#x95EE;&#x7684;&#xFF0C;&#x76EE;&#x524D;&#x63D0;&#x4F9B;PHP&#x3001;Ruby&#x3001;Java&#x3001;Python&#x3001;C&#x548C;C++&#x652F;&#x6301;&#x3002;</p>
+</li>
+<li><p><strong>CRUSH</strong></p>
+<p>CRUSH&#x662F;Ceph&#x4F7F;&#x7528;&#x7684;&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B97;&#x6CD5;&#xFF0C;&#x7C7B;&#x4F3C;&#x4E00;&#x81F4;&#x6027;&#x54C8;&#x5E0C;&#xFF0C;&#x8BA9;&#x6570;&#x636E;&#x5206;&#x914D;&#x5230;&#x9884;&#x671F;&#x7684;&#x5730;&#x65B9;&#x3002;</p>
+</li>
+<li><p><strong>RBD</strong></p>
+<p>RBD&#x5168;&#x79F0;RADOS block device&#xFF0C;&#x662F;Ceph&#x5BF9;&#x5916;&#x63D0;&#x4F9B;&#x7684;&#x5757;&#x8BBE;&#x5907;&#x670D;&#x52A1;&#x3002;</p>
+</li>
+<li><p><strong>RGW</strong></p>
+<p>RGW&#x5168;&#x79F0;RADOS gateway&#xFF0C;&#x662F;Ceph&#x5BF9;&#x5916;&#x63D0;&#x4F9B;&#x7684;&#x5BF9;&#x8C61;&#x5B58;&#x50A8;&#x670D;&#x52A1;&#xFF0C;&#x63A5;&#x53E3;&#x4E0E;S3&#x548C;Swift&#x517C;&#x5BB9;&#x3002;</p>
+</li>
+<li><p><strong>CephFS</strong></p>
+<p>CephFS&#x5168;&#x79F0;Ceph File System&#xFF0C;&#x662F;Ceph&#x5BF9;&#x5916;&#x63D0;&#x4F9B;&#x7684;&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#x670D;&#x52A1;&#x3002;</p>
+</li>
+</ul>
+<h2 id="1-5-&#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5757;&#x5B58;&#x50A8;"><a href="#1-5-&#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5757;&#x5B58;&#x50A8;" class="headerlink" title="1.5 &#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5757;&#x5B58;&#x50A8;"></a>1.5 &#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5757;&#x5B58;&#x50A8;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/1568330344529.png" alt="1568330344529"></p>
+<p><strong>&#x5178;&#x578B;&#x8BBE;&#x5907;&#xFF1A;</strong> &#x78C1;&#x76D8;&#x9635;&#x5217;&#xFF0C;&#x786C;&#x76D8;</p>
+<p>&#x4E3B;&#x8981;&#x662F;&#x5C06;&#x88F8;&#x78C1;&#x76D8;&#x7A7A;&#x95F4;&#x6620;&#x5C04;&#x7ED9;&#x4E3B;&#x673A;&#x4F7F;&#x7528;&#x7684;&#x3002;</p>
+<p><strong>&#x4F18;&#x70B9;&#xFF1A;</strong></p>
+<ul>
+<li>&#x901A;&#x8FC7;Raid&#x4E0E;LVM&#x7B49;&#x624B;&#x6BB5;&#xFF0C;&#x5BF9;&#x6570;&#x636E;&#x63D0;&#x4F9B;&#x4E86;&#x4FDD;&#x62A4;&#x3002;</li>
+<li>&#x591A;&#x5757;&#x5EC9;&#x4EF7;&#x7684;&#x786C;&#x76D8;&#x7EC4;&#x5408;&#x8D77;&#x6765;&#xFF0C;&#x63D0;&#x9AD8;&#x5BB9;&#x91CF;&#x3002;</li>
+<li>&#x591A;&#x5757;&#x78C1;&#x76D8;&#x7EC4;&#x5408;&#x51FA;&#x6765;&#x7684;&#x903B;&#x8F91;&#x76D8;&#xFF0C;&#x63D0;&#x5347;&#x8BFB;&#x5199;&#x6548;&#x7387;&#x3002;</li>
+</ul>
+<p><strong>&#x7F3A;&#x70B9;&#xFF1A;</strong></p>
+<ul>
+<li>&#x91C7;&#x7528;SAN&#x67B6;&#x6784;&#x7EC4;&#x7F51;&#x65F6;&#xFF0C;&#x5149;&#x7EA4;&#x4EA4;&#x6362;&#x673A;&#xFF0C;&#x9020;&#x4EF7;&#x6210;&#x672C;&#x9AD8;&#x3002;</li>
+<li>&#x4E3B;&#x673A;&#x4E4B;&#x95F4;&#x65E0;&#x6CD5;&#x5171;&#x4EAB;&#x6570;&#x636E;&#x3002;</li>
+</ul>
+<p><strong>&#x4F7F;&#x7528;&#x573A;&#x666F;&#xFF1A;</strong></p>
+<ul>
+<li>docker&#x5BB9;&#x5668;&#x3001;&#x865A;&#x62DF;&#x673A;&#x78C1;&#x76D8;&#x5B58;&#x50A8;&#x5206;&#x914D;&#x3002;</li>
+<li>&#x65E5;&#x5FD7;&#x5B58;&#x50A8;&#x3002;</li>
+<li>&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x3002;</li>
+<li>&#x2026;</li>
+</ul>
+<h2 id="1-6-&#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x6587;&#x4EF6;&#x5B58;&#x50A8;"><a href="#1-6-&#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x6587;&#x4EF6;&#x5B58;&#x50A8;" class="headerlink" title="1.6 &#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x6587;&#x4EF6;&#x5B58;&#x50A8;"></a>1.6 &#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x6587;&#x4EF6;&#x5B58;&#x50A8;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/1568330370511.png" alt="1568330370511"></p>
+<p><strong>&#x5178;&#x578B;&#x8BBE;&#x5907;&#xFF1A;</strong> FTP&#x3001;NFS&#x670D;&#x52A1;&#x5668;<br> &#x4E3A;&#x4E86;&#x514B;&#x670D;&#x5757;&#x5B58;&#x50A8;&#x6587;&#x4EF6;&#x65E0;&#x6CD5;&#x5171;&#x4EAB;&#x7684;&#x95EE;&#x9898;&#xFF0C;&#x6240;&#x4EE5;&#x6709;&#x4E86;&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x3002;<br> &#x5728;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x67B6;&#x8BBE;FTP&#x4E0E;NFS&#x670D;&#x52A1;&#xFF0C;&#x5C31;&#x662F;&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x3002;</p>
+<p><strong>&#x4F18;&#x70B9;&#xFF1A;</strong></p>
+<ul>
+<li>&#x9020;&#x4EF7;&#x4F4E;&#xFF0C;&#x968F;&#x4FBF;&#x4E00;&#x53F0;&#x673A;&#x5668;&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#x3002;</li>
+<li>&#x65B9;&#x4FBF;&#x6587;&#x4EF6;&#x5171;&#x4EAB;&#x3002;</li>
+</ul>
+<p><strong>&#x7F3A;&#x70B9;&#xFF1A;</strong></p>
+<ul>
+<li>&#x8BFB;&#x5199;&#x901F;&#x7387;&#x4F4E;&#x3002;</li>
+<li>&#x4F20;&#x8F93;&#x901F;&#x7387;&#x6162;&#x3002;</li>
+</ul>
+<p><strong>&#x4F7F;&#x7528;&#x573A;&#x666F;&#xFF1A;</strong></p>
+<ul>
+<li>&#x65E5;&#x5FD7;&#x5B58;&#x50A8;&#x3002;</li>
+<li>&#x6709;&#x76EE;&#x5F55;&#x7ED3;&#x6784;&#x7684;&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x3002;</li>
+<li>&#x2026;</li>
+</ul>
+<h2 id="1-7-&#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5BF9;&#x8C61;&#x5B58;&#x50A8;"><a href="#1-7-&#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5BF9;&#x8C61;&#x5B58;&#x50A8;" class="headerlink" title="1.7 &#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5BF9;&#x8C61;&#x5B58;&#x50A8;"></a>1.7 &#x4E09;&#x79CD;&#x5B58;&#x50A8;&#x7C7B;&#x578B;-&#x5BF9;&#x8C61;&#x5B58;&#x50A8;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-372ff5a93ceca813.png" alt="img"></p>
+<p><strong>&#x5178;&#x578B;&#x8BBE;&#x5907;&#xFF1A;</strong> &#x5185;&#x7F6E;&#x5927;&#x5BB9;&#x91CF;&#x786C;&#x76D8;&#x7684;&#x5206;&#x5E03;&#x5F0F;&#x670D;&#x52A1;&#x5668;(swift, s3)<br> &#x591A;&#x53F0;&#x670D;&#x52A1;&#x5668;&#x5185;&#x7F6E;&#x5927;&#x5BB9;&#x91CF;&#x786C;&#x76D8;&#xFF0C;&#x5B89;&#x88C5;&#x4E0A;&#x5BF9;&#x8C61;&#x5B58;&#x50A8;&#x7BA1;&#x7406;&#x8F6F;&#x4EF6;&#xFF0C;&#x5BF9;&#x5916;&#x63D0;&#x4F9B;&#x8BFB;&#x5199;&#x8BBF;&#x95EE;&#x529F;&#x80FD;&#x3002;</p>
+<p><strong>&#x4F18;&#x70B9;&#xFF1A;</strong></p>
+<ul>
+<li>&#x5177;&#x5907;&#x5757;&#x5B58;&#x50A8;&#x7684;&#x8BFB;&#x5199;&#x9AD8;&#x901F;&#x3002;</li>
+<li>&#x5177;&#x5907;&#x6587;&#x4EF6;&#x5B58;&#x50A8;&#x7684;&#x5171;&#x4EAB;&#x7B49;&#x7279;&#x6027;&#x3002;</li>
+</ul>
+<p><strong>&#x4F7F;&#x7528;&#x573A;&#x666F;&#xFF1A;</strong> (&#x9002;&#x5408;&#x66F4;&#x65B0;&#x53D8;&#x52A8;&#x8F83;&#x5C11;&#x7684;&#x6570;&#x636E;)</p>
+<ul>
+<li>&#x56FE;&#x7247;&#x5B58;&#x50A8;&#x3002;</li>
+<li>&#x89C6;&#x9891;&#x5B58;&#x50A8;&#x3002;</li>
+<li>&#x2026;</li>
+</ul>
+<h1 id="2-Ceph-IO&#x6D41;&#x7A0B;&#x53CA;&#x6570;&#x636E;&#x5206;&#x5E03;"><a href="#2-Ceph-IO&#x6D41;&#x7A0B;&#x53CA;&#x6570;&#x636E;&#x5206;&#x5E03;" class="headerlink" title="2. Ceph IO&#x6D41;&#x7A0B;&#x53CA;&#x6570;&#x636E;&#x5206;&#x5E03;"></a>2. Ceph IO&#x6D41;&#x7A0B;&#x53CA;&#x6570;&#x636E;&#x5206;&#x5E03;</h1><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-db0fd6e3e3f49f68.png" alt="img"></p>
+<p>rados_io_1.png</p>
+<h2 id="2-1-&#x6B63;&#x5E38;IO&#x6D41;&#x7A0B;&#x56FE;"><a href="#2-1-&#x6B63;&#x5E38;IO&#x6D41;&#x7A0B;&#x56FE;" class="headerlink" title="2.1 &#x6B63;&#x5E38;IO&#x6D41;&#x7A0B;&#x56FE;"></a>2.1 &#x6B63;&#x5E38;IO&#x6D41;&#x7A0B;&#x56FE;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-2c47144a5118bcf0.png" alt="img"></p>
+<p>ceph_io_2.png</p>
+<p><strong>&#x6B65;&#x9AA4;&#xFF1A;</strong></p>
+<ol>
+<li>client &#x521B;&#x5EFA;cluster handler&#x3002;</li>
+<li>client &#x8BFB;&#x53D6;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x3002;</li>
+<li>client &#x8FDE;&#x63A5;&#x4E0A;monitor&#xFF0C;&#x83B7;&#x53D6;&#x96C6;&#x7FA4;map&#x4FE1;&#x606F;&#x3002;</li>
+<li>client &#x8BFB;&#x5199;io &#x6839;&#x636E;crshmap &#x7B97;&#x6CD5;&#x8BF7;&#x6C42;&#x5BF9;&#x5E94;&#x7684;&#x4E3B;osd&#x6570;&#x636E;&#x8282;&#x70B9;&#x3002;</li>
+<li>&#x4E3B;osd&#x6570;&#x636E;&#x8282;&#x70B9;&#x540C;&#x65F6;&#x5199;&#x5165;&#x53E6;&#x5916;&#x4E24;&#x4E2A;&#x526F;&#x672C;&#x8282;&#x70B9;&#x6570;&#x636E;&#x3002;</li>
+<li>&#x7B49;&#x5F85;&#x4E3B;&#x8282;&#x70B9;&#x4EE5;&#x53CA;&#x53E6;&#x5916;&#x4E24;&#x4E2A;&#x526F;&#x672C;&#x8282;&#x70B9;&#x5199;&#x5B8C;&#x6570;&#x636E;&#x72B6;&#x6001;&#x3002;</li>
+<li>&#x4E3B;&#x8282;&#x70B9;&#x53CA;&#x526F;&#x672C;&#x8282;&#x70B9;&#x5199;&#x5165;&#x72B6;&#x6001;&#x90FD;&#x6210;&#x529F;&#x540E;&#xFF0C;&#x8FD4;&#x56DE;&#x7ED9;client&#xFF0C;io&#x5199;&#x5165;&#x5B8C;&#x6210;&#x3002;</li>
+</ol>
+<h2 id="2-2-&#x65B0;&#x4E3B;IO&#x6D41;&#x7A0B;&#x56FE;"><a href="#2-2-&#x65B0;&#x4E3B;IO&#x6D41;&#x7A0B;&#x56FE;" class="headerlink" title="2.2 &#x65B0;&#x4E3B;IO&#x6D41;&#x7A0B;&#x56FE;"></a>2.2 &#x65B0;&#x4E3B;IO&#x6D41;&#x7A0B;&#x56FE;</h2><p><strong>&#x8BF4;&#x660E;&#xFF1A;</strong></p>
+<p>&#x5982;&#x679C;&#x65B0;&#x52A0;&#x5165;&#x7684;OSD1&#x53D6;&#x4EE3;&#x4E86;&#x539F;&#x6709;&#x7684; OSD4&#x6210;&#x4E3A; Primary OSD, &#x7531;&#x4E8E; OSD1 &#x4E0A;&#x672A;&#x521B;&#x5EFA; PG , &#x4E0D;&#x5B58;&#x5728;&#x6570;&#x636E;&#xFF0C;&#x90A3;&#x4E48; PG &#x4E0A;&#x7684; I/O &#x65E0;&#x6CD5;&#x8FDB;&#x884C;&#xFF0C;&#x600E;&#x6837;&#x5DE5;&#x4F5C;&#x7684;&#x5462;&#xFF1F;</p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-9cc1013f7e3dc8f9.png" alt="img"></p>
+<p>ceph_io_3.png</p>
+<p><strong>&#x6B65;&#x9AA4;&#xFF1A;</strong></p>
+<ol>
+<li>client&#x8FDE;&#x63A5;monitor&#x83B7;&#x53D6;&#x96C6;&#x7FA4;map&#x4FE1;&#x606F;&#x3002;</li>
+<li>&#x540C;&#x65F6;&#x65B0;&#x4E3B;osd1&#x7531;&#x4E8E;&#x6CA1;&#x6709;pg&#x6570;&#x636E;&#x4F1A;&#x4E3B;&#x52A8;&#x4E0A;&#x62A5;monitor&#x544A;&#x77E5;&#x8BA9;osd2&#x4E34;&#x65F6;&#x63A5;&#x66FF;&#x4E3A;&#x4E3B;&#x3002;</li>
+<li>&#x4E34;&#x65F6;&#x4E3B;osd2&#x4F1A;&#x628A;&#x6570;&#x636E;&#x5168;&#x91CF;&#x540C;&#x6B65;&#x7ED9;&#x65B0;&#x4E3B;osd1&#x3002;</li>
+<li>client IO&#x8BFB;&#x5199;&#x76F4;&#x63A5;&#x8FDE;&#x63A5;&#x4E34;&#x65F6;&#x4E3B;osd2&#x8FDB;&#x884C;&#x8BFB;&#x5199;&#x3002;</li>
+<li>osd2&#x6536;&#x5230;&#x8BFB;&#x5199;io&#xFF0C;&#x540C;&#x65F6;&#x5199;&#x5165;&#x53E6;&#x5916;&#x4E24;&#x526F;&#x672C;&#x8282;&#x70B9;&#x3002;</li>
+<li>&#x7B49;&#x5F85;osd2&#x4EE5;&#x53CA;&#x53E6;&#x5916;&#x4E24;&#x526F;&#x672C;&#x5199;&#x5165;&#x6210;&#x529F;&#x3002;</li>
+<li>osd2&#x4E09;&#x4EFD;&#x6570;&#x636E;&#x90FD;&#x5199;&#x5165;&#x6210;&#x529F;&#x8FD4;&#x56DE;&#x7ED9;client, &#x6B64;&#x65F6;client io&#x8BFB;&#x5199;&#x5B8C;&#x6BD5;&#x3002;</li>
+<li>&#x5982;&#x679C;osd1&#x6570;&#x636E;&#x540C;&#x6B65;&#x5B8C;&#x6BD5;&#xFF0C;&#x4E34;&#x65F6;&#x4E3B;osd2&#x4F1A;&#x4EA4;&#x51FA;&#x4E3B;&#x89D2;&#x8272;&#x3002;</li>
+<li>osd1&#x6210;&#x4E3A;&#x4E3B;&#x8282;&#x70B9;&#xFF0C;osd2&#x53D8;&#x6210;&#x526F;&#x672C;&#x3002;</li>
+</ol>
+<h2 id="2-3-Ceph-IO&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;"><a href="#2-3-Ceph-IO&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;" class="headerlink" title="2.3 Ceph IO&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;"></a>2.3 Ceph IO&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-b24c72ac8bbf1a19.png" alt="img"></p>
+<p>ceph_io_4.png</p>
+<ol>
+<li>File&#x7528;&#x6237;&#x9700;&#x8981;&#x8BFB;&#x5199;&#x7684;&#x6587;&#x4EF6;&#x3002;File-&gt;Object&#x6620;&#x5C04;&#xFF1A;<ul>
+<li>a. ino (File&#x7684;&#x5143;&#x6570;&#x636E;&#xFF0C;File&#x7684;&#x552F;&#x4E00;id)&#x3002;</li>
+<li>b. ono(File&#x5207;&#x5206;&#x4EA7;&#x751F;&#x7684;&#x67D0;&#x4E2A;object&#x7684;&#x5E8F;&#x53F7;&#xFF0C;&#x9ED8;&#x8BA4;&#x4EE5;4M&#x5207;&#x5206;&#x4E00;&#x4E2A;&#x5757;&#x5927;&#x5C0F;)&#x3002;</li>
+<li>c. oid(object id: ino + ono)&#x3002;</li>
+</ul>
+</li>
+<li>Object&#x662F;RADOS&#x9700;&#x8981;&#x7684;&#x5BF9;&#x8C61;&#x3002;Ceph&#x6307;&#x5B9A;&#x4E00;&#x4E2A;&#x9759;&#x6001;hash&#x51FD;&#x6570;&#x8BA1;&#x7B97;oid&#x7684;&#x503C;&#xFF0C;&#x5C06;oid&#x6620;&#x5C04;&#x6210;&#x4E00;&#x4E2A;&#x8FD1;&#x4F3C;&#x5747;&#x5300;&#x5206;&#x5E03;&#x7684;&#x4F2A;&#x968F;&#x673A;&#x503C;&#xFF0C;&#x7136;&#x540E;&#x548C;mask&#x6309;&#x4F4D;&#x76F8;&#x4E0E;&#xFF0C;&#x5F97;&#x5230;pgid&#x3002;Object-&gt;PG&#x6620;&#x5C04;&#xFF1A;<ul>
+<li>a. hash(oid) &amp; mask-&gt; pgid &#x3002;</li>
+<li>b. mask = PG&#x603B;&#x6570;m(m&#x4E3A;2&#x7684;&#x6574;&#x6570;&#x5E42;)-1 &#x3002;</li>
+</ul>
+</li>
+<li>PG(Placement Group),&#x7528;&#x9014;&#x662F;&#x5BF9;object&#x7684;&#x5B58;&#x50A8;&#x8FDB;&#x884C;&#x7EC4;&#x7EC7;&#x548C;&#x4F4D;&#x7F6E;&#x6620;&#x5C04;, (&#x7C7B;&#x4F3C;&#x4E8E;redis  cluster&#x91CC;&#x9762;&#x7684;slot&#x7684;&#x6982;&#x5FF5;)  &#x4E00;&#x4E2A;PG&#x91CC;&#x9762;&#x4F1A;&#x6709;&#x5F88;&#x591A;object&#x3002;&#x91C7;&#x7528;CRUSH&#x7B97;&#x6CD5;&#xFF0C;&#x5C06;pgid&#x4EE3;&#x5165;&#x5176;&#x4E2D;&#xFF0C;&#x7136;&#x540E;&#x5F97;&#x5230;&#x4E00;&#x7EC4;OSD&#x3002;PG-&gt;OSD&#x6620;&#x5C04;&#xFF1A;<ul>
+<li>a. CRUSH(pgid)-&gt;(osd1,osd2,osd3) &#x3002;</li>
+</ul>
+</li>
+</ol>
+<h2 id="2-4-Ceph-IO&#x4F2A;&#x4EE3;&#x7801;&#x6D41;&#x7A0B;"><a href="#2-4-Ceph-IO&#x4F2A;&#x4EE3;&#x7801;&#x6D41;&#x7A0B;" class="headerlink" title="2.4 Ceph IO&#x4F2A;&#x4EE3;&#x7801;&#x6D41;&#x7A0B;"></a>2.4 Ceph IO&#x4F2A;&#x4EE3;&#x7801;&#x6D41;&#x7A0B;</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">locator = object_name</span><br><span class="line">obj_hash =  <span class="built_in">hash</span>(locator)</span><br><span class="line">pg = obj_hash % num_pg</span><br><span class="line">osds_for_pg = crush(pg)  <span class="comment"># returns a list of osds</span></span><br><span class="line">primary = osds_for_pg[0]</span><br><span class="line">replicas = osds_for_pg[1:]</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-5-Ceph-RBD-IO&#x6D41;&#x7A0B;"><a href="#2-5-Ceph-RBD-IO&#x6D41;&#x7A0B;" class="headerlink" title="2.5 Ceph RBD IO&#x6D41;&#x7A0B;"></a>2.5 Ceph RBD IO&#x6D41;&#x7A0B;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-ed51d7d8050dbf64.png" alt="img"></p>
+<p>ceph_rbd_io.png</p>
+<p><strong>&#x6B65;&#x9AA4;&#xFF1A;</strong></p>
+<ol>
+<li>&#x5BA2;&#x6237;&#x7AEF;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;pool&#xFF0C;&#x9700;&#x8981;&#x4E3A;&#x8FD9;&#x4E2A;pool&#x6307;&#x5B9A;pg&#x7684;&#x6570;&#x91CF;&#x3002;</li>
+<li>&#x521B;&#x5EFA;pool/image rbd&#x8BBE;&#x5907;&#x8FDB;&#x884C;&#x6302;&#x8F7D;&#x3002;</li>
+<li>&#x7528;&#x6237;&#x5199;&#x5165;&#x7684;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x5207;&#x5757;&#xFF0C;&#x6BCF;&#x4E2A;&#x5757;&#x7684;&#x5927;&#x5C0F;&#x9ED8;&#x8BA4;&#x4E3A;4M&#xFF0C;&#x5E76;&#x4E14;&#x6BCF;&#x4E2A;&#x5757;&#x90FD;&#x6709;&#x4E00;&#x4E2A;&#x540D;&#x5B57;&#xFF0C;&#x540D;&#x5B57;&#x5C31;&#x662F;object+&#x5E8F;&#x53F7;&#x3002;</li>
+<li>&#x5C06;&#x6BCF;&#x4E2A;object&#x901A;&#x8FC7;pg&#x8FDB;&#x884C;&#x526F;&#x672C;&#x4F4D;&#x7F6E;&#x7684;&#x5206;&#x914D;&#x3002;</li>
+<li>pg&#x6839;&#x636E;cursh&#x7B97;&#x6CD5;&#x4F1A;&#x5BFB;&#x627E;3&#x4E2A;osd&#xFF0C;&#x628A;&#x8FD9;&#x4E2A;object&#x5206;&#x522B;&#x4FDD;&#x5B58;&#x5728;&#x8FD9;&#x4E09;&#x4E2A;osd&#x4E0A;&#x3002;</li>
+<li>osd&#x4E0A;&#x5B9E;&#x9645;&#x662F;&#x628A;&#x5E95;&#x5C42;&#x7684;disk&#x8FDB;&#x884C;&#x4E86;&#x683C;&#x5F0F;&#x5316;&#x64CD;&#x4F5C;&#xFF0C;&#x4E00;&#x822C;&#x90E8;&#x7F72;&#x5DE5;&#x5177;&#x4F1A;&#x5C06;&#x5B83;&#x683C;&#x5F0F;&#x5316;&#x4E3A;xfs&#x6587;&#x4EF6;&#x7CFB;&#x7EDF;&#x3002;</li>
+<li>object&#x7684;&#x5B58;&#x50A8;&#x5C31;&#x53D8;&#x6210;&#x4E86;&#x5B58;&#x50A8;&#x4E00;&#x4E2A;&#x6587;rbd0.object1.file&#x3002;</li>
+</ol>
+<h2 id="2-6-Ceph-RBD-IO&#x6846;&#x67B6;&#x56FE;"><a href="#2-6-Ceph-RBD-IO&#x6846;&#x67B6;&#x56FE;" class="headerlink" title="2.6 Ceph RBD IO&#x6846;&#x67B6;&#x56FE;"></a>2.6 Ceph RBD IO&#x6846;&#x67B6;&#x56FE;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-850a745bc0f44494.png" alt="img"></p>
+<p>ceph_rbd_io1.png</p>
+<p><strong>&#x5BA2;&#x6237;&#x7AEF;&#x5199;&#x6570;&#x636E;osd&#x8FC7;&#x7A0B;&#xFF1A;</strong></p>
+<ol>
+<li>&#x91C7;&#x7528;&#x7684;&#x662F;librbd&#x7684;&#x5F62;&#x5F0F;&#xFF0C;&#x4F7F;&#x7528;librbd&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x5757;&#x8BBE;&#x5907;&#xFF0C;&#x5411;&#x8FD9;&#x4E2A;&#x5757;&#x8BBE;&#x5907;&#x4E2D;&#x5199;&#x5165;&#x6570;&#x636E;&#x3002;</li>
+<li>&#x5728;&#x5BA2;&#x6237;&#x7AEF;&#x672C;&#x5730;&#x540C;&#x8FC7;&#x8C03;&#x7528;librados&#x63A5;&#x53E3;&#xFF0C;&#x7136;&#x540E;&#x7ECF;&#x8FC7;pool&#xFF0C;rbd&#xFF0C;object&#x3001;pg&#x8FDB;&#x884C;&#x5C42;&#x5C42;&#x6620;&#x5C04;,&#x5728;PG&#x8FD9;&#x4E00;&#x5C42;&#x4E2D;&#xFF0C;&#x53EF;&#x4EE5;&#x77E5;&#x9053;&#x6570;&#x636E;&#x4FDD;&#x5B58;&#x5728;&#x54EA;3&#x4E2A;OSD&#x4E0A;&#xFF0C;&#x8FD9;3&#x4E2A;OSD&#x5206;&#x4E3A;&#x4E3B;&#x4ECE;&#x7684;&#x5173;&#x7CFB;&#x3002;</li>
+<li>&#x5BA2;&#x6237;&#x7AEF;&#x4E0E;primay OSD&#x5EFA;&#x7ACB;SOCKET &#x901A;&#x4FE1;&#xFF0C;&#x5C06;&#x8981;&#x5199;&#x5165;&#x7684;&#x6570;&#x636E;&#x4F20;&#x7ED9;primary OSD&#xFF0C;&#x7531;primary OSD&#x518D;&#x5C06;&#x6570;&#x636E;&#x53D1;&#x9001;&#x7ED9;&#x5176;&#x4ED6;replica OSD&#x6570;&#x636E;&#x8282;&#x70B9;&#x3002;</li>
+</ol>
+<h2 id="2-7-Ceph-Pool&#x548C;PG&#x5206;&#x5E03;&#x60C5;&#x51B5;"><a href="#2-7-Ceph-Pool&#x548C;PG&#x5206;&#x5E03;&#x60C5;&#x51B5;" class="headerlink" title="2.7 Ceph Pool&#x548C;PG&#x5206;&#x5E03;&#x60C5;&#x51B5;"></a>2.7 Ceph Pool&#x548C;PG&#x5206;&#x5E03;&#x60C5;&#x51B5;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-d49d90ae6a918ef2.png" alt="img"></p>
+<p>ceph_pool_pg.png</p>
+<p><strong>&#x8BF4;&#x660E;&#xFF1A;</strong></p>
+<ul>
+<li>pool&#x662F;ceph&#x5B58;&#x50A8;&#x6570;&#x636E;&#x65F6;&#x7684;&#x903B;&#x8F91;&#x5206;&#x533A;&#xFF0C;&#x5B83;&#x8D77;&#x5230;namespace&#x7684;&#x4F5C;&#x7528;&#x3002;</li>
+<li>&#x6BCF;&#x4E2A;pool&#x5305;&#x542B;&#x4E00;&#x5B9A;&#x6570;&#x91CF;(&#x53EF;&#x914D;&#x7F6E;)&#x7684;PG&#x3002;</li>
+<li>PG&#x91CC;&#x7684;&#x5BF9;&#x8C61;&#x88AB;&#x6620;&#x5C04;&#x5230;&#x4E0D;&#x540C;&#x7684;Object&#x4E0A;&#x3002;</li>
+<li>pool&#x662F;&#x5206;&#x5E03;&#x5230;&#x6574;&#x4E2A;&#x96C6;&#x7FA4;&#x7684;&#x3002;</li>
+<li>pool&#x53EF;&#x4EE5;&#x505A;&#x6545;&#x969C;&#x9694;&#x79BB;&#x57DF;&#xFF0C;&#x6839;&#x636E;&#x4E0D;&#x540C;&#x7684;&#x7528;&#x6237;&#x573A;&#x666F;&#x4E0D;&#x4E00;&#x8FDB;&#x884C;&#x9694;&#x79BB;&#x3002;</li>
+</ul>
+<h2 id="2-8-Ceph-&#x6570;&#x636E;&#x6269;&#x5BB9;PG&#x5206;&#x5E03;"><a href="#2-8-Ceph-&#x6570;&#x636E;&#x6269;&#x5BB9;PG&#x5206;&#x5E03;" class="headerlink" title="2.8 Ceph &#x6570;&#x636E;&#x6269;&#x5BB9;PG&#x5206;&#x5E03;"></a>2.8 Ceph &#x6570;&#x636E;&#x6269;&#x5BB9;PG&#x5206;&#x5E03;</h2><p><strong>&#x573A;&#x666F;&#x6570;&#x636E;&#x8FC1;&#x79FB;&#x6D41;&#x7A0B;&#xFF1A;</strong></p>
+<ul>
+<li>&#x73B0;&#x72B6;3&#x4E2A;OSD, 4&#x4E2A;PG</li>
+<li>&#x6269;&#x5BB9;&#x5230;4&#x4E2A;OSD, 4&#x4E2A;PG</li>
+</ul>
+<p><strong>&#x73B0;&#x72B6;&#xFF1A;</strong></p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-4dda9e2648dabe90.png" alt="img"></p>
+<p>ceph_recory_1.png</p>
+<p><strong>&#x6269;&#x5BB9;&#x540E;&#xFF1A;</strong></p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-9e324e87c6d086f3.png" alt="img"></p>
+<p>ceph_io_recry2.png</p>
+<p><strong>&#x8BF4;&#x660E;</strong><br> &#x6BCF;&#x4E2A;OSD&#x4E0A;&#x5206;&#x5E03;&#x5F88;&#x591A;PG, &#x5E76;&#x4E14;&#x6BCF;&#x4E2A;PG&#x4F1A;&#x81EA;&#x52A8;&#x6563;&#x843D;&#x5728;&#x4E0D;&#x540C;&#x7684;OSD&#x4E0A;&#x3002;&#x5982;&#x679C;&#x6269;&#x5BB9;&#x90A3;&#x4E48;&#x76F8;&#x5E94;&#x7684;PG&#x4F1A;&#x8FDB;&#x884C;&#x8FC1;&#x79FB;&#x5230;&#x65B0;&#x7684;OSD&#x4E0A;&#xFF0C;&#x4FDD;&#x8BC1;PG&#x6570;&#x91CF;&#x7684;&#x5747;&#x8861;&#x3002;</p>
+<h1 id="3-Ceph&#x5FC3;&#x8DF3;&#x673A;&#x5236;"><a href="#3-Ceph&#x5FC3;&#x8DF3;&#x673A;&#x5236;" class="headerlink" title="3. Ceph&#x5FC3;&#x8DF3;&#x673A;&#x5236;"></a>3. Ceph&#x5FC3;&#x8DF3;&#x673A;&#x5236;</h1><h2 id="3-1-&#x5FC3;&#x8DF3;&#x4ECB;&#x7ECD;"><a href="#3-1-&#x5FC3;&#x8DF3;&#x4ECB;&#x7ECD;" class="headerlink" title="3.1 &#x5FC3;&#x8DF3;&#x4ECB;&#x7ECD;"></a>3.1 &#x5FC3;&#x8DF3;&#x4ECB;&#x7ECD;</h2><p>&#x5FC3;&#x8DF3;&#x662F;&#x7528;&#x4E8E;&#x8282;&#x70B9;&#x95F4;&#x68C0;&#x6D4B;&#x5BF9;&#x65B9;&#x662F;&#x5426;&#x6545;&#x969C;&#x7684;&#xFF0C;&#x4EE5;&#x4FBF;&#x53CA;&#x65F6;&#x53D1;&#x73B0;&#x6545;&#x969C;&#x8282;&#x70B9;&#x8FDB;&#x5165;&#x76F8;&#x5E94;&#x7684;&#x6545;&#x969C;&#x5904;&#x7406;&#x6D41;&#x7A0B;&#x3002;</p>
+<p><strong>&#x95EE;&#x9898;&#xFF1A;</strong></p>
+<ul>
+<li>&#x6545;&#x969C;&#x68C0;&#x6D4B;&#x65F6;&#x95F4;&#x548C;&#x5FC3;&#x8DF3;&#x62A5;&#x6587;&#x5E26;&#x6765;&#x7684;&#x8D1F;&#x8F7D;&#x4E4B;&#x95F4;&#x505A;&#x6743;&#x8861;&#x3002;</li>
+<li>&#x5FC3;&#x8DF3;&#x9891;&#x7387;&#x592A;&#x9AD8;&#x5219;&#x8FC7;&#x591A;&#x7684;&#x5FC3;&#x8DF3;&#x62A5;&#x6587;&#x4F1A;&#x5F71;&#x54CD;&#x7CFB;&#x7EDF;&#x6027;&#x80FD;&#x3002;</li>
+<li>&#x5FC3;&#x8DF3;&#x9891;&#x7387;&#x8FC7;&#x4F4E;&#x5219;&#x4F1A;&#x5EF6;&#x957F;&#x53D1;&#x73B0;&#x6545;&#x969C;&#x8282;&#x70B9;&#x7684;&#x65F6;&#x95F4;&#xFF0C;&#x4ECE;&#x800C;&#x5F71;&#x54CD;&#x7CFB;&#x7EDF;&#x7684;&#x53EF;&#x7528;&#x6027;&#x3002;</li>
+</ul>
+<p><strong>&#x6545;&#x969C;&#x68C0;&#x6D4B;&#x7B56;&#x7565;&#x5E94;&#x8BE5;&#x80FD;&#x591F;&#x505A;&#x5230;&#xFF1A;</strong></p>
+<ul>
+<li><strong>&#x53CA;&#x65F6;</strong>&#xFF1A;&#x8282;&#x70B9;&#x53D1;&#x751F;&#x5F02;&#x5E38;&#x5982;&#x5B95;&#x673A;&#x6216;&#x7F51;&#x7EDC;&#x4E2D;&#x65AD;&#x65F6;&#xFF0C;&#x96C6;&#x7FA4;&#x53EF;&#x4EE5;&#x5728;&#x53EF;&#x63A5;&#x53D7;&#x7684;&#x65F6;&#x95F4;&#x8303;&#x56F4;&#x5185;&#x611F;&#x77E5;&#x3002;</li>
+<li><strong>&#x9002;&#x5F53;&#x7684;&#x538B;&#x529B;</strong>&#xFF1A;&#x5305;&#x62EC;&#x5BF9;&#x8282;&#x70B9;&#x7684;&#x538B;&#x529B;&#xFF0C;&#x548C;&#x5BF9;&#x7F51;&#x7EDC;&#x7684;&#x538B;&#x529B;&#x3002;</li>
+<li><strong>&#x5BB9;&#x5FCD;&#x7F51;&#x7EDC;&#x6296;&#x52A8;</strong>&#xFF1A;&#x7F51;&#x7EDC;&#x5076;&#x5C14;&#x5EF6;&#x8FDF;&#x3002;</li>
+<li><strong>&#x6269;&#x6563;&#x673A;&#x5236;</strong>&#xFF1A;&#x8282;&#x70B9;&#x5B58;&#x6D3B;&#x72B6;&#x6001;&#x6539;&#x53D8;&#x5BFC;&#x81F4;&#x7684;&#x5143;&#x4FE1;&#x606F;&#x53D8;&#x5316;&#x9700;&#x8981;&#x901A;&#x8FC7;&#x67D0;&#x79CD;&#x673A;&#x5236;&#x6269;&#x6563;&#x5230;&#x6574;&#x4E2A;&#x96C6;&#x7FA4;&#x3002;</li>
+</ul>
+<h2 id="3-2-Ceph-&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;"><a href="#3-2-Ceph-&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;" class="headerlink" title="3.2 Ceph &#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;"></a>3.2 Ceph &#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-797b8f8c9e2de4d7.png" alt="img"></p>
+<p>ceph_heartbeat_1.png</p>
+<p><strong>OSD&#x8282;&#x70B9;&#x4F1A;&#x76D1;&#x542C;public&#x3001;cluster&#x3001;front&#x548C;back&#x56DB;&#x4E2A;&#x7AEF;&#x53E3;</strong></p>
+<ul>
+<li><strong>public&#x7AEF;&#x53E3;</strong>&#xFF1A;&#x76D1;&#x542C;&#x6765;&#x81EA;Monitor&#x548C;Client&#x7684;&#x8FDE;&#x63A5;&#x3002;</li>
+<li><strong>cluster&#x7AEF;&#x53E3;</strong>&#xFF1A;&#x76D1;&#x542C;&#x6765;&#x81EA;OSD Peer&#x7684;&#x8FDE;&#x63A5;&#x3002;</li>
+<li><strong>front&#x7AEF;&#x53E3;</strong>&#xFF1A;&#x4F9B;&#x5BA2;&#x6237;&#x7AEF;&#x8FDE;&#x63A5;&#x96C6;&#x7FA4;&#x4F7F;&#x7528;&#x7684;&#x7F51;&#x5361;, &#x8FD9;&#x91CC;&#x4E34;&#x65F6;&#x7ED9;&#x96C6;&#x7FA4;&#x5185;&#x90E8;&#x4E4B;&#x95F4;&#x8FDB;&#x884C;&#x5FC3;&#x8DF3;&#x3002;</li>
+<li><strong>back&#x7AEF;&#x53E3;</strong>&#xFF1A;&#x4F9B;&#x5BA2;&#x96C6;&#x7FA4;&#x5185;&#x90E8;&#x4F7F;&#x7528;&#x7684;&#x7F51;&#x5361;&#x3002;&#x96C6;&#x7FA4;&#x5185;&#x90E8;&#x4E4B;&#x95F4;&#x8FDB;&#x884C;&#x5FC3;&#x8DF3;&#x3002;</li>
+<li><strong>hbclient</strong>&#xFF1A;&#x53D1;&#x9001;ping&#x5FC3;&#x8DF3;&#x7684;messenger&#x3002;</li>
+</ul>
+<h2 id="3-3-Ceph-OSD&#x4E4B;&#x95F4;&#x76F8;&#x4E92;&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;"><a href="#3-3-Ceph-OSD&#x4E4B;&#x95F4;&#x76F8;&#x4E92;&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;" class="headerlink" title="3.3 Ceph OSD&#x4E4B;&#x95F4;&#x76F8;&#x4E92;&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;"></a>3.3 Ceph OSD&#x4E4B;&#x95F4;&#x76F8;&#x4E92;&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-a04c96ba04ec47df.png" alt="img"></p>
+<p>ceph_heartbeat_osd.png</p>
+<p><strong>&#x6B65;&#x9AA4;&#xFF1A;</strong></p>
+<ul>
+<li>&#x540C;&#x4E00;&#x4E2A;PG&#x5185;OSD&#x4E92;&#x76F8;&#x5FC3;&#x8DF3;&#xFF0C;&#x4ED6;&#x4EEC;&#x4E92;&#x76F8;&#x53D1;&#x9001;PING/PONG&#x4FE1;&#x606F;&#x3002;</li>
+<li>&#x6BCF;&#x9694;6s&#x68C0;&#x6D4B;&#x4E00;&#x6B21;(&#x5B9E;&#x9645;&#x4F1A;&#x5728;&#x8FD9;&#x4E2A;&#x57FA;&#x7840;&#x4E0A;&#x52A0;&#x4E00;&#x4E2A;&#x968F;&#x673A;&#x65F6;&#x95F4;&#x6765;&#x907F;&#x514D;&#x5CF0;&#x503C;)&#x3002;</li>
+<li>20s&#x6CA1;&#x6709;&#x68C0;&#x6D4B;&#x5230;&#x5FC3;&#x8DF3;&#x56DE;&#x590D;&#xFF0C;&#x52A0;&#x5165;failure&#x961F;&#x5217;&#x3002;</li>
+</ul>
+<h2 id="3-4-Ceph-OSD&#x4E0E;Mon&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;"><a href="#3-4-Ceph-OSD&#x4E0E;Mon&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;" class="headerlink" title="3.4 Ceph OSD&#x4E0E;Mon&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;"></a>3.4 Ceph OSD&#x4E0E;Mon&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-06fcd181ba5c2671.png" alt="img"></p>
+<p>ceph_heartbeat_mon.png</p>
+<p><strong>OSD&#x62A5;&#x544A;&#x7ED9;Monitor&#xFF1A;</strong></p>
+<ul>
+<li>OSD&#x6709;&#x4E8B;&#x4EF6;&#x53D1;&#x751F;&#x65F6;&#xFF08;&#x6BD4;&#x5982;&#x6545;&#x969C;&#x3001;PG&#x53D8;&#x66F4;&#xFF09;&#x3002;</li>
+<li>&#x81EA;&#x8EAB;&#x542F;&#x52A8;5&#x79D2;&#x5185;&#x3002;</li>
+<li>OSD&#x5468;&#x671F;&#x6027;&#x7684;&#x4E0A;&#x62A5;&#x7ED9;Monito <ul>
+<li>OSD&#x68C0;&#x67E5;failure_queue&#x4E2D;&#x7684;&#x4F19;&#x4F34;OSD&#x5931;&#x8D25;&#x4FE1;&#x606F;&#x3002;</li>
+<li>&#x5411;Monitor&#x53D1;&#x9001;&#x5931;&#x6548;&#x62A5;&#x544A;&#xFF0C;&#x5E76;&#x5C06;&#x5931;&#x8D25;&#x4FE1;&#x606F;&#x52A0;&#x5165;failure_pending&#x961F;&#x5217;&#xFF0C;&#x7136;&#x540E;&#x5C06;&#x5176;&#x4ECE;failure_queue&#x79FB;&#x9664;&#x3002;</li>
+<li>&#x6536;&#x5230;&#x6765;&#x81EA;failure_queue&#x6216;&#x8005;failure_pending&#x4E2D;&#x7684;OSD&#x7684;&#x5FC3;&#x8DF3;&#x65F6;&#xFF0C;&#x5C06;&#x5176;&#x4ECE;&#x4E24;&#x4E2A;&#x961F;&#x5217;&#x4E2D;&#x79FB;&#x9664;&#xFF0C;&#x5E76;&#x544A;&#x77E5;Monitor&#x53D6;&#x6D88;&#x4E4B;&#x524D;&#x7684;&#x5931;&#x6548;&#x62A5;&#x544A;&#x3002;</li>
+<li>&#x5F53;&#x53D1;&#x751F;&#x4E0E;Monitor&#x7F51;&#x7EDC;&#x91CD;&#x8FDE;&#x65F6;&#xFF0C;&#x4F1A;&#x5C06;failure_pending&#x4E2D;&#x7684;&#x9519;&#x8BEF;&#x62A5;&#x544A;&#x52A0;&#x56DE;&#x5230;failure_queue&#x4E2D;&#xFF0C;&#x5E76;&#x518D;&#x6B21;&#x53D1;&#x9001;&#x7ED9;Monitor&#x3002;</li>
+</ul>
+</li>
+<li>Monitor&#x7EDF;&#x8BA1;&#x4E0B;&#x7EBF;OSD <ul>
+<li>Monitor&#x6536;&#x96C6;&#x6765;&#x81EA;OSD&#x7684;&#x4F19;&#x4F34;&#x5931;&#x6548;&#x62A5;&#x544A;&#x3002;</li>
+<li>&#x5F53;&#x9519;&#x8BEF;&#x62A5;&#x544A;&#x6307;&#x5411;&#x7684;OSD&#x5931;&#x6548;&#x8D85;&#x8FC7;&#x4E00;&#x5B9A;&#x9608;&#x503C;&#xFF0C;&#x4E14;&#x6709;&#x8DB3;&#x591F;&#x591A;&#x7684;OSD&#x62A5;&#x544A;&#x5176;&#x5931;&#x6548;&#x65F6;&#xFF0C;&#x5C06;&#x8BE5;OSD&#x4E0B;&#x7EBF;&#x3002;</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-5-Ceph&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;&#x603B;&#x7ED3;"><a href="#3-5-Ceph&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;&#x603B;&#x7ED3;" class="headerlink" title="3.5 Ceph&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;&#x603B;&#x7ED3;"></a>3.5 Ceph&#x5FC3;&#x8DF3;&#x68C0;&#x6D4B;&#x603B;&#x7ED3;</h2><p>Ceph&#x901A;&#x8FC7;&#x4F19;&#x4F34;OSD&#x6C47;&#x62A5;&#x5931;&#x6548;&#x8282;&#x70B9;&#x548C;Monitor&#x7EDF;&#x8BA1;&#x6765;&#x81EA;OSD&#x7684;&#x5FC3;&#x8DF3;&#x4E24;&#x79CD;&#x65B9;&#x5F0F;&#x5224;&#x5B9A;OSD&#x8282;&#x70B9;&#x5931;&#x6548;&#x3002;</p>
+<ul>
+<li><p><strong>&#x53CA;&#x65F6;</strong>&#xFF1A;&#x4F19;&#x4F34;OSD&#x53EF;&#x4EE5;&#x5728;&#x79D2;&#x7EA7;&#x53D1;&#x73B0;&#x8282;&#x70B9;&#x5931;&#x6548;&#x5E76;&#x6C47;&#x62A5;Monitor&#xFF0C;&#x5E76;&#x5728;&#x51E0;&#x5206;&#x949F;&#x5185;&#x7531;Monitor&#x5C06;&#x5931;&#x6548;OSD&#x4E0B;&#x7EBF;&#x3002;</p>
+</li>
+<li><p><strong>&#x9002;&#x5F53;&#x7684;&#x538B;&#x529B;</strong>&#xFF1A;&#x7531;&#x4E8E;&#x6709;&#x4F19;&#x4F34;OSD&#x6C47;&#x62A5;&#x673A;&#x5236;&#xFF0C;Monitor&#x4E0E;OSD&#x4E4B;&#x95F4;&#x7684;&#x5FC3;&#x8DF3;&#x7EDF;&#x8BA1;&#x66F4;&#x50CF;&#x662F;&#x4E00;&#x79CD;&#x4FDD;&#x9669;&#x63AA;&#x65BD;&#xFF0C;&#x56E0;&#x6B64;OSD&#x5411;Monitor&#x53D1;&#x9001;&#x5FC3;&#x8DF3;&#x7684;&#x95F4;&#x9694;&#x53EF;&#x4EE5;&#x957F;&#x8FBE;600&#x79D2;&#xFF0C;Monitor&#x7684;&#x68C0;&#x6D4B;&#x9608;&#x503C;&#x4E5F;&#x53EF;&#x4EE5;&#x957F;&#x8FBE;900&#x79D2;&#x3002;Ceph&#x5B9E;&#x9645;&#x4E0A;&#x662F;&#x5C06;&#x6545;&#x969C;&#x68C0;&#x6D4B;&#x8FC7;&#x7A0B;&#x4E2D;&#x4E2D;&#x5FC3;&#x8282;&#x70B9;&#x7684;&#x538B;&#x529B;&#x5206;&#x6563;&#x5230;&#x6240;&#x6709;&#x7684;OSD&#x4E0A;&#xFF0C;&#x4EE5;&#x6B64;&#x63D0;&#x9AD8;&#x4E2D;&#x5FC3;&#x8282;&#x70B9;Monitor&#x7684;&#x53EF;&#x9760;&#x6027;&#xFF0C;&#x8FDB;&#x800C;&#x63D0;&#x9AD8;&#x6574;&#x4E2A;&#x96C6;&#x7FA4;&#x7684;&#x53EF;&#x6269;&#x5C55;&#x6027;&#x3002;</p>
+</li>
+<li><p>&#x5BB9;&#x5FCD;&#x7F51;&#x7EDC;&#x6296;&#x52A8;</p>
+<p>&#xFF1A;Monitor&#x6536;&#x5230;OSD&#x5BF9;&#x5176;&#x4F19;&#x4F34;OSD&#x7684;&#x6C47;&#x62A5;&#x540E;&#xFF0C;&#x5E76;&#x6CA1;&#x6709;&#x9A6C;&#x4E0A;&#x5C06;&#x76EE;&#x6807;OSD&#x4E0B;&#x7EBF;&#xFF0C;&#x800C;&#x662F;&#x5468;&#x671F;&#x6027;&#x7684;&#x7B49;&#x5F85;&#x51E0;&#x4E2A;&#x6761;&#x4EF6;&#xFF1A; </p>
+<ul>
+<li>&#x76EE;&#x6807;OSD&#x7684;&#x5931;&#x6548;&#x65F6;&#x95F4;&#x5927;&#x4E8E;&#x901A;&#x8FC7;&#x56FA;&#x5B9A;&#x91CF;osd_heartbeat_grace&#x548C;&#x5386;&#x53F2;&#x7F51;&#x7EDC;&#x6761;&#x4EF6;&#x52A8;&#x6001;&#x786E;&#x5B9A;&#x7684;&#x9608;&#x503C;&#x3002;</li>
+<li>&#x6765;&#x81EA;&#x4E0D;&#x540C;&#x4E3B;&#x673A;&#x7684;&#x6C47;&#x62A5;&#x8FBE;&#x5230;mon_osd_min_down_reporters&#x3002;</li>
+<li>&#x6EE1;&#x8DB3;&#x524D;&#x4E24;&#x4E2A;&#x6761;&#x4EF6;&#x524D;&#x5931;&#x6548;&#x6C47;&#x62A5;&#x6CA1;&#x6709;&#x88AB;&#x6E90;OSD&#x53D6;&#x6D88;&#x3002;</li>
+</ul>
+</li>
+<li><p><strong>&#x6269;&#x6563;</strong>&#xFF1A;&#x4F5C;&#x4E3A;&#x4E2D;&#x5FC3;&#x8282;&#x70B9;&#x7684;Monitor&#x5E76;&#x6CA1;&#x6709;&#x5728;&#x66F4;&#x65B0;OSDMap&#x540E;&#x5C1D;&#x8BD5;&#x5E7F;&#x64AD;&#x901A;&#x77E5;&#x6240;&#x6709;&#x7684;OSD&#x548C;Client&#xFF0C;&#x800C;&#x662F;&#x60F0;&#x6027;&#x7684;&#x7B49;&#x5F85;OSD&#x548C;Client&#x6765;&#x83B7;&#x53D6;&#x3002;&#x4EE5;&#x6B64;&#x6765;&#x51CF;&#x5C11;Monitor&#x538B;&#x529B;&#x5E76;&#x7B80;&#x5316;&#x4EA4;&#x4E92;&#x903B;&#x8F91;&#x3002;</p>
+</li>
+</ul>
+<h1 id="4-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;"><a href="#4-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;" class="headerlink" title="4. Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;"></a>4. Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;</h1><h2 id="4-1-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x79CD;&#x7C7B;&#x4ECB;&#x7ECD;"><a href="#4-1-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x79CD;&#x7C7B;&#x4ECB;&#x7ECD;" class="headerlink" title="4.1 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x79CD;&#x7C7B;&#x4ECB;&#x7ECD;"></a>4.1 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x79CD;&#x7C7B;&#x4ECB;&#x7ECD;</h2><p><strong>&#x7F51;&#x7EDC;&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x4E09;&#x79CD;&#x4E0D;&#x540C;&#x7684;&#x5B9E;&#x73B0;&#x65B9;&#x5F0F;&#xFF1A;</strong></p>
+<ul>
+<li>Simple&#x7EBF;&#x7A0B;&#x6A21;&#x5F0F;<ul>
+<li><strong>&#x7279;&#x70B9;</strong>&#xFF1A;&#x6BCF;&#x4E00;&#x4E2A;&#x7F51;&#x7EDC;&#x94FE;&#x63A5;&#xFF0C;&#x90FD;&#x4F1A;&#x521B;&#x5EFA;&#x4E24;&#x4E2A;&#x7EBF;&#x7A0B;&#xFF0C;&#x4E00;&#x4E2A;&#x7528;&#x4E8E;&#x63A5;&#x6536;&#xFF0C;&#x4E00;&#x4E2A;&#x7528;&#x4E8E;&#x53D1;&#x9001;&#x3002;</li>
+<li><strong>&#x7F3A;&#x70B9;</strong>&#xFF1A;&#x5927;&#x91CF;&#x7684;&#x94FE;&#x63A5;&#x4F1A;&#x4EA7;&#x751F;&#x5927;&#x91CF;&#x7684;&#x7EBF;&#x7A0B;&#xFF0C;&#x4F1A;&#x6D88;&#x8017;CPU&#x8D44;&#x6E90;&#xFF0C;&#x5F71;&#x54CD;&#x6027;&#x80FD;&#x3002;</li>
+</ul>
+</li>
+<li>Async&#x4E8B;&#x4EF6;&#x7684;I/O&#x591A;&#x8DEF;&#x590D;&#x7528;&#x6A21;&#x5F0F;<ul>
+<li><strong>&#x7279;&#x70B9;</strong>&#xFF1A;&#x8FD9;&#x79CD;&#x662F;&#x76EE;&#x524D;&#x7F51;&#x7EDC;&#x901A;&#x4FE1;&#x4E2D;&#x5E7F;&#x6CDB;&#x91C7;&#x7528;&#x7684;&#x65B9;&#x5F0F;&#x3002;k&#x7248;&#x9ED8;&#x8BA4;&#x5DF2;&#x7ECF;&#x4F7F;&#x7528;Asnyc&#x4E86;&#x3002;</li>
+</ul>
+</li>
+<li>XIO&#x65B9;&#x5F0F;&#x4F7F;&#x7528;&#x4E86;&#x5F00;&#x6E90;&#x7684;&#x7F51;&#x7EDC;&#x901A;&#x4FE1;&#x5E93;accelio&#x6765;&#x5B9E;&#x73B0;<ul>
+<li><strong>&#x7279;&#x70B9;</strong>&#xFF1A;&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x9700;&#x8981;&#x4F9D;&#x8D56;&#x7B2C;&#x4E09;&#x65B9;&#x7684;&#x5E93;accelio&#x7A33;&#x5B9A;&#x6027;&#xFF0C;&#x76EE;&#x524D;&#x5904;&#x4E8E;&#x8BD5;&#x9A8C;&#x9636;&#x6BB5;&#x3002;</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-2-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x8BBE;&#x8BA1;&#x6A21;&#x5F0F;"><a href="#4-2-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x8BBE;&#x8BA1;&#x6A21;&#x5F0F;" class="headerlink" title="4.2 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x8BBE;&#x8BA1;&#x6A21;&#x5F0F;"></a>4.2 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x8BBE;&#x8BA1;&#x6A21;&#x5F0F;</h2><p><strong>&#x8BBE;&#x8BA1;&#x6A21;&#x5F0F;(Subscribe/Publish)</strong></p>
+<p>&#x8BA2;&#x9605;&#x53D1;&#x5E03;&#x6A21;&#x5F0F;&#x53C8;&#x540D;&#x89C2;&#x5BDF;&#x8005;&#x6A21;&#x5F0F;&#xFF0C;&#x5B83;&#x610F;&#x56FE;&#x662F;&#x201C;&#x5B9A;&#x4E49;&#x5BF9;&#x8C61;&#x95F4;&#x7684;&#x4E00;&#x79CD;&#x4E00;&#x5BF9;&#x591A;&#x7684;&#x4F9D;&#x8D56;&#x5173;&#x7CFB;&#xFF0C;<br> &#x5F53;&#x4E00;&#x4E2A;&#x5BF9;&#x8C61;&#x7684;&#x72B6;&#x6001;&#x53D1;&#x751F;&#x6539;&#x53D8;&#x65F6;&#xFF0C;&#x6240;&#x6709;&#x4F9D;&#x8D56;&#x4E8E;&#x5B83;&#x7684;&#x5BF9;&#x8C61;&#x90FD;&#x5F97;&#x5230;&#x901A;&#x77E5;&#x5E76;&#x88AB;&#x81EA;&#x52A8;&#x66F4;&#x65B0;&#x201D;&#x3002;</p>
+<h2 id="4-3-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x6D41;&#x7A0B;&#x56FE;"><a href="#4-3-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x6D41;&#x7A0B;&#x56FE;" class="headerlink" title="4.3 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x6D41;&#x7A0B;&#x56FE;"></a>4.3 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x6D41;&#x7A0B;&#x56FE;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-8662667e6a06e931.png" alt="img"></p>
+<p>ceph_message.png</p>
+<p><strong>&#x6B65;&#x9AA4;&#xFF1A;</strong></p>
+<ul>
+<li>Accepter&#x76D1;&#x542C;peer&#x7684;&#x8BF7;&#x6C42;, &#x8C03;&#x7528; SimpleMessenger::add_accept_pipe() &#x521B;&#x5EFA;&#x65B0;&#x7684; Pipe &#x5230; SimpleMessenger::pipes &#x6765;&#x5904;&#x7406;&#x8BE5;&#x8BF7;&#x6C42;&#x3002;</li>
+<li>Pipe&#x7528;&#x4E8E;&#x6D88;&#x606F;&#x7684;&#x8BFB;&#x53D6;&#x548C;&#x53D1;&#x9001;&#x3002;&#x8BE5;&#x7C7B;&#x4E3B;&#x8981;&#x6709;&#x4E24;&#x4E2A;&#x7EC4;&#x4EF6;&#xFF0C;Pipe::Reader&#xFF0C;Pipe::Writer&#x7528;&#x6765;&#x5904;&#x7406;&#x6D88;&#x606F;&#x8BFB;&#x53D6;&#x548C;&#x53D1;&#x9001;&#x3002;</li>
+<li>Messenger&#x4F5C;&#x4E3A;&#x6D88;&#x606F;&#x7684;&#x53D1;&#x5E03;&#x8005;, &#x5404;&#x4E2A; Dispatcher &#x5B50;&#x7C7B;&#x4F5C;&#x4E3A;&#x6D88;&#x606F;&#x7684;&#x8BA2;&#x9605;&#x8005;, Messenger &#x6536;&#x5230;&#x6D88;&#x606F;&#x4E4B;&#x540E;&#xFF0C;  &#x901A;&#x8FC7; Pipe &#x8BFB;&#x53D6;&#x6D88;&#x606F;&#xFF0C;&#x7136;&#x540E;&#x8F6C;&#x7ED9; Dispatcher &#x5904;&#x7406;&#x3002;</li>
+<li>Dispatcher&#x662F;&#x8BA2;&#x9605;&#x8005;&#x7684;&#x57FA;&#x7C7B;&#xFF0C;&#x5177;&#x4F53;&#x7684;&#x8BA2;&#x9605;&#x540E;&#x7AEF;&#x7EE7;&#x627F;&#x8BE5;&#x7C7B;,&#x521D;&#x59CB;&#x5316;&#x7684;&#x65F6;&#x5019;&#x901A;&#x8FC7; Messenger::add_dispatcher_tail/head &#x6CE8;&#x518C;&#x5230; Messenger::dispatchers. &#x6536;&#x5230;&#x6D88;&#x606F;&#x540E;&#xFF0C;&#x901A;&#x77E5;&#x8BE5;&#x7C7B;&#x5904;&#x7406;&#x3002;</li>
+<li>DispatchQueue&#x8BE5;&#x7C7B;&#x7528;&#x6765;&#x7F13;&#x5B58;&#x6536;&#x5230;&#x7684;&#x6D88;&#x606F;, &#x7136;&#x540E;&#x5524;&#x9192; DispatchQueue::dispatch_thread &#x7EBF;&#x7A0B;&#x627E;&#x5230;&#x540E;&#x7AEF;&#x7684; Dispatch &#x5904;&#x7406;&#x6D88;&#x606F;&#x3002;</li>
+</ul>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-f7e6ef5c9d3fe38f.png" alt="img"></p>
+<p>ceph_message_2.png</p>
+<h2 id="4-4-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x7C7B;&#x56FE;"><a href="#4-4-Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x7C7B;&#x56FE;" class="headerlink" title="4.4 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x7C7B;&#x56FE;"></a>4.4 Ceph&#x901A;&#x4FE1;&#x6846;&#x67B6;&#x7C7B;&#x56FE;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-a7d2248cb9963f1d.png" alt="img"></p>
+<p>ceph_message_3.png</p>
+<h2 id="4-5-Ceph&#x901A;&#x4FE1;&#x6570;&#x636E;&#x683C;&#x5F0F;"><a href="#4-5-Ceph&#x901A;&#x4FE1;&#x6570;&#x636E;&#x683C;&#x5F0F;" class="headerlink" title="4.5 Ceph&#x901A;&#x4FE1;&#x6570;&#x636E;&#x683C;&#x5F0F;"></a>4.5 Ceph&#x901A;&#x4FE1;&#x6570;&#x636E;&#x683C;&#x5F0F;</h2><p>&#x901A;&#x4FE1;&#x534F;&#x8BAE;&#x683C;&#x5F0F;&#x9700;&#x8981;&#x53CC;&#x65B9;&#x7EA6;&#x5B9A;&#x6570;&#x636E;&#x683C;&#x5F0F;&#x3002;</p>
+<p><strong>&#x6D88;&#x606F;&#x7684;&#x5185;&#x5BB9;&#x4E3B;&#x8981;&#x5206;&#x4E3A;&#x4E09;&#x90E8;&#x5206;&#xFF1A;</strong></p>
+<ul>
+<li>header //&#x6D88;&#x606F;&#x5934;&#x7C7B;&#x578B;&#x6D88;&#x606F;&#x7684;&#x4FE1;&#x5C01;</li>
+<li>user data //&#x9700;&#x8981;&#x53D1;&#x9001;&#x7684;&#x5B9E;&#x9645;&#x6570;&#x636E; <ul>
+<li>payload     //&#x64CD;&#x4F5C;&#x4FDD;&#x5B58;&#x5143;&#x6570;&#x636E;</li>
+<li>middle      //&#x9884;&#x7559;&#x5B57;&#x6BB5;</li>
+<li>data       //&#x8BFB;&#x5199;&#x6570;&#x636E;</li>
+</ul>
+</li>
+<li>footer       //&#x6D88;&#x606F;&#x7684;&#x7ED3;&#x675F;&#x6807;&#x8BB0;</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Message</span> :</span> <span class="keyword">public</span> RefCountedObject {</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">  ceph_msg_header  header;      <span class="comment">// &#x6D88;&#x606F;&#x5934;</span></span><br><span class="line">  ceph_msg_footer  footer;      <span class="comment">// &#x6D88;&#x606F;&#x5C3E;</span></span><br><span class="line">  bufferlist       payload;  <span class="comment">// &quot;front&quot; unaligned blob</span></span><br><span class="line">  bufferlist       middle;   <span class="comment">// &quot;middle&quot; unaligned blob</span></span><br><span class="line">  bufferlist       data;     <span class="comment">// data payload (page-alignment will be preserved where possible)</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* recv_stamp is set when the Messenger starts reading the</span></span><br><span class="line"><span class="comment">   * Message off the wire */</span></span><br><span class="line">  <span class="keyword">utime_t</span> recv_stamp;       <span class="comment">//&#x5F00;&#x59CB;&#x63A5;&#x6536;&#x6570;&#x636E;&#x7684;&#x65F6;&#x95F4;&#x6233;</span></span><br><span class="line">  <span class="comment">/* dispatch_stamp is set when the Messenger starts calling dispatch() on</span></span><br><span class="line"><span class="comment">   * its endpoints */</span></span><br><span class="line">  <span class="keyword">utime_t</span> dispatch_stamp;   <span class="comment">//dispatch &#x7684;&#x65F6;&#x95F4;&#x6233;</span></span><br><span class="line">  <span class="comment">/* throttle_stamp is the point at which we got throttle */</span></span><br><span class="line">  <span class="keyword">utime_t</span> throttle_stamp;   <span class="comment">//&#x83B7;&#x53D6;throttle &#x7684;slot&#x7684;&#x65F6;&#x95F4;&#x6233;</span></span><br><span class="line">  <span class="comment">/* time at which message was fully read */</span></span><br><span class="line">  <span class="keyword">utime_t</span> recv_complete_stamp;  <span class="comment">//&#x63A5;&#x6536;&#x5B8C;&#x6210;&#x7684;&#x65F6;&#x95F4;&#x6233;</span></span><br><span class="line"></span><br><span class="line">  ConnectionRef connection;     <span class="comment">//&#x7F51;&#x7EDC;&#x8FDE;&#x63A5;</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> magic = <span class="number">0</span>;           <span class="comment">//&#x6D88;&#x606F;&#x7684;&#x9B54;&#x672F;&#x5B57;</span></span><br><span class="line"></span><br><span class="line">  bi::list_member_hook&lt;&gt; dispatch_q;    <span class="comment">//boost::intrusive &#x6210;&#x5458;&#x5B57;&#x6BB5;</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ceph_msg_header</span> {</span></span><br><span class="line">    __le64 seq;       <span class="comment">// &#x5F53;&#x524D;session&#x5185; &#x6D88;&#x606F;&#x7684;&#x552F;&#x4E00; &#x5E8F;&#x53F7;</span></span><br><span class="line">    __le64 tid;       <span class="comment">// &#x6D88;&#x606F;&#x7684;&#x5168;&#x5C40;&#x552F;&#x4E00;&#x7684; id</span></span><br><span class="line">    __le16 type;      <span class="comment">// &#x6D88;&#x606F;&#x7C7B;&#x578B;</span></span><br><span class="line">    __le16 priority;  <span class="comment">// &#x4F18;&#x5148;&#x7EA7;</span></span><br><span class="line">    __le16 version;   <span class="comment">// &#x7248;&#x672C;&#x53F7;</span></span><br><span class="line"></span><br><span class="line">    __le32 front_len; <span class="comment">// payload &#x7684;&#x957F;&#x5EA6;</span></span><br><span class="line">    __le32 middle_len;<span class="comment">// middle &#x7684;&#x957F;&#x5EA6;</span></span><br><span class="line">    __le32 data_len;  <span class="comment">// data &#x7684; &#x957F;&#x5EA6;</span></span><br><span class="line">    __le16 data_off;  <span class="comment">// &#x5BF9;&#x8C61;&#x7684;&#x6570;&#x636E;&#x504F;&#x79FB;&#x91CF;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ceph_entity_name</span> <span class="title">src</span>;</span> <span class="comment">//&#x6D88;&#x606F;&#x6E90;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* oldest code we think can decode this.  unknown if zero. */</span></span><br><span class="line">    __le16 compat_version;</span><br><span class="line">    __le16 reserved;</span><br><span class="line">    __le32 crc;       <span class="comment">/* header crc32c */</span></span><br><span class="line">} __attribute__ ((packed));</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ceph_msg_footer</span> {</span></span><br><span class="line">    __le32 front_crc, middle_crc, data_crc; <span class="comment">//crc&#x6821;&#x9A8C;&#x7801;</span></span><br><span class="line">    __le64  sig; <span class="comment">//&#x6D88;&#x606F;&#x7684;64&#x4F4D;signature</span></span><br><span class="line">    __u8 flags; <span class="comment">//&#x7ED3;&#x675F;&#x6807;&#x5FD7;</span></span><br><span class="line">} __attribute__ ((packed));</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-Ceph-CRUSH&#x7B97;&#x6CD5;"><a href="#5-Ceph-CRUSH&#x7B97;&#x6CD5;" class="headerlink" title="5. Ceph CRUSH&#x7B97;&#x6CD5;"></a>5. Ceph CRUSH&#x7B97;&#x6CD5;</h1><h2 id="5-1-&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B97;&#x6CD5;&#x6311;&#x6218;"><a href="#5-1-&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B97;&#x6CD5;&#x6311;&#x6218;" class="headerlink" title="5.1 &#x6570;&#x636E;&#x5206;&#x5E03;&#x7B97;&#x6CD5;&#x6311;&#x6218;"></a>5.1 &#x6570;&#x636E;&#x5206;&#x5E03;&#x7B97;&#x6CD5;&#x6311;&#x6218;</h2><ul>
+<li>&#x6570;&#x636E;&#x5206;&#x5E03;&#x548C;&#x8D1F;&#x8F7D;&#x5747;&#x8861;<ul>
+<li>a. &#x6570;&#x636E;&#x5206;&#x5E03;&#x5747;&#x8861;&#xFF0C;&#x4F7F;&#x6570;&#x636E;&#x80FD;&#x5747;&#x5300;&#x7684;&#x5206;&#x5E03;&#x5230;&#x5404;&#x4E2A;&#x8282;&#x70B9;&#x4E0A;&#x3002;</li>
+<li>b. &#x8D1F;&#x8F7D;&#x5747;&#x8861;&#xFF0C;&#x4F7F;&#x6570;&#x636E;&#x8BBF;&#x95EE;&#x8BFB;&#x5199;&#x64CD;&#x4F5C;&#x7684;&#x8D1F;&#x8F7D;&#x5728;&#x5404;&#x4E2A;&#x8282;&#x70B9;&#x548C;&#x78C1;&#x76D8;&#x7684;&#x8D1F;&#x8F7D;&#x5747;&#x8861;&#x3002;</li>
+</ul>
+</li>
+<li>&#x7075;&#x6D3B;&#x5E94;&#x5BF9;&#x96C6;&#x7FA4;&#x4F38;&#x7F29;<ul>
+<li>a. &#x7CFB;&#x7EDF;&#x53EF;&#x4EE5;&#x65B9;&#x4FBF;&#x7684;&#x589E;&#x52A0;&#x6216;&#x8005;&#x5220;&#x9664;&#x8282;&#x70B9;&#x8BBE;&#x5907;&#xFF0C;&#x5E76;&#x4E14;&#x5BF9;&#x8282;&#x70B9;&#x5931;&#x6548;&#x8FDB;&#x884C;&#x5904;&#x7406;&#x3002;</li>
+<li>b. &#x589E;&#x52A0;&#x6216;&#x8005;&#x5220;&#x9664;&#x8282;&#x70B9;&#x8BBE;&#x5907;&#x540E;&#xFF0C;&#x80FD;&#x81EA;&#x52A8;&#x5B9E;&#x73B0;&#x6570;&#x636E;&#x7684;&#x5747;&#x8861;&#xFF0C;&#x5E76;&#x4E14;&#x5C3D;&#x53EF;&#x80FD;&#x5C11;&#x7684;&#x8FC1;&#x79FB;&#x6570;&#x636E;&#x3002;</li>
+</ul>
+</li>
+<li>&#x652F;&#x6301;&#x5927;&#x89C4;&#x6A21;&#x96C6;&#x7FA4;<ul>
+<li>a. &#x8981;&#x6C42;&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B97;&#x6CD5;&#x7EF4;&#x62A4;&#x7684;&#x5143;&#x6570;&#x636E;&#x76F8;&#x5BF9;&#x8F83;&#x5C0F;&#xFF0C;&#x5E76;&#x4E14;&#x8BA1;&#x7B97;&#x91CF;&#x4E0D;&#x80FD;&#x592A;&#x5927;&#x3002;&#x968F;&#x7740;&#x96C6;&#x7FA4;&#x89C4;&#x6A21;&#x7684;&#x589E; &#x52A0;&#xFF0C;&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B97;&#x6CD5;&#x5F00;&#x9500;&#x76F8;&#x5BF9;&#x6BD4;&#x8F83;&#x5C0F;&#x3002;</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-2-Ceph-CRUSH&#x7B97;&#x6CD5;&#x8BF4;&#x660E;"><a href="#5-2-Ceph-CRUSH&#x7B97;&#x6CD5;&#x8BF4;&#x660E;" class="headerlink" title="5.2 Ceph CRUSH&#x7B97;&#x6CD5;&#x8BF4;&#x660E;"></a>5.2 Ceph CRUSH&#x7B97;&#x6CD5;&#x8BF4;&#x660E;</h2><ul>
+<li>CRUSH&#x7B97;&#x6CD5;&#x7684;&#x5168;&#x79F0;&#x4E3A;&#xFF1A;Controlled Scalable Decentralized Placement of Replicated Data&#xFF0C;&#x53EF;&#x63A7;&#x7684;&#x3001;&#x53EF;&#x6269;&#x5C55;&#x7684;&#x3001;&#x5206;&#x5E03;&#x5F0F;&#x7684;&#x526F;&#x672C;&#x6570;&#x636E;&#x653E;&#x7F6E;&#x7B97;&#x6CD5;&#x3002;</li>
+<li>PG&#x5230;OSD&#x7684;&#x6620;&#x5C04;&#x7684;&#x8FC7;&#x7A0B;&#x7B97;&#x6CD5;&#x53EB;&#x505A;CRUSH &#x7B97;&#x6CD5;&#x3002;(&#x4E00;&#x4E2A;Object&#x9700;&#x8981;&#x4FDD;&#x5B58;&#x4E09;&#x4E2A;&#x526F;&#x672C;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x9700;&#x8981;&#x4FDD;&#x5B58;&#x5728;&#x4E09;&#x4E2A;osd&#x4E0A;)&#x3002;</li>
+<li>CRUSH&#x7B97;&#x6CD5;&#x662F;&#x4E00;&#x4E2A;&#x4F2A;&#x968F;&#x673A;&#x7684;&#x8FC7;&#x7A0B;&#xFF0C;&#x4ED6;&#x53EF;&#x4EE5;&#x4ECE;&#x6240;&#x6709;&#x7684;OSD&#x4E2D;&#xFF0C;&#x968F;&#x673A;&#x6027;&#x9009;&#x62E9;&#x4E00;&#x4E2A;OSD&#x96C6;&#x5408;&#xFF0C;&#x4F46;&#x662F;&#x540C;&#x4E00;&#x4E2A;PG&#x6BCF;&#x6B21;&#x968F;&#x673A;&#x9009;&#x62E9;&#x7684;&#x7ED3;&#x679C;&#x662F;&#x4E0D;&#x53D8;&#x7684;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x6620;&#x5C04;&#x7684;OSD&#x96C6;&#x5408;&#x662F;&#x56FA;&#x5B9A;&#x7684;&#x3002;</li>
+</ul>
+<h2 id="5-3-Ceph-CRUSH&#x7B97;&#x6CD5;&#x539F;&#x7406;"><a href="#5-3-Ceph-CRUSH&#x7B97;&#x6CD5;&#x539F;&#x7406;" class="headerlink" title="5.3 Ceph CRUSH&#x7B97;&#x6CD5;&#x539F;&#x7406;"></a>5.3 Ceph CRUSH&#x7B97;&#x6CD5;&#x539F;&#x7406;</h2><p><strong>CRUSH&#x7B97;&#x6CD5;&#x56E0;&#x5B50;&#xFF1A;</strong></p>
+<ul>
+<li>&#x5C42;&#x6B21;&#x5316;&#x7684;Cluster Map<br>&#x53CD;&#x6620;&#x4E86;&#x5B58;&#x50A8;&#x7CFB;&#x7EDF;&#x5C42;&#x7EA7;&#x7684;&#x7269;&#x7406;&#x62D3;&#x6251;&#x7ED3;&#x6784;&#x3002;&#x5B9A;&#x4E49;&#x4E86;OSD&#x96C6;&#x7FA4;&#x5177;&#x6709;&#x5C42;&#x7EA7;&#x5173;&#x7CFB;&#x7684; &#x9759;&#x6001;&#x62D3;&#x6251;&#x7ED3;&#x6784;&#x3002;OSD&#x5C42;&#x7EA7;&#x4F7F;&#x5F97; CRUSH&#x7B97;&#x6CD5;&#x5728;&#x9009;&#x62E9;OSD&#x65F6;&#x5B9E;&#x73B0;&#x4E86;&#x673A;&#x67B6;&#x611F;&#x77E5;&#x80FD;&#x529B;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x901A;&#x8FC7;&#x89C4;&#x5219;&#x5B9A;&#x4E49;&#xFF0C; &#x4F7F;&#x5F97;&#x526F;&#x672C;&#x53EF;&#x4EE5;&#x5206;&#x5E03;&#x5728;&#x4E0D;&#x540C;&#x7684;&#x673A; &#x67B6;&#x3001;&#x4E0D;&#x540C;&#x7684;&#x673A;&#x623F;&#x4E2D;&#x3001;&#x63D0;&#x4F9B;&#x6570;&#x636E;&#x7684;&#x5B89;&#x5168;&#x6027; &#x3002;</li>
+<li>Placement Rules<br>&#x51B3;&#x5B9A;&#x4E86;&#x4E00;&#x4E2A;PG&#x7684;&#x5BF9;&#x8C61;&#x526F;&#x672C;&#x5982;&#x4F55;&#x9009;&#x62E9;&#x7684;&#x89C4;&#x5219;&#xFF0C;&#x901A;&#x8FC7;&#x8FD9;&#x4E9B;&#x53EF;&#x4EE5;&#x81EA;&#x5DF1;&#x8BBE;&#x5B9A;&#x89C4;&#x5219;&#xFF0C;&#x7528;&#x6237;&#x53EF;&#x4EE5;&#x81EA;&#x5B9A;&#x4E49;&#x8BBE;&#x7F6E;&#x526F;&#x672C;&#x5728;&#x96C6;&#x7FA4;&#x4E2D;&#x7684;&#x5206;&#x5E03;&#x3002;</li>
+</ul>
+<h3 id="5-3-1-&#x5C42;&#x7EA7;&#x5316;&#x7684;Cluster-Map"><a href="#5-3-1-&#x5C42;&#x7EA7;&#x5316;&#x7684;Cluster-Map" class="headerlink" title="5.3.1 &#x5C42;&#x7EA7;&#x5316;&#x7684;Cluster Map"></a>5.3.1 &#x5C42;&#x7EA7;&#x5316;&#x7684;Cluster Map</h3><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-f0f7321a9e37361f.png" alt="img"></p>
+<p>ceph_crush.png</p>
+<p>CRUSH Map&#x662F;&#x4E00;&#x4E2A;&#x6811;&#x5F62;&#x7ED3;&#x6784;&#xFF0C;OSDMap&#x66F4;&#x591A;&#x8BB0;&#x5F55;&#x7684;&#x662F;OSDMap&#x7684;&#x5C5E;&#x6027;(epoch/fsid/pool&#x4FE1;&#x606F;&#x4EE5;&#x53CA;osd&#x7684;ip&#x7B49;&#x7B49;)&#x3002;</p>
+<p>&#x53F6;&#x5B50;&#x8282;&#x70B9;&#x662F;device&#xFF08;&#x4E5F;&#x5C31;&#x662F;osd&#xFF09;&#xFF0C;&#x5176;&#x4ED6;&#x7684;&#x8282;&#x70B9;&#x79F0;&#x4E3A;bucket&#x8282;&#x70B9;&#xFF0C;&#x8FD9;&#x4E9B;bucket&#x90FD;&#x662F;&#x865A;&#x6784;&#x7684;&#x8282;&#x70B9;&#xFF0C;&#x53EF;&#x4EE5;&#x6839;&#x636E;&#x7269;&#x7406;&#x7ED3;&#x6784;&#x8FDB;&#x884C;&#x62BD;&#x8C61;&#xFF0C;&#x5F53;&#x7136;&#x6811;&#x5F62;&#x7ED3;&#x6784;&#x53EA;&#x6709;&#x4E00;&#x4E2A;&#x6700;&#x7EC8;&#x7684;&#x6839;&#x8282;&#x70B9;&#x79F0;&#x4E4B;&#x4E3A;root&#x8282;&#x70B9;&#xFF0C;&#x4E2D;&#x95F4;&#x865A;&#x62DF;&#x7684;bucket&#x8282;&#x70B9;&#x53EF;&#x4EE5;&#x662F;&#x6570;&#x636E;&#x4E2D;&#x5FC3;&#x62BD;&#x8C61;&#x3001;&#x673A;&#x623F;&#x62BD;&#x8C61;&#x3001;&#x673A;&#x67B6;&#x62BD;&#x8C61;&#x3001;&#x4E3B;&#x673A;&#x62BD;&#x8C61;&#x7B49;&#x3002;</p>
+<h3 id="5-3-2-&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B56;&#x7565;Placement-Rules"><a href="#5-3-2-&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B56;&#x7565;Placement-Rules" class="headerlink" title="5.3.2 &#x6570;&#x636E;&#x5206;&#x5E03;&#x7B56;&#x7565;Placement Rules"></a>5.3.2 &#x6570;&#x636E;&#x5206;&#x5E03;&#x7B56;&#x7565;Placement Rules</h3><p><strong>&#x6570;&#x636E;&#x5206;&#x5E03;&#x7B56;&#x7565;Placement Rules&#x4E3B;&#x8981;&#x6709;&#x7279;&#x70B9;&#xFF1A;</strong></p>
+<ul>
+<li>a. &#x4ECE;CRUSH Map&#x4E2D;&#x7684;&#x54EA;&#x4E2A;&#x8282;&#x70B9;&#x5F00;&#x59CB;&#x67E5;&#x627E;</li>
+<li>b. &#x4F7F;&#x7528;&#x90A3;&#x4E2A;&#x8282;&#x70B9;&#x4F5C;&#x4E3A;&#x6545;&#x969C;&#x9694;&#x79BB;&#x57DF;</li>
+<li>c. &#x5B9A;&#x4F4D;&#x526F;&#x672C;&#x7684;&#x641C;&#x7D22;&#x6A21;&#x5F0F;&#xFF08;&#x5E7F;&#x5EA6;&#x4F18;&#x5148; or &#x6DF1;&#x5EA6;&#x4F18;&#x5148;&#xFF09;</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">rule replicated_ruleset  <span class="comment">#&#x89C4;&#x5219;&#x96C6;&#x7684;&#x547D;&#x540D;&#xFF0C;&#x521B;&#x5EFA;pool&#x65F6;&#x53EF;&#x4EE5;&#x6307;&#x5B9A;rule&#x96C6;</span></span><br><span class="line">{</span><br><span class="line">    ruleset 0                <span class="comment">#rules&#x96C6;&#x7684;&#x7F16;&#x53F7;&#xFF0C;&#x987A;&#x5E8F;&#x7F16;&#x5373;&#x53EF;   </span></span><br><span class="line">    <span class="built_in">type</span> replicated          <span class="comment">#&#x5B9A;&#x4E49;pool&#x7C7B;&#x578B;&#x4E3A;replicated(&#x8FD8;&#x6709;erasure&#x6A21;&#x5F0F;)   </span></span><br><span class="line">    min_size 1                <span class="comment">#pool&#x4E2D;&#x6700;&#x5C0F;&#x6307;&#x5B9A;&#x7684;&#x526F;&#x672C;&#x6570;&#x91CF;&#x4E0D;&#x80FD;&#x5C0F;1</span></span><br><span class="line">    max_size 10               <span class="comment">#pool&#x4E2D;&#x6700;&#x5927;&#x6307;&#x5B9A;&#x7684;&#x526F;&#x672C;&#x6570;&#x91CF;&#x4E0D;&#x80FD;&#x5927;&#x4E8E;10       </span></span><br><span class="line">    step take default         <span class="comment">#&#x67E5;&#x627E;bucket&#x5165;&#x53E3;&#x70B9;&#xFF0C;&#x4E00;&#x822C;&#x662F;root&#x7C7B;&#x578B;&#x7684;bucket    </span></span><br><span class="line">    step chooseleaf  firstn  0  <span class="built_in">type</span>  host <span class="comment">#&#x9009;&#x62E9;&#x4E00;&#x4E2A;host,&#x5E76;&#x9012;&#x5F52;&#x9009;&#x62E9;&#x53F6;&#x5B50;&#x8282;&#x70B9;osd     </span></span><br><span class="line">    step emit        <span class="comment">#&#x7ED3;&#x675F;</span></span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-3-3-Bucket&#x968F;&#x673A;&#x7B97;&#x6CD5;&#x7C7B;&#x578B;"><a href="#5-3-3-Bucket&#x968F;&#x673A;&#x7B97;&#x6CD5;&#x7C7B;&#x578B;" class="headerlink" title="5.3.3 Bucket&#x968F;&#x673A;&#x7B97;&#x6CD5;&#x7C7B;&#x578B;"></a>5.3.3 Bucket&#x968F;&#x673A;&#x7B97;&#x6CD5;&#x7C7B;&#x578B;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-ac18dabc9fb44d20.png" alt="img"></p>
+<p>ceph_bucket.png</p>
+<ul>
+<li><strong>&#x4E00;&#x822C;&#x7684;buckets</strong>&#xFF1A;&#x9002;&#x5408;&#x6240;&#x6709;&#x5B50;&#x8282;&#x70B9;&#x6743;&#x91CD;&#x76F8;&#x540C;&#xFF0C;&#x800C;&#x4E14;&#x5F88;&#x5C11;&#x6DFB;&#x52A0;&#x5220;&#x9664;item&#x3002;</li>
+<li><strong>list buckets</strong>&#xFF1A;&#x9002;&#x7528;&#x4E8E;&#x96C6;&#x7FA4;&#x6269;&#x5C55;&#x7C7B;&#x578B;&#x3002;&#x589E;&#x52A0;item&#xFF0C;&#x4EA7;&#x751F;&#x6700;&#x4F18;&#x7684;&#x6570;&#x636E;&#x79FB;&#x52A8;&#xFF0C;&#x67E5;&#x627E;item&#xFF0C;&#x65F6;&#x95F4;&#x590D;&#x6742;&#x5EA6;O(n)&#x3002;</li>
+<li><strong>tree buckets</strong>&#xFF1A;&#x67E5;&#x627E;&#x8D1F;&#x8D23;&#x5EA6;&#x662F;O (log n), &#x6DFB;&#x52A0;&#x5220;&#x9664;&#x53F6;&#x5B50;&#x8282;&#x70B9;&#x65F6;&#xFF0C;&#x5176;&#x4ED6;&#x8282;&#x70B9;node_id&#x4E0D;&#x53D8;&#x3002;</li>
+<li><strong>straw buckets</strong>&#xFF1A;&#x5141;&#x8BB8;&#x6240;&#x6709;&#x9879;&#x901A;&#x8FC7;&#x7C7B;&#x4F3C;&#x62BD;&#x7B7E;&#x7684;&#x65B9;&#x5F0F;&#x6765;&#x4E0E;&#x5176;&#x4ED6;&#x9879;&#x516C;&#x5E73;&#x201C;&#x7ADE;&#x4E89;&#x201D;&#x3002;&#x5B9A;&#x4F4D;&#x526F;&#x672C;&#x65F6;&#xFF0C;bucket&#x4E2D;&#x7684;&#x6BCF;&#x4E00;&#x9879;&#x90FD;&#x5BF9;&#x5E94;&#x4E00;&#x4E2A;&#x968F;&#x673A;&#x957F;&#x5EA6;&#x7684;straw&#xFF0C;&#x4E14;&#x62E5;&#x6709;&#x6700;&#x957F;&#x957F;&#x5EA6;&#x7684;straw&#x4F1A;&#x83B7;&#x5F97;&#x80DC;&#x5229;&#xFF08;&#x88AB;&#x9009;&#x4E2D;&#xFF09;&#xFF0C;&#x6DFB;&#x52A0;&#x6216;&#x8005;&#x91CD;&#x65B0;&#x8BA1;&#x7B97;&#xFF0C;&#x5B50;&#x6811;&#x4E4B;&#x95F4;&#x7684;&#x6570;&#x636E;&#x79FB;&#x52A8;&#x63D0;&#x4F9B;&#x6700;&#x4F18;&#x7684;&#x89E3;&#x51B3;&#x65B9;&#x6848;&#x3002;</li>
+</ul>
+<h2 id="5-4-CRUSH&#x7B97;&#x6CD5;&#x6848;&#x4F8B;"><a href="#5-4-CRUSH&#x7B97;&#x6CD5;&#x6848;&#x4F8B;" class="headerlink" title="5.4 CRUSH&#x7B97;&#x6CD5;&#x6848;&#x4F8B;"></a>5.4 CRUSH&#x7B97;&#x6CD5;&#x6848;&#x4F8B;</h2><p><strong>&#x8BF4;&#x660E;&#xFF1A;</strong></p>
+<p>&#x96C6;&#x7FA4;&#x4E2D;&#x6709;&#x90E8;&#x5206;sas&#x548C;ssd&#x78C1;&#x76D8;&#xFF0C;&#x73B0;&#x5728;&#x6709;&#x4E2A;&#x4E1A;&#x52A1;&#x7EBF;&#x6027;&#x80FD;&#x53CA;&#x53EF;&#x7528;&#x6027;&#x4F18;&#x5148;&#x7EA7;&#x9AD8;&#x4E8E;&#x5176;&#x4ED6;&#x4E1A;&#x52A1;&#x7EBF;&#xFF0C;&#x80FD;&#x5426;&#x8BA9;&#x8FD9;&#x4E2A;&#x9AD8;&#x4F18;&#x4E1A;&#x52A1;&#x7EBF;&#x7684;&#x6570;&#x636E;&#x90FD;&#x5B58;&#x653E;&#x5728;ssd&#x78C1;&#x76D8;&#x4E0A;&#x3002;</p>
+<p><strong>&#x666E;&#x901A;&#x7528;&#x6237;&#xFF1A;</strong></p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-1bd6980a2141bc51.png" alt="img"></p>
+<p>ceph_sas.png</p>
+<p><strong>&#x9AD8;&#x4F18;&#x7528;&#x6237;&#xFF1A;</strong></p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-127c6f8a40938233.png" alt="img"></p>
+<p>ssd.png</p>
+<p><strong>&#x914D;&#x7F6E;&#x89C4;&#x5219;&#xFF1A;</strong></p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-0084962b3a7847b4.png" alt="img"></p>
+<p>ceph_crush1.png</p>
+<h1 id="6-&#x5B9A;&#x5236;&#x5316;Ceph-RBD-QOS"><a href="#6-&#x5B9A;&#x5236;&#x5316;Ceph-RBD-QOS" class="headerlink" title="6. &#x5B9A;&#x5236;&#x5316;Ceph RBD QOS"></a>6. &#x5B9A;&#x5236;&#x5316;Ceph RBD QOS</h1><h2 id="6-1-QOS&#x4ECB;&#x7ECD;"><a href="#6-1-QOS&#x4ECB;&#x7ECD;" class="headerlink" title="6.1 QOS&#x4ECB;&#x7ECD;"></a>6.1 QOS&#x4ECB;&#x7ECD;</h2><p>QoS &#xFF08;Quality of Service&#xFF0C;&#x670D;&#x52A1;&#x8D28;&#x91CF;&#xFF09;&#x8D77;&#x6E90;&#x4E8E;&#x7F51;&#x7EDC;&#x6280;&#x672F;&#xFF0C;&#x5B83;&#x7528;&#x6765;&#x89E3;&#x51B3;&#x7F51;&#x7EDC;&#x5EF6;&#x8FDF;&#x548C;&#x963B;&#x585E;&#x7B49;&#x95EE;&#x9898;&#xFF0C;&#x80FD;&#x591F;&#x4E3A;&#x6307;&#x5B9A;&#x7684;&#x7F51;&#x7EDC;&#x901A;&#x4FE1;&#x63D0;&#x4F9B;&#x66F4;&#x597D;&#x7684;&#x670D;&#x52A1;&#x80FD;&#x529B;&#x3002;</p>
+<p><strong>&#x95EE;&#x9898;&#xFF1A;</strong></p>
+<p>&#x6211;&#x4EEC;&#x603B;&#x7684;Ceph&#x96C6;&#x7FA4;&#x7684;iIO&#x80FD;&#x529B;&#x662F;&#x6709;&#x9650;&#x7684;&#xFF0C;&#x6BD4;&#x5982;&#x5E26;&#x5BBD;&#xFF0C;IOPS&#x3002;&#x5982;&#x4F55;&#x907F;&#x514D;&#x7528;&#x6237;&#x4E89;&#x53D6;&#x8D44;&#x6E90;&#xFF0C;&#x5982;&#x679C;&#x4FDD;&#x8BC1;&#x96C6;&#x7FA4;&#x6240;&#x6709;&#x7528;&#x6237;&#x8D44;&#x6E90;&#x7684;&#x9AD8;&#x53EF;&#x7528;&#x6027;&#xFF0C;&#x4EE5;&#x53CA;&#x5982;&#x4F55;&#x4FDD;&#x8BC1;&#x9AD8;&#x4F18;&#x7528;&#x6237;&#x8D44;&#x6E90;&#x7684;&#x53EF;&#x7528;&#x6027;&#x3002;&#x6240;&#x4EE5;&#x6211;&#x4EEC;&#x9700;&#x8981;&#x628A;&#x6709;&#x9650;&#x7684;IO&#x80FD;&#x529B;&#x5408;&#x7406;&#x5206;&#x914D;&#x3002;</p>
+<h2 id="6-2-Ceph-IO&#x64CD;&#x4F5C;&#x7C7B;&#x578B;"><a href="#6-2-Ceph-IO&#x64CD;&#x4F5C;&#x7C7B;&#x578B;" class="headerlink" title="6.2 Ceph IO&#x64CD;&#x4F5C;&#x7C7B;&#x578B;"></a>6.2 Ceph IO&#x64CD;&#x4F5C;&#x7C7B;&#x578B;</h2><ul>
+<li><strong>ClientOp</strong>&#xFF1A;&#x6765;&#x81EA;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x8BFB;&#x5199;I/O&#x8BF7;&#x6C42;&#x3002;</li>
+<li><strong>SubOp</strong>&#xFF1A;osd&#x4E4B;&#x95F4;&#x7684;I/O&#x8BF7;&#x6C42;&#x3002;&#x4E3B;&#x8981;&#x5305;&#x62EC;&#x7531;&#x5BA2;&#x6237;&#x7AEF;I/O&#x4EA7;&#x751F;&#x7684;&#x526F;&#x672C;&#x95F4;&#x6570;&#x636E;&#x8BFB;&#x5199;&#x8BF7;&#x6C42;&#xFF0C;&#x4EE5;&#x53CA;&#x7531;&#x6570;&#x636E;&#x540C;&#x6B65;&#x3001;&#x6570;&#x636E;&#x626B;&#x63CF;&#x3001;&#x8D1F;&#x8F7D;&#x5747;&#x8861;&#x7B49;&#x5F15;&#x8D77;&#x7684;I/O&#x8BF7;&#x6C42;&#x3002;</li>
+<li><strong>SnapTrim</strong>&#xFF1A;&#x5FEB;&#x7167;&#x6570;&#x636E;&#x5220;&#x9664;&#x3002;&#x4ECE;&#x5BA2;&#x6237;&#x7AEF;&#x53D1;&#x9001;&#x5FEB;&#x7167;&#x5220;&#x9664;&#x547D;&#x4EE4;&#x540E;&#xFF0C;&#x5220;&#x9664;&#x76F8;&#x5173;&#x5143;&#x6570;&#x636E;&#x4FBF;&#x76F4;&#x63A5;&#x8FD4;&#x56DE;&#xFF0C;&#x4E4B;&#x540E;&#x7531;&#x540E;&#x53F0;&#x7EBF;&#x7A0B;&#x5220;&#x9664;&#x771F;&#x5B9E;&#x7684;&#x5FEB;&#x7167;&#x6570;&#x636E;&#x3002;&#x901A;&#x8FC7;&#x63A7;&#x5236;snaptrim&#x7684;&#x901F;&#x7387;&#x95F4;&#x63A5;&#x63A7;&#x5236;&#x5220;&#x9664;&#x901F;&#x7387;&#x3002;</li>
+<li><strong>Scrub</strong>&#xFF1A;&#x7528;&#x4E8E;&#x53D1;&#x73B0;&#x5BF9;&#x8C61;&#x7684;&#x9759;&#x9ED8;&#x6570;&#x636E;&#x9519;&#x8BEF;&#xFF0C;&#x626B;&#x63CF;&#x5143;&#x6570;&#x636E;&#x7684;Scrub&#x548C;&#x5BF9;&#x8C61;&#x6574;&#x4F53;&#x626B;&#x63CF;&#x7684;deep Scrub&#x3002;</li>
+<li><strong>Recovery</strong>&#xFF1A;&#x6570;&#x636E;&#x6062;&#x590D;&#x548C;&#x8FC1;&#x79FB;&#x3002;&#x96C6;&#x7FA4;&#x6269;/&#x7F29;&#x5BB9;&#x3001;osd&#x5931;&#x6548;/&#x4ECE;&#x65B0;&#x52A0;&#x5165;&#x7B49;&#x8FC7;&#x7A0B;&#x3002;</li>
+</ul>
+<h2 id="6-3-Ceph-&#x5B98;&#x65B9;QOS&#x539F;&#x7406;"><a href="#6-3-Ceph-&#x5B98;&#x65B9;QOS&#x539F;&#x7406;" class="headerlink" title="6.3 Ceph &#x5B98;&#x65B9;QOS&#x539F;&#x7406;"></a>6.3 Ceph &#x5B98;&#x65B9;QOS&#x539F;&#x7406;</h2><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-1e1649e967f3ae12.png" alt="img"></p>
+<p>ceph_mclok_qos.png</p>
+<p>mClock&#x662F;&#x4E00;&#x79CD;&#x57FA;&#x4E8E;&#x65F6;&#x95F4;&#x6807;&#x7B7E;&#x7684;I/O&#x8C03;&#x5EA6;&#x7B97;&#x6CD5;&#xFF0C;&#x6700;&#x5148;&#x88AB;Vmware&#x63D0;&#x51FA;&#x6765;&#x7684;&#x7528;&#x4E8E;&#x96C6;&#x4E2D;&#x5F0F;&#x7BA1;&#x7406;&#x7684;&#x5B58;&#x50A8;&#x7CFB;&#x7EDF;&#x3002;(&#x76EE;&#x524D;&#x5B98;&#x65B9;QOS&#x6A21;&#x5757;&#x5C5E;&#x4E8E;&#x534A;&#x6210;&#x54C1;)&#x3002;</p>
+<p><strong>&#x57FA;&#x672C;&#x601D;&#x60F3;&#xFF1A;</strong></p>
+<ul>
+<li>reservation &#x9884;&#x7559;&#xFF0C;&#x8868;&#x793A;&#x5BA2;&#x6237;&#x7AEF;&#x83B7;&#x5F97;&#x7684;&#x6700;&#x4F4E;I/O&#x8D44;&#x6E90;&#x3002;</li>
+<li>weight &#x6743;&#x91CD;&#xFF0C;&#x8868;&#x793A;&#x5BA2;&#x6237;&#x7AEF;&#x6240;&#x5360;&#x5171;&#x4EAB;I/O&#x8D44;&#x6E90;&#x7684;&#x6BD4;&#x91CD;&#x3002;</li>
+<li>limit &#x4E0A;&#x9650;&#xFF0C;&#x8868;&#x793A;&#x5BA2;&#x6237;&#x7AEF;&#x53EF;&#x83B7;&#x5F97;&#x7684;&#x6700;&#x9AD8;I/O&#x8D44;&#x6E90;&#x3002;</li>
+</ul>
+<h2 id="6-4-&#x5B9A;&#x5236;&#x5316;QOS&#x539F;&#x7406;"><a href="#6-4-&#x5B9A;&#x5236;&#x5316;QOS&#x539F;&#x7406;" class="headerlink" title="6.4 &#x5B9A;&#x5236;&#x5316;QOS&#x539F;&#x7406;"></a>6.4 &#x5B9A;&#x5236;&#x5316;QOS&#x539F;&#x7406;</h2><h3 id="6-4-1-&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x4ECB;&#x7ECD;"><a href="#6-4-1-&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x4ECB;&#x7ECD;" class="headerlink" title="6.4.1 &#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x4ECB;&#x7ECD;"></a>6.4.1 &#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x4ECB;&#x7ECD;</h3><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-44d8c1a4d4bfd7bb.png" alt="img"></p>
+<p>ceph_token_qos.png</p>
+<p>&#x57FA;&#x4E8E;&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;(TokenBucket)&#x5B9E;&#x73B0;&#x4E86;&#x4E00;&#x5957;&#x7B80;&#x5355;&#x6709;&#x6548;&#x7684;qos&#x529F;&#x80FD;&#xFF0C;&#x6EE1;&#x8DB3;&#x4E86;&#x4E91;&#x5E73;&#x53F0;&#x7528;&#x6237;&#x7684;&#x6838;&#x5FC3;&#x9700;&#x6C42;&#x3002;</p>
+<p><strong>&#x57FA;&#x672C;&#x601D;&#x60F3;&#xFF1A;</strong></p>
+<ul>
+<li>&#x6309;&#x7279;&#x5B9A;&#x7684;&#x901F;&#x7387;&#x5411;&#x4EE4;&#x724C;&#x6876;&#x6295;&#x653E;&#x4EE4;&#x724C;&#x3002;</li>
+<li>&#x6839;&#x636E;&#x9884;&#x8BBE;&#x7684;&#x5339;&#x914D;&#x89C4;&#x5219;&#x5148;&#x5BF9;&#x62A5;&#x6587;&#x8FDB;&#x884C;&#x5206;&#x7C7B;&#xFF0C;&#x4E0D;&#x7B26;&#x5408;&#x5339;&#x914D;&#x89C4;&#x5219;&#x7684;&#x62A5;&#x6587;&#x4E0D;&#x9700;&#x8981;&#x7ECF;&#x8FC7;&#x4EE4;&#x724C;&#x6876;&#x7684;&#x5904;&#x7406;&#xFF0C;&#x76F4;&#x63A5;&#x53D1;&#x9001;&#x3002;</li>
+<li>&#x7B26;&#x5408;&#x5339;&#x914D;&#x89C4;&#x5219;&#x7684;&#x62A5;&#x6587;&#xFF0C;&#x5219;&#x9700;&#x8981;&#x4EE4;&#x724C;&#x6876;&#x8FDB;&#x884C;&#x5904;&#x7406;&#x3002;&#x5F53;&#x6876;&#x4E2D;&#x6709;&#x8DB3;&#x591F;&#x7684;&#x4EE4;&#x724C;&#x5219;&#x62A5;&#x6587;&#x53EF;&#x4EE5;&#x88AB;&#x7EE7;&#x7EED;&#x53D1;&#x9001;&#x4E0B;&#x53BB;&#xFF0C;&#x540C;&#x65F6;&#x4EE4;&#x724C;&#x6876;&#x4E2D;&#x7684;&#x4EE4;&#x724C;&#x91CF;&#x6309;&#x62A5;&#x6587;&#x7684;&#x957F;&#x5EA6;&#x505A;&#x76F8;&#x5E94;&#x7684;&#x51CF;&#x5C11;&#x3002;</li>
+<li>&#x5F53;&#x4EE4;&#x724C;&#x6876;&#x4E2D;&#x7684;&#x4EE4;&#x724C;&#x4E0D;&#x8DB3;&#x65F6;&#xFF0C;&#x62A5;&#x6587;&#x5C06;&#x4E0D;&#x80FD;&#x88AB;&#x53D1;&#x9001;&#xFF0C;&#x53EA;&#x6709;&#x7B49;&#x5230;&#x6876;&#x4E2D;&#x751F;&#x6210;&#x4E86;&#x65B0;&#x7684;&#x4EE4;&#x724C;&#xFF0C;&#x62A5;&#x6587;&#x624D;&#x53EF;&#x4EE5;&#x53D1;&#x9001;&#x3002;&#x8FD9;&#x5C31;&#x53EF;&#x4EE5;&#x9650;&#x5236;&#x62A5;&#x6587;&#x7684;&#x6D41;&#x91CF;&#x53EA;&#x80FD;&#x662F;&#x5C0F;&#x4E8E;&#x7B49;&#x4E8E;&#x4EE4;&#x724C;&#x751F;&#x6210;&#x7684;&#x901F;&#x5EA6;&#xFF0C;&#x8FBE;&#x5230;&#x9650;&#x5236;&#x6D41;&#x91CF;&#x7684;&#x76EE;&#x7684;&#x3002;</li>
+</ul>
+<h3 id="6-4-2-RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;"><a href="#6-4-2-RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;" class="headerlink" title="6.4.2 RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;"></a>6.4.2 RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6D41;&#x7A0B;</h3><p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-ee0e5f4494379b96.png" alt="img"></p>
+<p>ceph_token1.png</p>
+<p><strong>&#x6B65;&#x9AA4;&#xFF1A;</strong></p>
+<ul>
+<li>&#x7528;&#x6237;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;&#x5F02;&#x6B65;IO&#x5230;&#x8FBE;Image&#x4E2D;&#x3002;</li>
+<li>&#x8BF7;&#x6C42;&#x5230;&#x8FBE;ImageRequestWQ&#x961F;&#x5217;&#x4E2D;&#x3002;</li>
+<li>&#x5728;ImageRequestWQ&#x51FA;&#x961F;&#x5217;&#x7684;&#x65F6;&#x5019;&#x52A0;&#x5165;&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;TokenBucket&#x3002;</li>
+<li>&#x901A;&#x8FC7;&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x8FDB;&#x884C;&#x9650;&#x901F;&#xFF0C;&#x7136;&#x540E;&#x53D1;&#x9001;&#x7ED9;ImageRequest&#x8FDB;&#x884C;&#x5904;&#x7406;&#x3002;</li>
+</ul>
+<h3 id="6-4-3-RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6846;&#x67B6;&#x56FE;"><a href="#6-4-3-RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6846;&#x67B6;&#x56FE;" class="headerlink" title="6.4.3 RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6846;&#x67B6;&#x56FE;"></a>6.4.3 RBD&#x4EE4;&#x724C;&#x6876;&#x7B97;&#x6CD5;&#x6846;&#x67B6;&#x56FE;</h3><p><strong>&#x73B0;&#x6709;&#x6846;&#x67B6;&#x56FE;&#xFF1A;</strong></p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-a5c9368ebffc0c96.png" alt="img"></p>
+<p>ceph_qos2.png</p>
+<p><strong>&#x4EE4;&#x724C;&#x56FE;&#x7B97;&#x6CD5;&#x6846;&#x67B6;&#x56FE;&#xFF1A;</strong></p>
+<p><img src="/2018/09/19/Ceph&#x4ECB;&#x7ECD;&#x53CA;&#x539F;&#x7406;&#x67B6;&#x6784;&#x5206;&#x4EAB;/2099201-da583f0fc10fbd87.png" alt="img"></p>
+<p>ceph_qos_token2.png</p>
+<h1 id="&#x6765;&#x81EA;"><a href="#&#x6765;&#x81EA;" class="headerlink" title="&#x6765;&#x81EA;"></a>&#x6765;&#x81EA;</h1><p><a href="https://www.jianshu.com/p/cc3ece850433" target="_blank" rel="noopener">https://www.jianshu.com/p/cc3ece850433</a></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2018\09\21\分布式存储Ceph之PG状态详解\" rel="bookmark">分布式存储Ceph之PG状态详解</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/ceph/" rel="tag"><i class="fa fa-tag"></i> ceph</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2018/09/18/CentOS7系统优化/" rel="next" title="CentOS7系统优化">
+                  <i class="fa fa-chevron-left"></i> CentOS7系统优化
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2018/09/21/分布式存储Ceph之PG状态详解/" rel="prev" title="分布式存储Ceph之PG状态详解">
+                  分布式存储Ceph之PG状态详解 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Ceph架构简介及使用场景介绍"><span class="nav-number">1.</span> <span class="nav-text">1. Ceph架构简介及使用场景介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-Ceph简介"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Ceph简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-Ceph特点"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Ceph特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-Ceph架构"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 Ceph架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-Ceph核心组件及概念介绍"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 Ceph核心组件及概念介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-三种存储类型-块存储"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 三种存储类型-块存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-6-三种存储类型-文件存储"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 三种存储类型-文件存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-7-三种存储类型-对象存储"><span class="nav-number">1.7.</span> <span class="nav-text">1.7 三种存储类型-对象存储</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Ceph-IO流程及数据分布"><span class="nav-number">2.</span> <span class="nav-text">2. Ceph IO流程及数据分布</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-正常IO流程图"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 正常IO流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-新主IO流程图"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 新主IO流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Ceph-IO算法流程"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 Ceph IO算法流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-Ceph-IO伪代码流程"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 Ceph IO伪代码流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-Ceph-RBD-IO流程"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 Ceph RBD IO流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-Ceph-RBD-IO框架图"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 Ceph RBD IO框架图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-Ceph-Pool和PG分布情况"><span class="nav-number">2.7.</span> <span class="nav-text">2.7 Ceph Pool和PG分布情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-8-Ceph-数据扩容PG分布"><span class="nav-number">2.8.</span> <span class="nav-text">2.8 Ceph 数据扩容PG分布</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Ceph心跳机制"><span class="nav-number">3.</span> <span class="nav-text">3. Ceph心跳机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-心跳介绍"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 心跳介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-Ceph-心跳检测"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 Ceph 心跳检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-Ceph-OSD之间相互心跳检测"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 Ceph OSD之间相互心跳检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-Ceph-OSD与Mon心跳检测"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 Ceph OSD与Mon心跳检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-Ceph心跳检测总结"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 Ceph心跳检测总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Ceph通信框架"><span class="nav-number">4.</span> <span class="nav-text">4. Ceph通信框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-Ceph通信框架种类介绍"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 Ceph通信框架种类介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-Ceph通信框架设计模式"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 Ceph通信框架设计模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-Ceph通信框架流程图"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 Ceph通信框架流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-Ceph通信框架类图"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 Ceph通信框架类图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-Ceph通信数据格式"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 Ceph通信数据格式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Ceph-CRUSH算法"><span class="nav-number">5.</span> <span class="nav-text">5. Ceph CRUSH算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-数据分布算法挑战"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 数据分布算法挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-Ceph-CRUSH算法说明"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 Ceph CRUSH算法说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-Ceph-CRUSH算法原理"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 Ceph CRUSH算法原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-1-层级化的Cluster-Map"><span class="nav-number">5.3.1.</span> <span class="nav-text">5.3.1 层级化的Cluster Map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-2-数据分布策略Placement-Rules"><span class="nav-number">5.3.2.</span> <span class="nav-text">5.3.2 数据分布策略Placement Rules</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-3-Bucket随机算法类型"><span class="nav-number">5.4.</span> <span class="nav-text">5.3.3 Bucket随机算法类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-CRUSH算法案例"><span class="nav-number">5.5.</span> <span class="nav-text">5.4 CRUSH算法案例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-定制化Ceph-RBD-QOS"><span class="nav-number">6.</span> <span class="nav-text">6. 定制化Ceph RBD QOS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-QOS介绍"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 QOS介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-Ceph-IO操作类型"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 Ceph IO操作类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-Ceph-官方QOS原理"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 Ceph 官方QOS原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-定制化QOS原理"><span class="nav-number">6.4.</span> <span class="nav-text">6.4 定制化QOS原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-1-令牌桶算法介绍"><span class="nav-number">6.4.1.</span> <span class="nav-text">6.4.1 令牌桶算法介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-2-RBD令牌桶算法流程"><span class="nav-number">6.4.2.</span> <span class="nav-text">6.4.2 RBD令牌桶算法流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-3-RBD令牌桶算法框架图"><span class="nav-number">6.4.3.</span> <span class="nav-text">6.4.3 RBD令牌桶算法框架图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#来自"><span class="nav-number">7.</span> <span class="nav-text">来自</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@cszhi.com" title="E-Mail &rarr; mailto:cszhi@cszhi.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2011 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">382k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">15:54</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '091529c38ad591e045ce',
+      clientSecret: 'b66b5ffda0604e75b3d6d4e74d8658e8dfea76a4',
+      repo: 'cszhi.github.io',
+      owner: 'cszhi',
+      admin: ['cszhi'],
+      id: 'df97bf1ebf2ac80d63f83011c196caba',
+        language: 'zh-CN',
+      
+      distractionFreeMode: 'false'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
