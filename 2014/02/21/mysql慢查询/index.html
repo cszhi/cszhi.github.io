@@ -332,14 +332,14 @@
 <li>log_output&#xFF1A;&#x65E5;&#x5FD7;&#x5B58;&#x50A8;&#x65B9;&#x5F0F;&#x3002;log_output=&#x2019;FILE&#x2019;&#x8868;&#x793A;&#x5C06;&#x65E5;&#x5FD7;&#x5B58;&#x5165;&#x6587;&#x4EF6;&#xFF0C;&#x9ED8;&#x8BA4;&#x503C;&#x662F;&#x2019;FILE&#x2019;&#x3002;log_output=&#x2019;TABLE&#x2019;&#x8868;&#x793A;&#x5C06;&#x65E5;&#x5FD7;&#x5B58;&#x5165;&#x6570;&#x636E;&#x5E93;&#x3002;</li>
 </ul>
 <h3 id="&#x914D;&#x7F6E;"><a href="#&#x914D;&#x7F6E;" class="headerlink" title="&#x914D;&#x7F6E;"></a>&#x914D;&#x7F6E;</h3><h4 id="slow-query-log"><a href="#slow-query-log" class="headerlink" title="slow_query_log"></a>slow_query_log</h4><p>&#x9ED8;&#x8BA4;&#x60C5;&#x51B5;&#x4E0B;slow_query_log&#x7684;&#x503C;&#x4E3A;OFF&#xFF0C;&#x8868;&#x793A;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x662F;&#x7981;&#x7528;&#x7684;&#xFF0C;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x8BBE;&#x7F6E;slow_query_log&#x7684;&#x503C;&#x6765;&#x5F00;&#x542F;&#xFF0C;&#x5982;&#x4E0B;&#x6240;&#x793A;&#xFF1A;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables  like &apos;%slow_query_log%&apos;;</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | Variable_name       | Value                                         |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | slow_query_log      | OFF                                           |</span><br><span class="line"> | slow_query_log_file | /home/WDPM/MysqlData/mysql/DB-Server-slow.log |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> 2 rows in set (0.00 sec)</span><br><span class="line">mysql&gt; set global slow_query_log=1;</span><br><span class="line"> Query OK, 0 rows affected (0.09 sec)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables  like &apos;%slow_query_log%&apos;;</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | Variable_name       | Value                                         |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | slow_query_log      | OFF                                           |</span><br><span class="line"> | slow_query_log_file | /data/mysql/node1-slow.log |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> 2 rows in set (0.00 sec)</span><br><span class="line">mysql&gt; set global slow_query_log=1;</span><br><span class="line"> Query OK, 0 rows affected (0.09 sec)</span><br></pre></td></tr></table></figure>
 
 <p>&#x4F7F;&#x7528;set global slow_query_log=1&#x5F00;&#x542F;&#x4E86;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x53EA;&#x5BF9;&#x5F53;&#x524D;&#x6570;&#x636E;&#x5E93;&#x751F;&#x6548;&#xFF0C;MySQL&#x91CD;&#x542F;&#x540E;&#x5219;&#x4F1A;&#x5931;&#x6548;&#x3002;<br>&#x5982;&#x679C;&#x8981;&#x6C38;&#x4E45;&#x751F;&#x6548;&#xFF0C;&#x5C31;&#x5FC5;&#x987B;&#x4FEE;&#x6539;&#x914D;&#x7F6E;&#x6587;&#x4EF6;my.cnf&#xFF08;&#x5176;&#x5B83;&#x7CFB;&#x7EDF;&#x53D8;&#x91CF;&#x4E5F;&#x662F;&#x5982;&#x6B64;&#xFF09;&#x3002;<br>my.cnf&#x8981;&#x589E;&#x52A0;&#x6216;&#x4FEE;&#x6539;&#x53C2;&#x6570;slow_query_log &#x548C;slow_query_log_file&#xFF0C;&#x5982;&#x4E0B;&#x6240;&#x793A;</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">slow_query_log = 1</span><br><span class="line">slow_query_log_file = /tmp/mysql_slow.log</span><br></pre></td></tr></table></figure>
 
 <p>&#x7136;&#x540E;&#x91CD;&#x542F;MySQL&#x670D;&#x52A1;&#x5668;&#x3002;</p>
 <h4 id="slow-query-log-file"><a href="#slow-query-log-file" class="headerlink" title="slow_query_log_file"></a>slow_query_log_file</h4><p>&#x8FD9;&#x4E2A;&#x53C2;&#x6570;&#x7528;&#x4E8E;&#x6307;&#x5B9A;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x7684;&#x5B58;&#x653E;&#x8DEF;&#x5F84;&#xFF0C;&#x7F3A;&#x7701;&#x60C5;&#x51B5;&#x662F;host_name-slow.log&#x6587;&#x4EF6;&#xFF0C;</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like &apos;slow_query_log_file&apos;;</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | Variable_name       | Value                                         |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | slow_query_log_file | /home/WDPM/MysqlData/mysql/DB-Server-slow.log |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> 1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like &apos;slow_query_log_file&apos;;</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | Variable_name       | Value                                         |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> | slow_query_log_file | /data/mysql/node1-slow.log |</span><br><span class="line"> +---------------------+-----------------------------------------------+</span><br><span class="line"> 1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
 
 <h4 id="long-query-time"><a href="#long-query-time" class="headerlink" title="long_query_time"></a>long_query_time</h4><p>&#x5F00;&#x542F;&#x4E86;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x540E;&#xFF0C;&#x4EC0;&#x4E48;&#x6837;&#x7684;SQL&#x624D;&#x4F1A;&#x8BB0;&#x5F55;&#x5230;&#x6162;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x91CC;&#x9762;&#x5462;&#xFF1F;<br>&#x8FD9;&#x4E2A;&#x662F;&#x7531;&#x53C2;&#x6570;long_query_time&#x63A7;&#x5236;&#xFF0C;&#x9ED8;&#x8BA4;&#x60C5;&#x51B5;&#x4E0B;long_query_time&#x7684;&#x503C;&#x4E3A;10&#x79D2;&#xFF0C;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x547D;&#x4EE4;&#x4FEE;&#x6539;&#xFF0C;&#x4E5F;&#x53EF;&#x4EE5;&#x5728;my.cnf&#x53C2;&#x6570;&#x91CC;&#x9762;&#x4FEE;&#x6539;&#x3002;<br>&#x5173;&#x4E8E;&#x8FD0;&#x884C;&#x65F6;&#x95F4;&#x6B63;&#x597D;&#x7B49;&#x4E8E;long_query_time&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x5E76;&#x4E0D;&#x4F1A;&#x88AB;&#x8BB0;&#x5F55;&#x4E0B;&#x6765;&#x3002;<br>&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#xFF0C;&#x5728;mysql&#x6E90;&#x7801;&#x91CC;&#x662F;&#x5224;&#x65AD;&#x5927;&#x4E8E;long_query_time&#xFF0C;&#x800C;&#x975E;&#x5927;&#x4E8E;&#x7B49;&#x4E8E;&#x3002;<br>&#x4ECE;MySQL 5.1&#x5F00;&#x59CB;&#xFF0C;long_query_time&#x5F00;&#x59CB;&#x4EE5;&#x5FAE;&#x79D2;&#x8BB0;&#x5F55;SQL&#x8BED;&#x53E5;&#x8FD0;&#x884C;&#x65F6;&#x95F4;&#xFF0C;&#x4E4B;&#x524D;&#x4EC5;&#x7528;&#x79D2;&#x4E3A;&#x5355;&#x4F4D;&#x8BB0;&#x5F55;&#x3002;<br>&#x5982;&#x679C;&#x8BB0;&#x5F55;&#x5230;&#x8868;&#x91CC;&#x9762;&#xFF0C;&#x53EA;&#x4F1A;&#x8BB0;&#x5F55;&#x6574;&#x6570;&#x90E8;&#x5206;&#xFF0C;&#x4E0D;&#x4F1A;&#x8BB0;&#x5F55;&#x5FAE;&#x79D2;&#x90E8;&#x5206;&#x3002;</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like &apos;long_query_time%&apos;;</span><br><span class="line"> +-----------------+-----------+</span><br><span class="line"> | Variable_name   | Value     |</span><br><span class="line"> +-----------------+-----------+</span><br><span class="line"> | long_query_time | 10.000000 |</span><br><span class="line"> +-----------------+-----------+</span><br><span class="line"> 1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; set global long_query_time=4;</span><br><span class="line"> Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; show variables like &apos;long_query_time&apos;;</span><br><span class="line"> +-----------------+-----------+</span><br><span class="line"> | Variable_name   | Value     |</span><br><span class="line"> +-----------------+-----------+</span><br><span class="line"> | long_query_time | 10.000000 |</span><br><span class="line"> +-----------------+-----------+</span><br><span class="line"> 1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
@@ -554,14 +554,14 @@ range checked for eache record(index map:N)&#xFF1A;&#x6CA1;&#x6709;&#x597D;&#x76
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\08\MySQL忘记root密码后强制修改密码的方法\" rel="bookmark">MySQL忘记root密码后强制修改密码的方法</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\08\MySQL忘记root密码后强制修改密码的方法\" rel="bookmark">MySQL忘记root密码后强制修改密码的方法</a></div>
+      <div class="popular-posts-title"><a href="\2012\01\29\MySQL将显示结果输出到文件\" rel="bookmark">MySQL将显示结果输出到文件</a></div>
       
     </li>
   
@@ -675,7 +675,7 @@ range checked for eache record(index map:N)&#xFF1A;&#x6CA1;&#x6709;&#x597D;&#x76
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-count">62</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -701,7 +701,7 @@ range checked for eache record(index map:N)&#xFF1A;&#x6CA1;&#x6709;&#x597D;&#x76
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -760,12 +760,12 @@ range checked for eache record(index map:N)&#xFF1A;&#x6CA1;&#x6709;&#x597D;&#x76
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">403k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">15:54</span>
+    <span title="站点阅读时长">16:47</span>
 </div>
 
         

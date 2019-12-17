@@ -66,7 +66,7 @@
 <meta property="og:site_name" content="csz&#39;s blog">
 <meta property="og:description" content="&amp;#x65E5;&amp;#x5FD7;&amp;#x7CFB;&amp;#x7EDF;&amp;#x5728;&amp;#x7CFB;&amp;#x7EDF;&amp;#x53D1;&amp;#x751F;&amp;#x6545;&amp;#x969C;&amp;#x65F6;&amp;#xFF0C;&amp;#x5DE5;&amp;#x7A0B;&amp;#x5E08;&amp;#x9700;&amp;#x8981;&amp;#x767B;&amp;#x5F55;&amp;#x5230;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E0A;">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-01T07:38:00.291Z">
+<meta property="og:updated_time" content="2019-11-26T06:20:35.456Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ELK介绍与部署">
 <meta name="twitter:description" content="&amp;#x65E5;&amp;#x5FD7;&amp;#x7CFB;&amp;#x7EDF;&amp;#x5728;&amp;#x7CFB;&amp;#x7EDF;&amp;#x53D1;&amp;#x751F;&amp;#x6545;&amp;#x969C;&amp;#x65F6;&amp;#xFF0C;&amp;#x5DE5;&amp;#x7A0B;&amp;#x5E08;&amp;#x9700;&amp;#x8981;&amp;#x767B;&amp;#x5F55;&amp;#x5230;&amp;#x670D;&amp;#x52A1;&amp;#x5668;&amp;#x4E0A;">
@@ -378,7 +378,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br></pre></td></tr></table></figure>
 
 <p>&#x914D;&#x7F6E;Elasticsearch&#x7684;yum&#x6E90;</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@elk1 ~]<span class="comment"># vi /etc/yum.repos.d/elasticsearch.repo</span></span><br><span class="line">[elasticsearch-7.x]</span><br><span class="line">name=Elasticsearch repository <span class="keyword">for</span> 7.x packages</span><br><span class="line">baseurl=https://artifacts.elastic.co/packages/7.x/yum</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">enabled=1</span><br><span class="line">autorefresh=1</span><br><span class="line"><span class="built_in">type</span>=rpm-md</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@elk1 ~]<span class="comment"># vi /etc/yum.repos.d/elasticsearch.repo</span></span><br><span class="line">[elasticsearch-7.x]</span><br><span class="line">name=Elasticsearch repository <span class="keyword">for</span> 7.x packages</span><br><span class="line">baseurl=https://artifacts.elastic.co/packages/7.x/yum</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">enabled=1</span><br><span class="line">autorefresh=1</span><br><span class="line"><span class="built_in">type</span>=rpm-md</span><br></pre></td></tr></table></figure>
 
 <p>&#x4E09;&#x53F0;&#x670D;&#x52A1;&#x5668;&#x6267;&#x884C;</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install elasticsearch</span><br></pre></td></tr></table></figure>
@@ -688,7 +688,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-count">62</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -714,7 +714,7 @@
             <a href="/tags/">
           
         
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">30</span>
         <span class="site-state-item-name">标签</span>
         </a>
       </div>
@@ -773,12 +773,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">403k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">15:54</span>
+    <span title="站点阅读时长">16:47</span>
 </div>
 
         

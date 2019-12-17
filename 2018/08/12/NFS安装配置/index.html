@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":"mac"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: true,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="&amp;#x5B89;&amp;#x88C5;nfs1yum install -y nfs-utils rpcbind  &amp;#x521B;&amp;#x5EFA;&amp;#x5171;&amp;#x4EAB;&amp;#x76EE;&amp;#x5F55;&amp;#x5C06;&amp;#x6587;&amp;#x4EF6;&amp;#x6240;&amp;#x6709;&amp;#x8005;&amp;#x6307;&amp;#x5B9A;&amp;#x4E3A;nfsnobody&amp;#x3002;nfsnobody">
+<meta name="keywords" content="nfs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NFS安装配置">
+<meta property="og:url" content="http://blogs.cszhi.com/2018/08/12/NFS安装配置/index.html">
+<meta property="og:site_name" content="csz&#39;s blog">
+<meta property="og:description" content="&amp;#x5B89;&amp;#x88C5;nfs1yum install -y nfs-utils rpcbind  &amp;#x521B;&amp;#x5EFA;&amp;#x5171;&amp;#x4EAB;&amp;#x76EE;&amp;#x5F55;&amp;#x5C06;&amp;#x6587;&amp;#x4EF6;&amp;#x6240;&amp;#x6709;&amp;#x8005;&amp;#x6307;&amp;#x5B9A;&amp;#x4E3A;nfsnobody&amp;#x3002;nfsnobody">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://blogs.cszhi.com/2018/08/12/NFS安装配置/1575965111625.png">
+<meta property="og:updated_time" content="2019-12-17T03:15:06.942Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NFS安装配置">
+<meta name="twitter:description" content="&amp;#x5B89;&amp;#x88C5;nfs1yum install -y nfs-utils rpcbind  &amp;#x521B;&amp;#x5EFA;&amp;#x5171;&amp;#x4EAB;&amp;#x76EE;&amp;#x5F55;&amp;#x5C06;&amp;#x6587;&amp;#x4EF6;&amp;#x6240;&amp;#x6709;&amp;#x8005;&amp;#x6307;&amp;#x5B9A;&amp;#x4E3A;nfsnobody&amp;#x3002;nfsnobody">
+<meta name="twitter:image" content="http://blogs.cszhi.com/2018/08/12/NFS安装配置/1575965111625.png">
+  <link rel="canonical" href="http://blogs.cszhi.com/2018/08/12/NFS安装配置/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>NFS安装配置 | csz's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">csz's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2018/08/12/NFS安装配置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="csz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="csz's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">NFS安装配置
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2018-08-12 00:00:00" itemprop="dateCreated datePublished" datetime="2018-08-12T00:00:00+08:00">2018-08-12</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术/" itemprop="url" rel="index"><span itemprop="name">技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              
+              <span>14 分钟</span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="&#x5B89;&#x88C5;nfs"><a href="#&#x5B89;&#x88C5;nfs" class="headerlink" title="&#x5B89;&#x88C5;nfs"></a>&#x5B89;&#x88C5;nfs</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y nfs-utils rpcbind</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x521B;&#x5EFA;&#x5171;&#x4EAB;&#x76EE;&#x5F55;"><a href="#&#x521B;&#x5EFA;&#x5171;&#x4EAB;&#x76EE;&#x5F55;" class="headerlink" title="&#x521B;&#x5EFA;&#x5171;&#x4EAB;&#x76EE;&#x5F55;"></a>&#x521B;&#x5EFA;&#x5171;&#x4EAB;&#x76EE;&#x5F55;</h3><p>&#x5C06;&#x6587;&#x4EF6;&#x6240;&#x6709;&#x8005;&#x6307;&#x5B9A;&#x4E3A;nfsnobody&#x3002;nfsnobody&#x7528;&#x6237;&#x5728;&#x5B89;&#x88C5;nfs&#x65F6;&#x4F1A;&#x81EA;&#x52A8;&#x521B;&#x5EFA;&#x3002;</p>
+<p>&#x5982;&#x679C;&#x4E0D;&#x6307;&#x5B9A;&#x5171;&#x4EAB;&#x7528;&#x6237;&#xFF0C;&#x5219;nfs&#x7CFB;&#x7EDF;&#x5728;&#x5206;&#x914D;&#x6743;&#x9650;&#x65F6;&#x4F1A;&#x4EE5;&#x7528;&#x6237;uid&#x4E3A;&#x4E3B;&#xFF0C;&#x5BA2;&#x6237;&#x7AEF;&#x5982;&#x679C;&#x7528;root&#x8D26;&#x6237;&#x4F1A;&#x5728;&#x670D;&#x52A1;&#x5668;&#x88AB;&#x81EA;&#x52A8;&#x964D;&#x7EA7;&#x81F3;nfsnobody&#x3002;</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir  -p /data/nfs</span><br><span class="line">chown -R nfsnobody:nfsnobody /data/nfs</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<h3 id="&#x914D;&#x7F6E;"><a href="#&#x914D;&#x7F6E;" class="headerlink" title="&#x914D;&#x7F6E;"></a>&#x914D;&#x7F6E;</h3><h4 id="server&#x914D;&#x7F6E;&#x6587;&#x4EF6;"><a href="#server&#x914D;&#x7F6E;&#x6587;&#x4EF6;" class="headerlink" title="server&#x914D;&#x7F6E;&#x6587;&#x4EF6;"></a>server&#x914D;&#x7F6E;&#x6587;&#x4EF6;</h4><p>&#x683C;&#x5F0F;&#xFF1A;&#x5171;&#x4EAB;&#x76EE;&#x5F55;     &#x6307;&#x5B9A;&#x5171;&#x4EAB;&#x5BF9;&#x8C61;(&#x5171;&#x4EAB;&#x53C2;&#x6570;)</p>
+<p>&#x4F8B;&#xFF1A; /data   192.168.1.0/24(rw,sync)</p>
+<p>&#x5C06; /data  &#x5171;&#x4EAB;&#x7ED9;192.168.1.x &#xFF0C;&#x5BA2;&#x6237;&#x7AEF;&#x6743;&#x9650;rw</p>
+<p>&#x5176;&#x4E2D;&#x5171;&#x4EAB;&#x5BF9;&#x8C61;&#x53EF;&#x4EE5;&#x7528;&#x901A;&#x914D;&#x7B26;&#xFF0C;&#x6BD4;&#x5982; * &#x4EE3;&#x8868;&#x6240;&#x6709;&#x5730;&#x5740;&#x3002;</p>
+<h4 id="&#x914D;&#x7F6E;&#x53C2;&#x6570;"><a href="#&#x914D;&#x7F6E;&#x53C2;&#x6570;" class="headerlink" title="&#x914D;&#x7F6E;&#x53C2;&#x6570;"></a>&#x914D;&#x7F6E;&#x53C2;&#x6570;</h4><ul>
+<li><p>rw&#xFF1A; &#x8BFB;&#x5199;</p>
+</li>
+<li><p>ro &#xFF1A;&#x53EA;&#x8BFB;</p>
+</li>
+<li><p>sync&#xFF1A;&#x5C06;&#x6570;&#x636E;&#x540C;&#x6B65;&#x5199;&#x5165;&#x5185;&#x5B58;&#x7F13;&#x51B2;&#x533A;&#x4E0E;&#x78C1;&#x76D8;&#x4E2D;&#xFF0C;&#x6548;&#x7387;&#x4F4E;&#xFF0C;&#x4F46;&#x53EF;&#x4EE5;&#x4FDD;&#x8BC1;&#x6570;&#x636E;&#x7684;&#x4E00;&#x81F4;&#x6027;&#xFF1B;</p>
+</li>
+<li><p>async&#xFF1A;&#x662F;&#x5927;&#x6570;&#x636E;&#x65F6;&#x4F7F;&#x7528;&#xFF0C;&#x662F;&#x5148;&#x5199;&#x5230;&#x7F13;&#x5B58;&#x533A;&#xFF0C;&#x5FC5;&#x8981;&#x65F6;&#x518D;&#x5199;&#x5230;&#x78C1;&#x76D8;&#x91CC;&#x3002;</p>
+</li>
+<li><p>all_squash&#xFF1A;&#x6240;&#x6709;&#x8BBF;&#x95EE;&#x7528;&#x6237;&#x90FD;&#x6620;&#x5C04;&#x4E3A;&#x533F;&#x540D;&#x7528;&#x6237;&#x6216;&#x7528;&#x6237;&#x7EC4;&#xFF1B;<br>no_all_squash&#xFF08;&#x9ED8;&#x8BA4;&#xFF09;&#xFF1A;&#x8BBF;&#x95EE;&#x7528;&#x6237;&#x5148;&#x4E0E;&#x672C;&#x673A;&#x7528;&#x6237;&#x5339;&#x914D;&#xFF0C;&#x5339;&#x914D;&#x5931;&#x8D25;&#x540E;&#x518D;&#x6620;&#x5C04;&#x4E3A;&#x533F;&#x540D;&#x7528;&#x6237;&#x6216;&#x7528;&#x6237;&#x7EC4;&#xFF1B;</p>
+</li>
+<li><p>root_squash&#xFF08;&#x9ED8;&#x8BA4;&#xFF09;&#xFF1A;&#x5C06;&#x6765;&#x8BBF;&#x7684;root&#x7528;&#x6237;&#x6620;&#x5C04;&#x4E3A;&#x533F;&#x540D;&#x7528;&#x6237;&#x6216;&#x7528;&#x6237;&#x7EC4;&#xFF1B;<br>no_root_squash&#xFF1A;&#x6765;&#x8BBF;&#x7684;root&#x7528;&#x6237;&#x4FDD;&#x6301;root&#x5E10;&#x53F7;&#x6743;&#x9650;&#xFF1B;</p>
+</li>
+<li><p>wdelay&#xFF08;&#x9ED8;&#x8BA4;&#xFF09;&#xFF1A;&#x68C0;&#x67E5;&#x662F;&#x5426;&#x6709;&#x76F8;&#x5173;&#x7684;&#x5199;&#x64CD;&#x4F5C;&#xFF0C;&#x5982;&#x679C;&#x6709;&#x5219;&#x5C06;&#x8FD9;&#x4E9B;&#x5199;&#x64CD;&#x4F5C;&#x4E00;&#x8D77;&#x6267;&#x884C;&#xFF0C;&#x8FD9;&#x6837;&#x53EF;&#x4EE5;&#x63D0;&#x9AD8;&#x6548;&#x7387;&#xFF1B;<br>no_wdelay&#xFF1A;&#x82E5;&#x6709;&#x5199;&#x64CD;&#x4F5C;&#x5219;&#x7ACB;&#x5373;&#x6267;&#x884C;&#xFF0C;&#x5E94;&#x4E0E;sync&#x914D;&#x5408;&#x4F7F;&#x7528;&#xFF1B;</p>
+</li>
+<li><p>subtree_check &#xFF1A;&#x82E5;&#x8F93;&#x51FA;&#x76EE;&#x5F55;&#x662F;&#x4E00;&#x4E2A;&#x5B50;&#x76EE;&#x5F55;&#xFF0C;&#x5219;nfs&#x670D;&#x52A1;&#x5668;&#x5C06;&#x68C0;&#x67E5;&#x5176;&#x7236;&#x76EE;&#x5F55;&#x7684;&#x6743;&#x9650;&#xFF1B;<br>no_subtree_check&#xFF08;&#x9ED8;&#x8BA4;&#xFF09;&#xFF1A;&#x5373;&#x4F7F;&#x8F93;&#x51FA;&#x76EE;&#x5F55;&#x662F;&#x4E00;&#x4E2A;&#x5B50;&#x76EE;&#x5F55;&#xFF0C;nfs&#x670D;&#x52A1;&#x5668;&#x4E5F;&#x4E0D;&#x68C0;&#x67E5;&#x5176;&#x7236;&#x76EE;&#x5F55;&#x7684;&#x6743;&#x9650;&#xFF0C;&#x8FD9;&#x6837;&#x53EF;&#x4EE5;&#x63D0;&#x9AD8;&#x6548;&#x7387;&#xFF1B;</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# cat /etc/exports</span><br><span class="line">/data/nfs 10.10.16.0/22(rw)</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x542F;&#x52A8;&#x670D;&#x52A1;"><a href="#&#x542F;&#x52A8;&#x670D;&#x52A1;" class="headerlink" title="&#x542F;&#x52A8;&#x670D;&#x52A1;"></a>&#x542F;&#x52A8;&#x670D;&#x52A1;</h3><p>&#x6CE8;&#x610F;&#x5148;&#x542F;&#x52A8;rpcbind&#x518D;&#x542F;&#x52A8;nfs</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">service rpcbind start</span><br><span class="line">service nfs start</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x67E5;&#x8BE2;nfs&#x6302;&#x8F7D;"><a href="#&#x67E5;&#x8BE2;nfs&#x6302;&#x8F7D;" class="headerlink" title="&#x67E5;&#x8BE2;nfs&#x6302;&#x8F7D;"></a>&#x67E5;&#x8BE2;nfs&#x6302;&#x8F7D;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">showmount  -e</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x67E5;&#x770B;&#x5171;&#x4EAB;&#x76EE;&#x5F55;&#x53C2;&#x6570;"><a href="#&#x67E5;&#x770B;&#x5171;&#x4EAB;&#x76EE;&#x5F55;&#x53C2;&#x6570;" class="headerlink" title="&#x67E5;&#x770B;&#x5171;&#x4EAB;&#x76EE;&#x5F55;&#x53C2;&#x6570;"></a>&#x67E5;&#x770B;&#x5171;&#x4EAB;&#x76EE;&#x5F55;&#x53C2;&#x6570;</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /var/lib/nfs/etab</span><br></pre></td></tr></table></figure>
+
+<h3 id="&#x5BA2;&#x6237;&#x7AEF;"><a href="#&#x5BA2;&#x6237;&#x7AEF;" class="headerlink" title="&#x5BA2;&#x6237;&#x7AEF;"></a>&#x5BA2;&#x6237;&#x7AEF;</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost nova]<span class="comment"># mount -t nfs 10.10.16.182:/data/nfs /nfs</span></span><br><span class="line">[root@localhost nova]<span class="comment"># df -h</span></span><br><span class="line">Filesystem              Size  Used Avail Use% Mounted on</span><br><span class="line">devtmpfs                 59G     0   59G   0% /dev</span><br><span class="line">tmpfs                    59G     0   59G   0% /dev/shm</span><br><span class="line">tmpfs                    59G  4.1G   55G   7% /run</span><br><span class="line">tmpfs                    59G     0   59G   0% /sys/fs/cgroup</span><br><span class="line">/dev/sda3               246G  5.9G  240G   3% /</span><br><span class="line">/dev/sda1              1014M  142M  872M  15% /boot</span><br><span class="line">tmpfs                    12G     0   12G   0% /run/user/0</span><br><span class="line">10.10.16.182:/data/nfs  1.8T   76M  1.7T   1% /nfs</span><br></pre></td></tr></table></figure>
+
+<h4 id="&#x5BA2;&#x6237;&#x7AEF;&#x6302;&#x8F7D;&#x4F18;&#x5316;&#x53C2;&#x6570;"><a href="#&#x5BA2;&#x6237;&#x7AEF;&#x6302;&#x8F7D;&#x4F18;&#x5316;&#x53C2;&#x6570;" class="headerlink" title="&#x5BA2;&#x6237;&#x7AEF;&#x6302;&#x8F7D;&#x4F18;&#x5316;&#x53C2;&#x6570;"></a>&#x5BA2;&#x6237;&#x7AEF;&#x6302;&#x8F7D;&#x4F18;&#x5316;&#x53C2;&#x6570;</h4><ul>
+<li><p>noatime       &#x4E0D;&#x66F4;&#x65B0;&#x6587;&#x4EF6;&#x7684;inode&#x8BBF;&#x95EE;&#x65F6;&#x95F4;&#x6233;&#xFF0C;&#x6587;&#x4EF6;&#x5F88;&#x591A;&#x65F6;&#x6B64;&#x53C2;&#x6570;&#x53EF;&#x4EE5;&#x63D0;&#x9AD8;&#x6548;&#x7387;&#x3002;</p>
+</li>
+<li><p>nodiratime   &#x4E0D;&#x66F4;&#x65B0;&#x76EE;&#x5F55;&#x7684;&#x8BBF;&#x95EE;&#x65F6;&#x95F4;&#x6233;&#xFF0C;&#x540C;&#x4E0A;&#x3002;</p>
+</li>
+<li><p>nosuid         &#x5173;&#x95ED;&#x6302;&#x8F7D;&#x76EE;&#x5F55;&#x7684;suid</p>
+</li>
+<li><p>noexec        &#x4E0D;&#x5141;&#x8BB8;&#x6267;&#x884C;&#x4E8C;&#x8FDB;&#x5236;&#x6587;&#x4EF6;&#x3002;shell&#x811A;&#x672C;&#x65E0;&#x6CD5;&#x76F4;&#x63A5;&#x4F7F;&#x7528;&#xFF0C;&#x4F46;&#x662F;&#x7528;sh  xxx.sh&#x4F9D;&#x7136;&#x53EF;&#x4EE5;&#x8C03;&#x7528;&#x3002;</p>
+</li>
+<li><p>rsize           &#x7CFB;&#x7EDF;&#x6BCF;&#x6B21;&#x8BFB;&#x53D6;&#x7684;&#x6700;&#x5927;&#x5B57;&#x8282;&#xFF0C;centos6.5&#x9ED8;&#x8BA4;131072&#xFF0C;&#x6B64;&#x53C2;&#x6570;&#x8FC7;&#x5C0F;&#x4F1A;&#x5F71;&#x54CD;&#x7CFB;&#x7EDF;&#x7684;I/O&#x6548;&#x7387;.</p>
+</li>
+<li><p>wsize          &#x7CFB;&#x7EDF;&#x6BCF;&#x6B21;&#x5199;&#x5165;&#x7684;&#x6700;&#x5927;&#x5B57;&#x8282;&#xFF0C;&#x540C;&#x4E0A;</p>
+</li>
+<li><p>defaults &#x4F7F;&#x7528;&#x9ED8;&#x8BA4;&#x7684;&#x9009;&#x9879;&#x3002;&#x9ED8;&#x8BA4;&#x9009;&#x9879;&#x4E3A;rw&#x3001;suid&#x3001;dev&#x3001;exec&#x3001;anto  nouser&#x4E0E;async&#x3002; </p>
+</li>
+<li><p>&#x4F8B;&#xFF1A; mount  -o  nosuid  noexec noatime   -t nfs  192.168.1.240:/data/nfs  /mnt</p>
+</li>
+</ul>
+<p>windows&#x5BA2;&#x6237;&#x7AEF;&#x914D;&#x7F6E;</p>
+<p><img src="/2018/08/12/NFS&#x5B89;&#x88C5;&#x914D;&#x7F6E;/1575965111625.png" alt="1575965111625"></p>
+<p>cmd&#x91CC;&#x76F4;&#x63A5;&#x8F93;&#x5165; mount 10.10.16.182:/data/nfs  z: </p>
+<p>&#x53C2;&#x8003;&#xFF1A;</p>
+<p><a href="https://www.cnblogs.com/sunny18/p/8287934.html" target="_blank" rel="noopener">https://www.cnblogs.com/sunny18/p/8287934.html</a></p>
+
+    </div>
+
+    
+    
+    
+      
+
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/nfs/" rel="tag"><i class="fa fa-tag"></i> nfs</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2018/04/22/Apache2.4+PHP7.1部署/" rel="next" title="Apache2.4+PHP7.1部署">
+                  <i class="fa fa-chevron-left"></i> Apache2.4+PHP7.1部署
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2018/09/18/CentOS7系统优化/" rel="prev" title="CentOS7系统优化">
+                  CentOS7系统优化 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="gitalk-container"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装nfs"><span class="nav-number">1.</span> <span class="nav-text">安装nfs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建共享目录"><span class="nav-number">2.</span> <span class="nav-text">创建共享目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置"><span class="nav-number">3.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#server配置文件"><span class="nav-number">3.1.</span> <span class="nav-text">server配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置参数"><span class="nav-number">3.2.</span> <span class="nav-text">配置参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动服务"><span class="nav-number">4.</span> <span class="nav-text">启动服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#查询nfs挂载"><span class="nav-number">4.1.</span> <span class="nav-text">查询nfs挂载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看共享目录参数"><span class="nav-number">4.2.</span> <span class="nav-text">查看共享目录参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端"><span class="nav-number">5.</span> <span class="nav-text">客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#客户端挂载优化参数"><span class="nav-number">5.1.</span> <span class="nav-text">客户端挂载优化参数</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="csz">
+  <p class="site-author-name" itemprop="name">csz</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/cszhi" title="GitHub &rarr; https://github.com/cszhi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:cszhi@cszhi.com" title="E-Mail &rarr; mailto:cszhi@cszhi.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2011 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">csz</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">403k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">16:47</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '091529c38ad591e045ce',
+      clientSecret: 'b66b5ffda0604e75b3d6d4e74d8658e8dfea76a4',
+      repo: 'cszhi.github.io',
+      owner: 'cszhi',
+      admin: ['cszhi'],
+      id: 'e247dd92c81f75d649d4fda9953167fe',
+        language: 'zh-CN',
+      
+      distractionFreeMode: 'false'
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+</script>
+
+</body>
+</html>
