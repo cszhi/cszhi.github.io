@@ -239,7 +239,7 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/01/29/MySQL将显示结果输出到文件/">
+    <link itemprop="mainEntityOfPage" href="http://blogs.cszhi.com/2012/01/29/dd指令的使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="csz">
@@ -253,7 +253,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
             
-            <a href="/2012/01/29/MySQL将显示结果输出到文件/" class="post-title-link" itemprop="url">MySQL将显示结果输出到文件</a>
+            <a href="/2012/01/29/dd指令的使用/" class="post-title-link" itemprop="url">dd指令的使用</a>
           
         </h1>
 
@@ -293,7 +293,7 @@
               
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               
-              <span>2 分钟</span>
+              <span>13 分钟</span>
             </span>
           
 
@@ -306,14 +306,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>1&#x3001;&#x5982;&#x679C;MYSQL&#x670D;&#x52A1;&#x5668;&#x5C31;&#x662F;&#x4F60;&#x8981;&#x5BFC;&#x51FA;&#x6587;&#x4EF6;&#x7684;&#x673A;&#x5668;&#xFF0C;&#x90A3;&#x4E48;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x7528;select &#x2026;into outfile&#x8BED;&#x53E5;&#x3002;</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from rank into outfile <span class="string">&quot;/home/a.txt&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>2&#x3001;&#x5982;&#x679C;MYSQL&#x670D;&#x52A1;&#x5668;&#x662F;&#x5355;&#x72EC;&#x7684;&#x673A;&#x5668;&#xFF0C;&#x6211;&#x4EEC;&#x662F;&#x5728;&#x4E00;&#x4E2A;client&#x4E0A;&#x8FDB;&#x884C;&#x64CD;&#x4F5C;&#xFF0C;&#x6211;&#x4EEC;&#x8981;&#x628A;&#x6570;&#x636E;&#x7ED3;&#x679C;&#x5BFC;&#x5165;&#x5230;client&#x673A;&#x5668;&#x4E0A;&#x3002;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;mysql -e&#x8BED;&#x53E5;&#x3002;</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -proot -P3306 -h10.35.13.89 dbname -e <span class="string">&quot;select * from rank&quot;</span> &gt; /home/a.txt</span><br></pre></td></tr></table></figure>
-
-<p>3&#x3001;&#x4F7F;&#x7528;mysql&#x7684;tee&#xFF08;T&#xFF09;&#x547D;&#x4EE4;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x628A;MYSQL&#x7684;&#x6240;&#x6709;&#x8F93;&#x51FA;&#x90FD;&#x8F93;&#x5165;&#x5230;&#x6307;&#x5B9A;&#x6587;&#x4EF6;&#x3002;</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt;tee /home/a.txt</span><br><span class="line">mysql&gt;select * from rank;</span><br><span class="line">mysql&gt;<span class="built_in">exit</span></span><br><span class="line">&#x6216;</span><br><span class="line">mysql&gt; \T output.txt</span><br><span class="line">Logging to file <span class="string">&apos;output.txt&apos;</span></span><br><span class="line">mysql&gt; \t</span><br><span class="line">Outfile disabled.</span><br></pre></td></tr></table></figure>
+          <p>dd &#x662F; Linux/UNIX &#x4E0B;&#x7684;&#x4E00;&#x4E2A;&#x975E;&#x5E38;&#x6709;&#x7528;&#x7684;&#x547D;&#x4EE4;&#xFF0C;&#x4F5C;&#x7528;&#x662F;&#x7528;&#x6307;&#x5B9A;&#x5927;&#x5C0F;&#x7684;&#x5757;&#x62F7;&#x8D1D;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#xFF0C;&#x5E76;&#x5728;&#x62F7;&#x8D1D;&#x7684;&#x540C;&#x65F6;&#x8FDB;&#x884C;&#x6307;&#x5B9A;&#x7684;&#x8F6C;&#x6362;&#x3002; </p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2012/01/29/dd指令的使用/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
@@ -327,35 +329,42 @@
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\10\MySQL备份方法总结\" rel="bookmark">MySQL备份方法总结</a></div>
+      <div class="popular-posts-title"><a href="\2012\04\22\简单的系统监控脚本\" rel="bookmark">简单的系统监控脚本</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2012\05\08\MySQL忘记root密码后强制修改密码的方法\" rel="bookmark">MySQL忘记root密码后强制修改密码的方法</a></div>
+      <div class="popular-posts-title"><a href="\2012\08\03\生产环境常见的HTTP状态码列表\" rel="bookmark">生产环境常见的HTTP状态码列表</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2019\08\29\mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解\" rel="bookmark">mysql sync_binlog innodb_flush_log_at_trx_commit 深入理解</a></div>
+      <div class="popular-posts-title"><a href="\2012\03\11\Linux下大文件跨网传输的方法\" rel="bookmark">Linux下大文件跨网传输的方法</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2019\02\23\MariaDB Galera Cluster\" rel="bookmark">MariaDB Galera Cluster</a></div>
+      <div class="popular-posts-title"><a href="\2012\03\12\rsync简明教程\" rel="bookmark">rsync简明教程</a></div>
       
     </li>
   
     <li class="popular-posts-item">
       
       
-      <div class="popular-posts-title"><a href="\2014\02\21\mysql慢查询\" rel="bookmark">mysql慢查询</a></div>
+      <div class="popular-posts-title"><a href="\2012\05\13\tar远程备份\" rel="bookmark">tar远程备份</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+      
+      <div class="popular-posts-title"><a href="\2012\04\18\test的用法与变量的测试替换\" rel="bookmark">test的用法与变量的测试替换</a></div>
       
     </li>
   
